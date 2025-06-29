@@ -146,7 +146,7 @@ export default function MemeTokenGaming() {
               <div className="w-40 h-2 bg-gradient-to-r from-orange-500 to-yellow-500 mx-auto mb-10 animate-pulse rounded-full shadow-lg" />
             </div>
 
-            <div className="relative inline-block group w-full px-2 sm:px-0">
+            <div className="relative inline-block group w-max-3xl px-2 sm:px-0">
               <Button
                 size="lg"
                 disabled
