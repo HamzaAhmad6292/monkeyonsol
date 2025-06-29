@@ -179,7 +179,7 @@ export default function MemeTokenGaming() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
             {[
-              { title: "Total Supply", value: "1,000,000,000", unit: "$MEME" },
+              { title: "Total Supply", value: "1,000,000,000", unit: "$MONKEY" },
               { title: "Liquidity Locked", value: "✅", unit: "SECURED" },
               { title: "Buy/Sell Tax", value: "0% / 0%", unit: "NO FEES" },
               { title: "Community-Owned", value: "100%", unit: "DECENTRALIZED" },
