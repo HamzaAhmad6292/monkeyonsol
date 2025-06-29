@@ -77,13 +77,13 @@ export default function MemeTokenGaming() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative z-10 min-h-[70vh] flex items-center justify-center px-6">
-        <div className="text-center max-w-6xl mx-auto">
+      <section className="relative z-10 min-h-[70vh] flex items-center justify-center px-2 sm:px-4">
+        <div className="text-center max-w-6xl mx-auto w-full">
           <div
             className={`transition-all duration-2000 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
           >
             {/* Header Image with Loading Animation */}
-            <div className="mb-16 relative">
+            <div className="mb-16 relative px-2 sm:px-4">
               <div className="relative overflow-hidden rounded-3xl border-4 border-orange-400/40 shadow-[0_8px_48px_0_rgba(251,146,60,0.25)]">
                 <img
                   src="/images/header1.jpg"
@@ -146,11 +146,11 @@ export default function MemeTokenGaming() {
               <div className="w-40 h-2 bg-gradient-to-r from-orange-500 to-yellow-500 mx-auto mb-10 animate-pulse rounded-full shadow-lg" />
             </div>
 
-            <div className="relative inline-block group">
+            <div className="relative inline-block group w-full px-2 sm:px-0">
               <Button
                 size="lg"
                 disabled
-                className="bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white font-extrabold italic py-5 px-16 text-2xl border-4 border-orange-400/60 shadow-2xl shadow-orange-500/25 animate-pulse cursor-not-allowed tracking-widest rounded-2xl"
+                className="w-full max-w-xs sm:max-w-none bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white font-extrabold italic py-5 px-6 sm:px-16 text-2xl border-4 border-orange-400/60 shadow-2xl shadow-orange-500/25 animate-pulse cursor-not-allowed tracking-widest rounded-2xl"
               >
                 <Zap className="mr-3 h-8 w-8" />
                 COMING SOON
@@ -189,7 +189,7 @@ export default function MemeTokenGaming() {
                 className="bg-black/60 border-4 border-orange-400/30 hover:border-yellow-400/60 transition-all duration-300 group hover:scale-105 rounded-2xl shadow-xl"
               >
                 <CardContent className="p-10 text-center">
-                  <div className="text-3xl lg:text-4xl font-extrabold italic text-orange-300 mb-3 group-hover:text-yellow-300 transition-colors tracking-wider drop-shadow">
+                  <div className="break-words text-3xl lg:text-4xl font-extrabold italic text-orange-300 mb-3 group-hover:text-yellow-300 transition-colors tracking-wider drop-shadow max-w-full">
                     {item.value}
                   </div>
                   <div className="text-white font-bold text-lg mb-2 uppercase tracking-wide">{item.title}</div>
