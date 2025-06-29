@@ -141,7 +141,7 @@ export default function MemeTokenGaming() {
 
             <div className="mb-12">
               <div className="text-5xl lg:text-7xl font-black italic text-white mb-4 drop-shadow-[0_2px_32px_orange] tracking-tight">
-                3D GALLERY <span className="bg-gradient-to-r from-orange-400 via-yellow-400 to-amber-300 bg-clip-text text-transparent">COMING SOON</span>
+                Enter 3D Space <span className="bg-gradient-to-r from-orange-400 via-yellow-400 to-amber-300 bg-clip-text text-transparent">(Coming Soon)</span>
               </div>
               <div className="w-40 h-2 bg-gradient-to-r from-orange-500 to-yellow-500 mx-auto mb-10 animate-pulse rounded-full shadow-lg" />
             </div>
