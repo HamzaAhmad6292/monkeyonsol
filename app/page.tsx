@@ -296,13 +296,13 @@ export default function MemeTokenGaming() {
               </div>
             </div>
             <div>
-              {/* <h2 className="text-5xl lg:text-6xl font-black italic mb-8 text-white drop-shadow-[0_2px_32px_orange] tracking-tight">
-                THE ARTISTIC{" "}
+              <h2 className="text-5xl lg:text-6xl font-black italic mb-8 text-white drop-shadow-[0_2px_32px_orange] tracking-tight">
+               MONKEY {" "}
                 <span className="bg-gradient-to-r from-orange-400 via-yellow-400 to-amber-300 bg-clip-text text-transparent">
-                  DOG
+                  LOVES
                 </span>{" "}
-                ON SOLANA
-              </h2> */}
+                DRAWING
+              </h2>
               <div className="flex gap-6 mb-8">
                 <div className="w-6 h-6 bg-orange-500 rounded-full animate-pulse shadow-lg" />
                 <div className="w-6 h-6 bg-yellow-500 rounded-full animate-pulse" style={{ animationDelay: "0.5s" }} />
