@@ -259,7 +259,8 @@ export default function MemeTokenGaming() {
                 <div className="w-6 h-6 bg-amber-600 rounded-full animate-pulse" style={{ animationDelay: "1s" }} />
               </div>
               <p className="text-lg lg:text-2xl text-orange-200 font-medium italic leading-relaxed drop-shadow">
-                Monkey’s owner, Omar Von Muller, a Hollywood pro trainer , <span className="text-yellow-300 font-bold">(The Artist, Once Upon a Time, Call of duty)</span>guides this Belgian Malinois to paint with joy. No 9-to-5 grind here—Monkey creates art when the mood strikes, making painting a fun hobby under Omar’s expert care. Happy tail, happy life
+                Experience the fusion of art and memes on Solana. <span className="text-yellow-300 font-bold">Monkey The Picasso</span> is not just a token, it's a movement. Join the revolution of creativity, community, and fun!
+                Monkey's Ferrari artwork was recently sold at auction for $15,000, 
                  
               </p>
             </div>
@@ -274,6 +275,43 @@ export default function MemeTokenGaming() {
                   }}
                 />
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="relative z-10 py-24 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="flex justify-center">
+              <div className="bg-gradient-to-r from-orange-900/80 via-black/80 to-yellow-900/80 rounded-3xl shadow-2xl shadow-orange-500/25 border-4 border-orange-400/40 p-2">
+                <img
+                  src="/images/dog_buttom_1.jpg"
+                  alt="Gallery Loading"
+                  className="w-full max-w-md mx-auto h-auto object-cover filter brightness-90 contrast-150 saturate-200 rounded-2xl"
+                  style={{
+                    mixBlendMode: "screen",
+                  }}
+                />
+              </div>
+            </div>
+            <div>
+              {/* <h2 className="text-5xl lg:text-6xl font-black italic mb-8 text-white drop-shadow-[0_2px_32px_orange] tracking-tight">
+                THE ARTISTIC{" "}
+                <span className="bg-gradient-to-r from-orange-400 via-yellow-400 to-amber-300 bg-clip-text text-transparent">
+                  DOG
+                </span>{" "}
+                ON SOLANA
+              </h2> */}
+              <div className="flex gap-6 mb-8">
+                <div className="w-6 h-6 bg-orange-500 rounded-full animate-pulse shadow-lg" />
+                <div className="w-6 h-6 bg-yellow-500 rounded-full animate-pulse" style={{ animationDelay: "0.5s" }} />
+                <div className="w-6 h-6 bg-amber-600 rounded-full animate-pulse" style={{ animationDelay: "1s" }} />
+              </div>
+              <p className="text-lg lg:text-2xl text-orange-200 font-medium italic leading-relaxed drop-shadow">
+                Monkey's owner, Omar Von Muller, a Hollywood pro trainer , <span className="text-yellow-300 font-bold">(The Artist, Once Upon a Time, Call of duty)</span>guides this Belgian Malinois to paint with joy. No 9-to-5 grind here—Monkey creates art when the mood strikes, making painting a fun hobby under Omar's expert care. Happy tail, happy life
+                 
+              </p>
             </div>
           </div>
         </div>
