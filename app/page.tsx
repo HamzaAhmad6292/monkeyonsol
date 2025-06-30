@@ -11,7 +11,7 @@ export default function MemeTokenGaming() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [isLoaded, setIsLoaded] = useState(false)
   const [copied, setCopied] = useState(false)
-  const contractAddress = "8ZmESLgWmBJNBa653RUdZbMPSsrkYbHqVT2QQHuTVAoR"
+  const contractAddress = "CNNQZyEWfz9mDBRCiRNwjaUvMaLnaRWem8HeJYh7bonk"
 
   useEffect(() => {
     setIsLoaded(true)
@@ -46,8 +46,11 @@ export default function MemeTokenGaming() {
       </div>
 
       {/* Navigation */}
-      <nav className="relative z-50 flex justify-center items-center p-8 lg:px-16">
-        <div className="text-4xl lg:text-7xl font-black italic bg-gradient-to-r from-orange-400 via-yellow-400 to-amber-300 bg-clip-text text-transparent text-center drop-shadow-[0_4px_32px_rgba(251,146,60,0.5)] tracking-tight uppercase">
+      <nav className="relative z-50 flex flex-col items-center justify-center gap-2 p-8 lg:px-16">
+        <div className="text-5xl lg:text-8xl font-black italic bg-gradient-to-r from-yellow-400 via-orange-400 to-amber-300 bg-clip-text text-transparent text-center drop-shadow-[0_6px_32px_rgba(251,146,60,0.7)] tracking-tight uppercase">
+          $Monkey
+        </div>
+        <div className="text-2xl lg:text-4xl font-extrabold italic bg-gradient-to-r from-orange-400 via-yellow-400 to-amber-300 bg-clip-text text-transparent text-center drop-shadow-[0_2px_16px_rgba(251,146,60,0.5)] tracking-tight uppercase">
           Monkey the Picasso
         </div>
       </nav>
@@ -141,7 +144,7 @@ export default function MemeTokenGaming() {
 
             <div className="mb-12">
               <div className="text-5xl lg:text-7xl font-black italic text-white mb-4 drop-shadow-[0_2px_32px_orange] tracking-tight">
-                Enter 3D Space <span className="bg-gradient-to-r from-orange-400 via-yellow-400 to-amber-300 bg-clip-text text-transparent">(Coming Soon)</span>
+                Enter Museum <span className="bg-gradient-to-r from-orange-400 via-yellow-400 to-amber-300 bg-clip-text text-transparent">(Coming Soon)</span>
               </div>
               <div className="w-40 h-2 bg-gradient-to-r from-orange-500 to-yellow-500 mx-auto mb-10 animate-pulse rounded-full shadow-lg" />
             </div>
@@ -177,10 +180,10 @@ export default function MemeTokenGaming() {
             Tokenomics
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {[
               { title: "Total Supply", value: "1,000,000,000", unit: "$MONKEY" },
-              { title: "Liquidity Locked", value: "✅", unit: "SECURED" },
+              // { title: "Liquidity Locked", value: "✅", unit: "SECURED" },
               { title: "Buy/Sell Tax", value: "0% / 0%", unit: "NO FEES" },
               { title: "Community-Owned", value: "100%", unit: "DECENTRALIZED" },
             ].map((item, index) => (
@@ -203,7 +206,7 @@ export default function MemeTokenGaming() {
           {/* Dexscreener Button Below Tokenomics */}
           <div className="flex justify-center mt-16">
             <a
-              href="http://dexscreener.com/solana/8ZmESLgWmBJNBa653RUdZbMPSsrkYbHqVT2QQHuTVAoR"
+              href="http://dexscreener.com/solana/CNNQZyEWfz9mDBRCiRNwjaUvMaLnaRWem8HeJYh7bonk"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 px-8 py-4 rounded-2xl border-2 border-orange-400/60 bg-gradient-to-r from-black/80 via-orange-900/60 to-yellow-900/60 text-orange-200 font-extrabold italic text-xl shadow-xl hover:bg-yellow-500/10 hover:border-yellow-400 hover:text-yellow-300 transition-all duration-200"
@@ -237,13 +240,14 @@ export default function MemeTokenGaming() {
                 <div className="w-6 h-6 bg-amber-600 rounded-full animate-pulse" style={{ animationDelay: "1s" }} />
               </div>
               <p className="text-lg lg:text-2xl text-orange-200 font-medium italic leading-relaxed drop-shadow">
-                Experience the fusion of art and memes on Solana. <span className="text-yellow-300 font-bold">Monkey the Picasso</span> is not just a token, it's a movement. Join the revolution of creativity, community, and fun!
+                Monkey’s owner, Omar Von Muller, a Hollywood pro trainer , <span className="text-yellow-300 font-bold">(The Artist, Once Upon a Time, Call of duty)</span>guides this Belgian Malinois to paint with joy. No 9-to-5 grind here—Monkey creates art when the mood strikes, making painting a fun hobby under Omar’s expert care. Happy tail, happy life
+                 
               </p>
             </div>
             <div className="flex justify-center">
               <div className="bg-gradient-to-r from-orange-900/80 via-black/80 to-yellow-900/80 rounded-3xl shadow-2xl shadow-orange-500/25 border-4 border-orange-400/40 p-2">
                 <img
-                  src="/images/dog_art.jpg"
+                  src="/images/dog_buttom.jpg"
                   alt="Gallery Loading"
                   className="w-full max-w-md mx-auto h-auto object-cover filter brightness-90 contrast-150 saturate-200 rounded-2xl"
                   style={{
@@ -314,7 +318,7 @@ export default function MemeTokenGaming() {
         <div className="max-w-6xl mx-auto text-center">
           <div className="w-full h-1 bg-gradient-to-r from-transparent via-orange-400 to-transparent mb-10 rounded-full" />
           <p className="text-lg text-orange-200 mb-4 font-medium italic">© 2025 MemeToken • Powered by Memes & Community</p>
-          <p className="text-base text-gray-400 italic">Game currently under development. All rights reserved.</p>
+          <p className="text-base text-gray-400 italic">Museum currently under development. All rights reserved.</p>
         </div>
         <div className="absolute bottom-2 right-4 mt-2">
           <a
@@ -324,7 +328,7 @@ export default function MemeTokenGaming() {
             className="flex items-center gap-2 text-sm text-orange-300 hover:text-yellow-300 transition-colors duration-300 bg-black/60 border-2 border-orange-400/40 rounded-xl px-4 py-2 hover:border-yellow-400 hover:shadow-[0_0_16px_orange] font-bold italic"
           >
             <Terminal size={16} />
-            <span>Made by @Basusalee</span>
+            <span>Made by </span>
           </a>
         </div>
       </footer>
