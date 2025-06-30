@@ -366,7 +366,7 @@ export default function MemeTokenGaming() {
           <p className="text-lg text-orange-200 mb-4 font-medium italic">© 2025 MemeToken • Powered by Memes & Community</p>
           <p className="text-base text-gray-400 italic">Museum currently under development. All rights reserved.</p>
         </div>
-        <div className="absolute bottom-2 right-4 mt-2">
+        {/* <div className="absolute bottom-2 right-4 mt-2">
           <a
             href="https://t.me/Basusalee"
             target="_blank"
@@ -376,7 +376,7 @@ export default function MemeTokenGaming() {
             <Terminal size={16} />
             <span>Made by </span>
           </a>
-        </div>
+        </div> */}
       </footer>
     </div>
   )
