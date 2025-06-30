@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import Telegram from "@/components/icons/Telegram";
+import XIcon from "@/components/icons/XIcon"; // <-- Add this import for your X logo SVG component
+import TikTokIcon from "@/components/icons/TikTokIcon";
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Terminal,Rocket, Trophy, Zap, Users, Twitter, MessageCircle, Hash, ExternalLink, ChevronDown, Instagram } from "lucide-react"
@@ -47,10 +49,27 @@ export default function MemeTokenGaming() {
 
       {/* Navigation */}
       <nav className="relative z-50 flex flex-col items-center justify-center gap-2 p-8 lg:px-16">
-        <div className="text-5xl lg:text-8xl font-black italic bg-gradient-to-r from-yellow-400 via-orange-400 to-amber-300 bg-clip-text text-transparent text-center drop-shadow-[0_6px_32px_rgba(251,146,60,0.7)] tracking-tight uppercase">
+        <div className="font-extrabold italic text-transparent text-center uppercase tracking-[0.08em] drop-shadow-[0_8px_40px_rgba(251,146,60,0.8)]"
+          style={{
+            fontFamily: "'Bebas Neue', 'Oswald', 'Montserrat', Arial, sans-serif",
+            fontSize: "clamp(2.5rem, 8vw, 6rem)",
+            letterSpacing: "0.08em",
+            background: "linear-gradient(90deg, #fde047 0%, #fb923c 50%, #fbbf24 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
+        >
           $Monkey
         </div>
-        <div className="text-2xl lg:text-4xl font-extrabold italic bg-gradient-to-r from-orange-400 via-yellow-400 to-amber-300 bg-clip-text text-transparent text-center drop-shadow-[0_2px_16px_rgba(251,146,60,0.5)] tracking-tight uppercase">
+        <div className="font-black italic text-transparent text-center uppercase tracking-[0.06em] drop-shadow-[0_4px_24px_rgba(251,146,60,0.6)]"
+          style={{
+            fontFamily: "'Pacifico', 'Dancing Script', 'Montserrat', Arial, sans-serif",
+            fontSize: "clamp(1.5rem, 4vw, 3rem)",
+            background: "linear-gradient(90deg, #fb923c 0%, #fde047 50%, #fbbf24 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
+        >
           Monkey the Picasso
         </div>
       </nav>
@@ -267,8 +286,8 @@ export default function MemeTokenGaming() {
               <div className="flex justify-center gap-4">
                 {[
                   {
-                    icon: Twitter,
-                    label: "Twitter",
+                    icon: XIcon,
+                    label: "X",
                     href: "https://x.com/MonkeyGoodBoy?t=-QDE1J-1iAEuMrexSIJdDA&s=09",
                   },
                   {
@@ -277,14 +296,14 @@ export default function MemeTokenGaming() {
                     href: "https://www.instagram.com/omarvonmuller?igsh=c2p6NDZqaTJkNHg1",
                   },
                   {
-                    icon: Telegram, // use string to check later
-                    label: "Telegram",
-                    href: "https://t.me/monkeyportal1",
+                    icon: TikTokIcon,
+                    label: "TikTok",
+                    href: "https://www.tiktok.com/@omarvonmuller?_t=ZS-8xdCXISxYVV&_r=1", // <-- Replace with your TikTok link
                   },
                   {
-                    icon: ExternalLink, // use string to check later
+                    icon: Telegram,
                     label: "Telegram",
-                    href: "https://www.monkey-coin.com/",
+                    href: "https://t.me/monkeyportal1",
                   },
 
                 ].map((social, index) => (
@@ -294,18 +313,7 @@ export default function MemeTokenGaming() {
                       size="lg"
                       className="w-20 h-20 rounded-full border-4 border-orange-400/60 hover:border-yellow-400 hover:bg-yellow-500/10 transition-all duration-300 group bg-black/40 shadow-lg"
                     >
-                        {social.icon === "telegram" ? (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 240 240"
-                            className="h-10 w-10 text-orange-300 group-hover:text-yellow-300 transition-colors fill-current"
-                          >
-                            {/* paste contents of your telegram.svg file here */}
-                          </svg>
-                        ) : (
-                          <social.icon className="h-10 w-10 text-orange-300 group-hover:text-yellow-300 transition-colors" />
-                        )}
-
+                        <social.icon className="h-10 w-10 text-orange-300 group-hover:text-yellow-300 transition-colors" />
                     </Button>
                   </Link>
                 ))}
