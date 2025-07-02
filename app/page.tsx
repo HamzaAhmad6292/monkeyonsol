@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/button"
 import Telegram from "@/components/icons/Telegram";
 import XIcon from "@/components/icons/XIcon"; // <-- Add this import for your X logo SVG component
 import TikTokIcon from "@/components/icons/TikTokIcon";
+import { useRouter } from "next/navigation"
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Terminal,Rocket, Trophy, Zap, Users, Twitter, MessageCircle, Hash, ExternalLink, ChevronDown, Instagram } from "lucide-react"
 import Link from "next/link"
 export default function MemeTokenGaming() {
+  const router = useRouter();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [isLoaded, setIsLoaded] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -163,7 +165,7 @@ export default function MemeTokenGaming() {
 
             <div className="mb-12">
               <div className="text-5xl lg:text-7xl font-black italic text-white mb-4 drop-shadow-[0_2px_32px_orange] tracking-tight">
-                Enter Museum <span className="bg-gradient-to-r from-orange-400 via-yellow-400 to-amber-300 bg-clip-text text-transparent">(Coming Soon)</span>
+                Enter Museum <span className="bg-gradient-to-r from-orange-400 via-yellow-400 to-amber-300 bg-clip-text text-transparent"></span>
               </div>
               <div className="w-40 h-2 bg-gradient-to-r from-orange-500 to-yellow-500 mx-auto mb-10 animate-pulse rounded-full shadow-lg" />
             </div>
@@ -171,11 +173,11 @@ export default function MemeTokenGaming() {
             <div className="relative inline-block group w-max-3xl px-2 sm:px-0">
               <Button
                 size="lg"
-                disabled
-                className="w-full max-w-xs sm:max-w-none bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white font-extrabold italic py-5 px-6 sm:px-16 text-2xl border-4 border-orange-400/60 shadow-2xl shadow-orange-500/25 animate-pulse cursor-not-allowed tracking-widest rounded-2xl"
+                onClick={() => router.push("/game")}
+                className="w-full max-w-xs sm:max-w-none bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white font-extrabold italic py-5 px-6 sm:px-16 text-2xl border-4 border-orange-400/60 shadow-2xl shadow-orange-500/25 tracking-widest rounded-2xl"
               >
                 <Zap className="mr-3 h-8 w-8" />
-                COMING SOON
+                PLAY GAME
               </Button>
               <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity -z-10" />
             </div>
