@@ -28,7 +28,7 @@ export default function MonkeyOnSol() {
         </div>
       )}
       <iframe
-        src="https://monumental-granita-0a5659.netlify.app/"
+        src="https://monumental-granita-0a5659.netlify.app"
         title="Monkey on Sol"
         allowFullScreen
         sandbox="allow-scripts allow-same-origin"

@@ -174,7 +174,8 @@ export default function MemeTokenGaming() {
             <Button
               size="lg"
               onClick={() => {
-                window.open("https://hamza010101.itch.io/monkeyonsol?secret=5BJcYSDF2aOVO42YEbIHoSaD8", "_blank");
+                // window.open("", "_blank");
+                router.push("/game")
               }}
               className="w-full max-w-xs sm:max-w-none bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white font-extrabold italic py-5 px-6 sm:px-16 text-2xl border-4 border-orange-400/60 shadow-2xl shadow-orange-500/25 tracking-widest rounded-2xl"
             >
