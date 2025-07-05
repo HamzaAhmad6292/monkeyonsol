@@ -28,7 +28,7 @@ export default function MonkeyOnSol() {
         </div>
       )}
       <iframe
-        src="comforting-snickerdoodle-279300.netlify.app"
+        src="https://comforting-snickerdoodle-279300.netlify.app/"
         title="Monkey on Sol"
         allowFullScreen
         sandbox="allow-scripts allow-same-origin"
