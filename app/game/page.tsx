@@ -1,10 +1,39 @@
-// pages/monkey.tsx
-"use client"
+// app/game/page.tsx or pages/game.tsx (based on your setup)
+'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-export default function MonkeyOnSol() {
+export default function GamePage() {
+  const [isMobile, setIsMobile] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const gameURL = 'https://keen-griffin-31c725.netlify.app';
+
+  useEffect(() => {
+    const mobileRegex = /iPhone|iPad|iPod|Android/i;
+    const isPhone = mobileRegex.test(navigator.userAgent);
+
+    if (isPhone) {
+      setIsMobile(true);
+      window.location.href = gameURL; // open in new tab (auto-redirect)
+    }
+  }, []);
+
+  if (isMobile) {
+    return (
+      <div style={{
+        width: '100vw',
+        height: '100vh',
+        background: '#000',
+        color: '#fff',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '1.2rem',
+      }}>
+        Redirecting to game...
+      </div>
+    );
+  }
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', background: '#000' }}>
@@ -14,7 +43,7 @@ export default function MonkeyOnSol() {
             position: 'absolute',
             top: 0,
             left: 0,
-            width: '100%' ,
+            width: '100%',
             height: '100%',
             display: 'flex',
             alignItems: 'center',
@@ -28,8 +57,9 @@ export default function MonkeyOnSol() {
         </div>
       )}
       <iframe
-        src="https://keen-griffin-31c725.netlify.app"
+        src={gameURL}
         title="Monkey on Sol"
+        allow="fullscreen; autoplay; encrypted-media"
         allowFullScreen
         sandbox="allow-scripts allow-same-origin"
         style={{
