@@ -1,4 +1,3 @@
-// app/game/page.tsx or pages/game.tsx (based on your setup)
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -14,23 +13,25 @@ export default function GamePage() {
 
     if (isPhone) {
       setIsMobile(true);
-      window.location.href = gameURL; // open in new tab (auto-redirect)
+      window.open(gameURL, '_blank'); // ✅ open in new tab
     }
   }, []);
 
   if (isMobile) {
     return (
-      <div style={{
-        width: '100vw',
-        height: '100vh',
-        background: '#000',
-        color: '#fff',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '1.2rem',
-      }}>
-        Redirecting to game...
+      <div
+        style={{
+          width: '100vw',
+          height: '100vh',
+          background: '#000',
+          color: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '1.2rem',
+        }}
+      >
+        Opening game in a new tab…
       </div>
     );
   }

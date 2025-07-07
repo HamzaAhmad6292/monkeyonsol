@@ -171,17 +171,22 @@ export default function MemeTokenGaming() {
             </div>
 
             <div className="relative inline-block group w-max-3xl px-2 sm:px-0">
-            <Button
-              size="lg"
-              onClick={() => {
-                // window.open("", "_blank");
-                router.push("/game")
-              }}
-              className="w-full max-w-xs sm:max-w-none bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white font-extrabold italic py-5 px-6 sm:px-16 text-2xl border-4 border-orange-400/60 shadow-2xl shadow-orange-500/25 tracking-widest rounded-2xl"
-            >
-              <Zap className="mr-3 h-8 w-8" />
-              Join Now
-            </Button>
+              <Button
+                size="lg"
+                onClick={() => {
+                  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+                  if (isMobile) {
+                    window.open('https://keen-griffin-31c725.netlify.app', '_blank'); // ✅ open in new tab
+                  } else {
+                    router.push('/game'); // ✅ iframe view
+                  }
+                }}
+                className="w-full max-w-xs sm:max-w-none bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white font-extrabold italic py-5 px-6 sm:px-16 text-2xl border-4 border-orange-400/60 shadow-2xl shadow-orange-500/25 tracking-widest rounded-2xl"
+              >
+                <Zap className="mr-3 h-8 w-8" />
+                Join Now
+              </Button>
 
               <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity -z-10" />
             </div>
