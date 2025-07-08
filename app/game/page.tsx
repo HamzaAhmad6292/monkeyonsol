@@ -7,34 +7,34 @@ export default function GamePage() {
   const [loaded, setLoaded] = useState(false);
   const gameURL = 'https://peppy-fairy-cb97c0.netlify.app';
 
-  useEffect(() => {
-    const mobileRegex = /iPhone|iPad|iPod|Android/i;
-    const isPhone = mobileRegex.test(navigator.userAgent);
+  // useEffect(() => {
+  //   const mobileRegex = /iPhone|iPad|iPod|Android/i;
+  //   const isPhone = mobileRegex.test(navigator.userAgent);
 
-    if (isPhone) {
-      setIsMobile(true);
-      window.open(gameURL, '_blank'); // ✅ open in new tab
-    }
-  }, []);
+  //   if (isPhone) {
+  //     setIsMobile(true);
+  //     window.open(gameURL, '_blank'); // ✅ open in new tab
+  //   }
+  // }, []);
 
-  if (isMobile) {
-    return (
-      <div
-        style={{
-          width: '100vw',
-          height: '100vh',
-          background: '#000',
-          color: '#fff',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '1.2rem',
-        }}
-      >
-        Opening game in a new tab…
-      </div>
-    );
-  }
+  // if (isMobile) {
+  //   return (
+  //     <div
+  //       style={{
+  //         width: '100vw',
+  //         height: '100vh',
+  //         background: '#000',
+  //         color: '#fff',
+  //         display: 'flex',
+  //         alignItems: 'center',
+  //         justifyContent: 'center',
+  //         fontSize: '1.2rem',
+  //       }}
+  //     >
+  //       Opening game in a new tab…
+  //     </div>
+  //   );
+  // }
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', background: '#000' }}>
