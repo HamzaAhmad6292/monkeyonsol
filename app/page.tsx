@@ -176,11 +176,9 @@ export default function MemeTokenGaming() {
                 onClick={() => {
                   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-                  if (isMobile) {
-                    window.open('https://peppy-fairy-cb97c0.netlify.app', '_blank'); // ✅ open in new tab
-                  } else {
+      
                     router.push('/game'); // ✅ iframe view
-                  }
+                  
                 }}
                 className="w-full max-w-xs sm:max-w-none bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white font-extrabold italic py-5 px-6 sm:px-16 text-2xl border-4 border-orange-400/60 shadow-2xl shadow-orange-500/25 tracking-widest rounded-2xl"
               >
