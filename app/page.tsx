@@ -177,7 +177,7 @@ export default function MemeTokenGaming() {
                   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
                   if (isMobile) {
-                    window.open('https://keen-griffin-31c725.netlify.app', '_blank'); // ✅ open in new tab
+                    window.open('https://peppy-fairy-cb97c0.netlify.app', '_blank'); // ✅ open in new tab
                   } else {
                     router.push('/game'); // ✅ iframe view
                   }
