@@ -2,16 +2,16 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import Telegram from "@/components/icons/Telegram";
-import XIcon from "@/components/icons/XIcon"; // <-- Add this import for your X logo SVG component
-import TikTokIcon from "@/components/icons/TikTokIcon";
+import Telegram from "@/components/icons/Telegram"
+import XIcon from "@/components/icons/XIcon" // <-- Add this import for your X logo SVG component
+import TikTokIcon from "@/components/icons/TikTokIcon"
 import { useRouter } from "next/navigation"
 
 import { Card, CardContent } from "@/components/ui/card"
-import { Terminal,Rocket, Trophy, Zap, Users, Twitter, MessageCircle, Hash, ExternalLink, ChevronDown, Instagram } from "lucide-react"
+import { Zap, Instagram, Facebook } from "lucide-react"
 import Link from "next/link"
 export default function MemeTokenGaming() {
-  const router = useRouter();
+  const router = useRouter()
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [isLoaded, setIsLoaded] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -51,7 +51,8 @@ export default function MemeTokenGaming() {
 
       {/* Navigation */}
       <nav className="relative z-50 flex flex-col items-center justify-center gap-2 p-8 lg:px-16">
-        <div className="font-extrabold italic text-transparent text-center uppercase tracking-[0.08em] drop-shadow-[0_8px_40px_rgba(251,146,60,0.8)]"
+        <div
+          className="font-extrabold italic text-transparent text-center uppercase tracking-[0.08em] drop-shadow-[0_8px_40px_rgba(251,146,60,0.8)]"
           style={{
             fontFamily: "'Bebas Neue', 'Oswald', 'Montserrat', Arial, sans-serif",
             fontSize: "clamp(2.5rem, 8vw, 6rem)",
@@ -63,7 +64,8 @@ export default function MemeTokenGaming() {
         >
           $Monkey
         </div>
-        <div className="font-black italic text-transparent text-center uppercase tracking-[0.06em] drop-shadow-[0_4px_24px_rgba(251,146,60,0.6)]"
+        <div
+          className="font-black italic text-transparent text-center uppercase tracking-[0.06em] drop-shadow-[0_4px_24px_rgba(251,146,60,0.6)]"
           style={{
             fontFamily: "'Pacifico', 'Dancing Script', 'Montserrat', Arial, sans-serif",
             fontSize: "clamp(1.5rem, 4vw, 3rem)",
@@ -127,11 +129,7 @@ export default function MemeTokenGaming() {
                   <div className="text-center">
                     <div className="text-5xl lg:text-7xl font-black italic text-white mb-6 drop-shadow-[0_2px_32px_orange] tracking-widest">
                       {"LOADING".split("").map((char, i) => (
-                        <span
-                          key={i}
-                          className="inline-block animate-pulse"
-                          style={{ animationDelay: `${i * 0.1}s` }}
-                        >
+                        <span key={i} className="inline-block animate-pulse" style={{ animationDelay: `${i * 0.1}s` }}>
                           {char}
                         </span>
                       ))}
@@ -165,7 +163,8 @@ export default function MemeTokenGaming() {
 
             <div className="mb-12">
               <div className="text-5xl lg:text-7xl font-black italic text-white mb-4 drop-shadow-[0_2px_32px_orange] tracking-tight">
-                Enter Art Gallery <span className="bg-gradient-to-r from-orange-400 via-yellow-400 to-amber-300 bg-clip-text text-transparent"></span>
+                Enter Art Gallery{" "}
+                <span className="bg-gradient-to-r from-orange-400 via-yellow-400 to-amber-300 bg-clip-text text-transparent"></span>
               </div>
               <div className="w-40 h-2 bg-gradient-to-r from-orange-500 to-yellow-500 mx-auto mb-10 animate-pulse rounded-full shadow-lg" />
             </div>
@@ -174,11 +173,9 @@ export default function MemeTokenGaming() {
               <Button
                 size="lg"
                 onClick={() => {
-                  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
-      
-                    router.push('/game'); // ✅ iframe view
-                  
+                  router.push("/game") // ✅ iframe view
                 }}
                 className="w-full max-w-xs sm:max-w-none bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white font-extrabold italic py-5 px-6 sm:px-16 text-2xl border-4 border-orange-400/60 shadow-2xl shadow-orange-500/25 tracking-widest rounded-2xl"
               >
@@ -241,8 +238,8 @@ export default function MemeTokenGaming() {
               title="View Token on Dexscreener"
             >
               <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path d="M14 3h7v7" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M5 19l16-16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M14 3h7v7" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M5 19l16-16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               View Token on Dexscreener
             </a>
@@ -268,9 +265,10 @@ export default function MemeTokenGaming() {
                 <div className="w-6 h-6 bg-amber-600 rounded-full animate-pulse" style={{ animationDelay: "1s" }} />
               </div>
               <p className="text-lg lg:text-2xl text-orange-200 font-medium italic leading-relaxed drop-shadow">
-                Experience the fusion of art and memes on Solana. <span className="text-yellow-300 font-bold">Monkey The Picasso</span> is not just a token, it's a movement. Join the revolution of creativity, community, and fun!
-                Monkey's Ferrari artwork was recently sold at auction for $15,000, 
-                 
+                Experience the fusion of art and memes on Solana.{" "}
+                <span className="text-yellow-300 font-bold">Monkey The Picasso</span> is not just a token, it's a
+                movement. Join the revolution of creativity, community, and fun! Monkey's Ferrari artwork was recently
+                sold at auction for $15,000,
               </p>
             </div>
             <div className="flex justify-center">
@@ -306,7 +304,7 @@ export default function MemeTokenGaming() {
             </div>
             <div>
               <h2 className="text-5xl lg:text-6xl font-black italic mb-8 text-white drop-shadow-[0_2px_32px_orange] tracking-tight">
-               MONKEY {" "}
+                MONKEY{" "}
                 <span className="bg-gradient-to-r from-orange-400 via-yellow-400 to-amber-300 bg-clip-text text-transparent">
                   LOVES
                 </span>{" "}
@@ -318,53 +316,336 @@ export default function MemeTokenGaming() {
                 <div className="w-6 h-6 bg-amber-600 rounded-full animate-pulse" style={{ animationDelay: "1s" }} />
               </div>
               <p className="text-lg lg:text-2xl text-orange-200 font-medium italic leading-relaxed drop-shadow">
-                Monkey's owner, Omar Von Muller, a Hollywood pro trainer , <span className="text-yellow-300 font-bold">(The Artist, Once Upon a Time, Call of duty)</span>guides this Belgian Malinois to paint with joy. No 9-to-5 grind here—Monkey creates art when the mood strikes, making painting a fun hobby under Omar's expert care. Happy tail, happy life
-                 
+                Monkey's owner, Omar Von Muller, a Hollywood pro trainer ,{" "}
+                <span className="text-yellow-300 font-bold">(The Artist, Once Upon a Time, Call of duty)</span>guides
+                this Belgian Malinois to paint with joy. No 9-to-5 grind here—Monkey creates art when the mood strikes,
+                making painting a fun hobby under Omar's expert care. Happy tail, happy life
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Social Links */}
+      {/* Social Media Section */}
+      <section className="relative z-10 py-20 px-6">
+        <div className="max-w-6xl mx-auto text-center">
+          <h2 className="text-4xl lg:text-5xl font-black italic mb-6 text-white drop-shadow-[0_2px_32px_orange] tracking-tight uppercase">
+            Follow Monkey The Picasso
+          </h2>
+          <p className="text-lg lg:text-xl text-orange-200 font-medium leading-relaxed mb-12 max-w-4xl mx-auto">
+            Monkey's owner, Omar, manages three social media accounts with a large following. This advantage is a key
+            strength of our community and token.
+          </p>
+
+          {/* Social Media Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            {/* Instagram Card */}
+            <div className="group relative bg-gradient-to-br from-orange-900/80 via-black/90 to-yellow-900/80 rounded-2xl border-2 border-orange-400/40 p-6 hover:border-yellow-400/80 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/30 backdrop-blur-sm">
+              {/* Glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-yellow-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-14 h-14 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-orange-500/50 transition-all duration-300 group-hover:scale-110">
+                  <Instagram className="h-7 w-7 text-white drop-shadow-lg" />
+                </div>
+                <div className="text-left">
+                  <div className="text-white font-black text-xl italic tracking-wide group-hover:text-yellow-200 transition-colors duration-300">
+                    INSTAGRAM
+                  </div>
+                  <div className="text-orange-300 text-sm font-medium">@omarvonmuller</div>
+                </div>
+              </div>
+
+              <p className="text-orange-200 text-left mb-8 leading-relaxed font-medium group-hover:text-yellow-100 transition-colors duration-300">
+                Follow Monkey's artistic journey through stunning photos and videos of his painting process. See his
+                latest masterpieces and behind-the-scenes content.
+              </p>
+
+              <div className="grid grid-cols-3 gap-4 mb-8">
+                <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
+                  <div className="text-orange-400 font-black text-2xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
+                    570K+
+                  </div>
+                  <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Followers</div>
+                </div>
+                <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
+                  <div className="text-orange-400 font-black text-2xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
+                    1000+
+                  </div>
+                  <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Posts</div>
+                </div>
+                <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
+                  <div className="text-orange-400 font-black text-2xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
+                    4K+
+                  </div>
+                  <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Avg Likes</div>
+                </div>
+              </div>
+
+              <Link
+                href="https://www.instagram.com/omarvonmuller?igsh=c2p6NDZqaTJkNHg1"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button className="w-full bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white font-black italic py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-orange-500/40 border-2 border-orange-400/40 hover:border-yellow-400 tracking-widest text-lg">
+                  <Instagram className="mr-2 h-5 w-5" />
+                  FOLLOW NOW
+                </Button>
+              </Link>
+            </div>
+
+            {/* TikTok Card */}
+            <div className="group relative bg-gradient-to-br from-orange-900/80 via-black/90 to-yellow-900/80 rounded-2xl border-2 border-orange-400/40 p-6 hover:border-yellow-400/80 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/30 backdrop-blur-sm">
+              {/* Glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-yellow-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-14 h-14 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-orange-500/50 transition-all duration-300 group-hover:scale-110">
+                  <TikTokIcon className="h-7 w-7 text-white drop-shadow-lg" />
+                </div>
+                <div className="text-left">
+                  <div className="text-white font-black text-xl italic tracking-wide group-hover:text-yellow-200 transition-colors duration-300">
+                    TIKTOK
+                  </div>
+                  <div className="text-orange-300 text-sm font-medium">@omarvonmuller</div>
+                </div>
+              </div>
+
+              <p className="text-orange-200 text-left mb-8 leading-relaxed font-medium group-hover:text-yellow-100 transition-colors duration-300">
+                Watch viral videos of Monkey creating his masterpieces. His painting process has captivated millions of
+                viewers worldwide on this entertainment platform.
+              </p>
+
+              <div className="grid grid-cols-3 gap-4 mb-8">
+                <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
+                  <div className="text-orange-400 font-black text-2xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
+                    40K+
+                  </div>
+                  <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Followers</div>
+                </div>
+                <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
+                  <div className="text-orange-400 font-black text-2xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
+                    60+
+                  </div>
+                  <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Videos</div>
+                </div>
+                <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
+                  <div className="text-orange-400 font-black text-2xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
+                    6.4M+
+                  </div>
+                  <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Total Likes</div>
+                </div>
+              </div>
+
+              <Link
+                href="https://www.tiktok.com/@omarvonmuller?_t=ZS-8xdCXISxYVV&_r=1"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button className="w-full bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white font-black italic py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-orange-500/40 border-2 border-orange-400/40 hover:border-yellow-400 tracking-widest text-lg">
+                  <TikTokIcon className="mr-2 h-5 w-5" />
+                  FOLLOW NOW
+                </Button>
+              </Link>
+            </div>
+
+            {/* Facebook Card */}
+            <div className="group relative bg-gradient-to-br from-orange-900/80 via-black/90 to-yellow-900/80 rounded-2xl border-2 border-orange-400/40 p-6 hover:border-yellow-400/80 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/30 backdrop-blur-sm">
+              {/* Glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-yellow-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-14 h-14 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-orange-500/50 transition-all duration-300 group-hover:scale-110">
+                  <Facebook className="h-7 w-7 text-white drop-shadow-lg" />
+                </div>
+                <div className="text-left">
+                  <div className="text-white font-black text-xl italic tracking-wide group-hover:text-yellow-200 transition-colors duration-300">
+                    FACEBOOK
+                  </div>
+                  <div className="text-orange-300 text-sm font-medium">Omar and Monkey</div>
+                </div>
+              </div>
+
+              <p className="text-orange-200 text-left mb-8 leading-relaxed font-medium group-hover:text-yellow-100 transition-colors duration-300">
+                Join the official Monkey the Painting Dog Fan Club on Facebook. Connect with fellow fans, get updates on
+                Monkey's latest adventures, and support the token.
+              </p>
+
+              <div className="grid grid-cols-3 gap-4 mb-8">
+                <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
+                  <div className="text-orange-400 font-black text-2xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
+                    800K+
+                  </div>
+                  <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Members</div>
+                </div>
+                <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
+                  <div className="text-orange-400 font-black text-2xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
+                    WEEKLY
+                  </div>
+                  <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Updates</div>
+                </div>
+                <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
+                  <div className="text-orange-400 font-black text-2xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
+                    HIGH
+                  </div>
+                  <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Engagement</div>
+                </div>
+              </div>
+
+              <Link href="https://www.facebook.com/people/Omar-and-Monkey/100088557324948/" target="" rel="noopener noreferrer">
+                <Button className="w-full bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white font-black italic py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-orange-500/40 border-2 border-orange-400/40 hover:border-yellow-400 tracking-widest text-lg">
+                  <Facebook className="mr-2 h-5 w-5" />
+                  FOLLOW NOW
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Monkey Paw Agent Section */}
+      <section className="relative z-10 py-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl lg:text-5xl font-black italic mb-6 text-white drop-shadow-[0_2px_32px_orange] tracking-tight uppercase">
+              Meet Monkey Paw Agent
+            </h2>
+            <p className="text-lg lg:text-xl text-orange-200 font-medium italic leading-relaxed mb-12 max-w-4xl mx-auto">
+              Introducing the digital version of Monkey the Picasso! Our AI Agent brings the artistic spirit of our
+              beloved painting dog to the digital world.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="flex justify-center">
+              <div className=" rounded-3xl shadow-2xl shadow-orange-500/25 border-4 border-orange-400/40 p-2">
+                <img
+                  src="/images/paw.jpeg"
+                  alt="Monkey Paw Agent"
+                  className="w-full max-w-md mx-auto h-auto object-cover filter brightness-90 contrast-150 rounded-2xl"
+                />
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-4xl lg:text-5xl font-black italic mb-8 text-white drop-shadow-[0_2px_24px_orange] tracking-tight">
+                THE DIGITAL{" "}
+                <span className="bg-gradient-to-r from-orange-400 via-yellow-400 to-amber-300 bg-clip-text text-transparent">
+                  ARTIST
+                </span>
+              </h3>
+
+              <div className="flex gap-6 mb-8">
+                <div className="w-6 h-6 bg-orange-500 rounded-full animate-pulse shadow-lg" />
+                <div className="w-6 h-6 bg-yellow-500 rounded-full animate-pulse" style={{ animationDelay: "0.5s" }} />
+                <div className="w-6 h-6 bg-amber-600 rounded-full animate-pulse" style={{ animationDelay: "1s" }} />
+              </div>
+
+              <p className="text-lg lg:text-xl text-orange-200 font-medium italic leading-relaxed mb-8 drop-shadow">
+                <span className="text-yellow-300 font-bold">Monkey Paw Agent</span> is an AI-powered Twitter bot that
+                embodies the creative spirit and personality of Monkey the Picasso. Interact with the digital version of
+                our artistic genius and experience his wit, creativity, and love for art in real-time conversations.
+              </p>
+
+              <div className="bg-gradient-to-r from-orange-900/60 via-black/60 to-yellow-900/60 rounded-2xl border-2 border-orange-400/30 p-6 mb-8">
+                <h4 className="text-xl font-bold text-white mb-4">Features:</h4>
+                <ul className="text-orange-200 space-y-2">
+                  <li className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                    AI-powered conversations about art and creativity
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                    Real-time updates about Monkey's activities
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                    Interactive community engagement
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                    Art tips and creative inspiration
+                  </li>
+                </ul>
+              </div>
+
+              <Link href="https://x.com/paw_agent" target="_blank" rel="noopener noreferrer">
+                <Button className="w-full bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white font-extrabold italic py-4 px-8 text-xl border-4 border-orange-400/60 shadow-2xl shadow-orange-500/25 tracking-widest rounded-2xl transition-all duration-300 hover:scale-105">
+                  <XIcon className="mr-3 h-6 w-6" />
+                  Follow Monkey Paw Agent
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Community Socials */}
       <section className="relative z-10 py-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl lg:text-5xl font-black italic mb-14 text-white drop-shadow-[0_2px_32px_orange] tracking-tight uppercase">Join the Community</h2>
-              <div className="flex justify-center gap-4">
-                {[
-                  {
-                    icon: XIcon,
-                    label: "X",
-                    href: "https://x.com/MonkeyGoodBoy?t=-QDE1J-1iAEuMrexSIJdDA&s=09",
-                  },
-                  {
-                    icon: Instagram,
-                    label: "Instagram",
-                    href: "https://www.instagram.com/omarvonmuller?igsh=c2p6NDZqaTJkNHg1",
-                  },
-                  {
-                    icon: TikTokIcon,
-                    label: "TikTok",
-                    href: "https://www.tiktok.com/@omarvonmuller?_t=ZS-8xdCXISxYVV&_r=1", // <-- Replace with your TikTok link
-                  },
-                  {
-                    icon: Telegram,
-                    label: "Telegram",
-                    href: "https://t.me/monkeyportal1",
-                  },
-
-                ].map((social, index) => (
-                  <Link key={index} href={social.href}>
+          <h2 className="text-4xl lg:text-5xl font-black italic mb-6 text-white drop-shadow-[0_2px_32px_orange] tracking-tight uppercase">
+            Join The $MONKEY Community
+          </h2>
+          <p className="text-lg lg:text-xl text-orange-200 font-medium italic leading-relaxed mb-12 max-w-3xl mx-auto">
+            Connect with fellow art enthusiasts and $MONKEY holders. Share your love for artistic expression, discuss
+            the latest developments, and be part of the growing community that celebrates creativity and innovation.
+          </p>
+          <div className="flex justify-center gap-6">
+            {[
+              {
+                icon: Telegram,
+                label: "Telegram",
+                href: "https://t.me/monkeyportal1",
+                description: "Community chat & updates",
+                color: "from-blue-500 to-cyan-500",
+              },
+              {
+                icon: XIcon,
+                label: "X Community",
+                href: "https://x.com/MonkeyGoodBoy?t=-QDE1J-1iAEuMrexSIJdDA&s=09",
+                description: "Latest news & discussions",
+                color: "from-gray-600 to-black",
+              },
+            ].map((social, index) => (
+              <div key={index} className="group">
+                <Link href={social.href} target="_blank" rel="noopener noreferrer">
+                  <div className="relative">
                     <Button
                       variant="outline"
                       size="lg"
-                      className="w-20 h-20 rounded-full border-4 border-orange-400/60 hover:border-yellow-400 hover:bg-yellow-500/10 transition-all duration-300 group bg-black/40 shadow-lg"
+                      className="w-24 h-24 rounded-full border-4 border-orange-400/60 hover:border-yellow-400 hover:bg-yellow-500/10 transition-all duration-300 group bg-black/40 shadow-lg hover:shadow-2xl hover:shadow-orange-500/25 hover:scale-110"
                     >
-                        <social.icon className="h-10 w-10 text-orange-300 group-hover:text-yellow-300 transition-colors" />
+                      <social.icon className="h-12 w-12 text-orange-300 group-hover:text-yellow-300 transition-colors" />
                     </Button>
-                  </Link>
-                ))}
+                    <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="bg-black/90 border-2 border-orange-400/60 rounded-xl px-4 py-2 text-center min-w-max">
+                        <div className="text-orange-200 font-bold text-sm">{social.label}</div>
+                        <div className="text-yellow-300 text-xs italic">{social.description}</div>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
               </div>
+            ))}
+          </div>
+
+          {/* Community Stats */}
+          {/* <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { number: "1B", label: "Total Supply", sublabel: "$MONKEY Tokens" },
+              { number: "0%", label: "Tax", sublabel: "Buy & Sell Fees" },
+              { number: "100%", label: "Community", sublabel: "Owned & Driven" },
+            ].map((stat, index) => (
+              <div
+                key={index}
+                className="bg-gradient-to-r from-orange-900/60 via-black/60 to-yellow-900/60 rounded-2xl border-2 border-orange-400/30 p-6 hover:border-yellow-400/60 transition-all duration-300 hover:scale-105"
+              >
+                <div className="text-3xl lg:text-4xl font-black italic text-orange-300 mb-2">{stat.number}</div>
+                <div className="text-white font-bold text-lg mb-1">{stat.label}</div>
+                <div className="text-yellow-200 text-sm italic">{stat.sublabel}</div>
+              </div>
+            ))}
+          </div> */}
         </div>
       </section>
 
@@ -372,20 +653,11 @@ export default function MemeTokenGaming() {
       <footer className="relative z-10 py-12 px-6">
         <div className="max-w-6xl mx-auto text-center">
           <div className="w-full h-1 bg-gradient-to-r from-transparent via-orange-400 to-transparent mb-10 rounded-full" />
-          <p className="text-lg text-orange-200 mb-4 font-medium italic">© 2025 MemeToken • Powered by Memes & Community</p>
+          <p className="text-lg text-orange-200 mb-4 font-medium italic">
+            © 2025 MemeToken • Powered by Memes & Community
+          </p>
           <p className="text-base text-gray-400 italic">Museum currently under development. All rights reserved.</p>
         </div>
-        {/* <div className="absolute bottom-2 right-4 mt-2">
-          <a
-            href="https://t.me/Basusalee"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-sm text-orange-300 hover:text-yellow-300 transition-colors duration-300 bg-black/60 border-2 border-orange-400/40 rounded-xl px-4 py-2 hover:border-yellow-400 hover:shadow-[0_0_16px_orange] font-bold italic"
-          >
-            <Terminal size={16} />
-            <span>Made by </span>
-          </a>
-        </div> */}
       </footer>
     </div>
   )
