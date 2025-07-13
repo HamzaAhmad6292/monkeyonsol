@@ -364,7 +364,7 @@ export default function MemeTokenGaming() {
               <div className="grid grid-cols-3 gap-4 mb-8">
                 <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
                   <div className="text-orange-400 font-black text-2xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
-                    570K+
+                    640k+
                   </div>
                   <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Followers</div>
                 </div>
@@ -419,7 +419,7 @@ export default function MemeTokenGaming() {
               <div className="grid grid-cols-3 gap-4 mb-8">
                 <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
                   <div className="text-orange-400 font-black text-2xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
-                    40K+
+                    49K+
                   </div>
                   <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Followers</div>
                 </div>
@@ -474,7 +474,7 @@ export default function MemeTokenGaming() {
               <div className="grid grid-cols-3 gap-4 mb-8">
                 <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
                   <div className="text-orange-400 font-black text-2xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
-                    800K+
+                    1.2M+
                   </div>
                   <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Members</div>
                 </div>
