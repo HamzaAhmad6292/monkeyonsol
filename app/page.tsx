@@ -8,7 +8,7 @@ import TikTokIcon from "@/components/icons/TikTokIcon"
 import { useRouter } from "next/navigation"
 
 import { Card, CardContent } from "@/components/ui/card"
-import { Zap, Instagram, Facebook } from "lucide-react"
+import { Zap, Instagram, Facebook, Youtube } from "lucide-react"
 import Link from "next/link"
 export default function MemeTokenGaming() {
   const router = useRouter()
@@ -327,181 +327,239 @@ export default function MemeTokenGaming() {
       </section>
 
       {/* Social Media Section */}
-      <section className="relative z-10 py-20 px-6">
-        <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-4xl lg:text-5xl font-black italic mb-6 text-white drop-shadow-[0_2px_32px_orange] tracking-tight uppercase">
-            Follow Monkey The Picasso
-          </h2>
-          <p className="text-lg lg:text-xl text-orange-200 font-medium leading-relaxed mb-12 max-w-4xl mx-auto">
-            Monkey's owner, Omar, manages three social media accounts with a large following. This advantage is a key
-            strength of our community and token.
-          </p>
+    <section className="relative z-10 py-20 px-6">
+      <div className="max-w-7xl mx-auto text-center">
+        <h2 className="text-4xl lg:text-5xl font-black italic mb-6 text-white drop-shadow-[0_2px_32px_orange] tracking-tight uppercase">
+          Follow Monkey The Picasso
+        </h2>
+        <p className="text-lg lg:text-xl text-orange-200 font-medium leading-relaxed mb-12 max-w-4xl mx-auto">
+          Monkey's owner, Omar, manages three social media accounts with a large following. This advantage is a key
+          strength of our community and token.
+        </p>
 
-          {/* Social Media Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-            {/* Instagram Card */}
-            <div className="group relative bg-gradient-to-br from-orange-900/80 via-black/90 to-yellow-900/80 rounded-2xl border-2 border-orange-400/40 p-6 hover:border-yellow-400/80 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/30 backdrop-blur-sm">
-              {/* Glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-yellow-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+        {/* Social Media Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          {/* Instagram Card */}
+          <div className="group relative bg-gradient-to-br from-orange-900/80 via-black/90 to-yellow-900/80 rounded-2xl border-2 border-orange-400/40 p-6 hover:border-yellow-400/80 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/30 backdrop-blur-sm min-h-[480px] flex flex-col">
+            {/* Glow effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-yellow-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
 
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-14 h-14 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-orange-500/50 transition-all duration-300 group-hover:scale-110">
-                  <Instagram className="h-7 w-7 text-white drop-shadow-lg" />
-                </div>
-                <div className="text-left">
-                  <div className="text-white font-black text-xl italic tracking-wide group-hover:text-yellow-200 transition-colors duration-300">
-                    INSTAGRAM
-                  </div>
-                  <div className="text-orange-300 text-sm font-medium">@omarvonmuller</div>
-                </div>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-orange-500/50 transition-all duration-300 group-hover:scale-110">
+                <Instagram className="h-6 w-6 text-white drop-shadow-lg" />
               </div>
-
-              <p className="text-orange-200 text-left mb-8 leading-relaxed font-medium group-hover:text-yellow-100 transition-colors duration-300">
-                Follow Monkey's artistic journey through stunning photos and videos of his painting process. See his
-                latest masterpieces and behind-the-scenes content.
-              </p>
-
-              <div className="grid grid-cols-3 gap-4 mb-8">
-                <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
-                  <div className="text-orange-400 font-black text-2xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
-                    640k+
-                  </div>
-                  <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Followers</div>
+              <div className="text-left">
+                <div className="text-white font-black text-lg italic tracking-wide group-hover:text-yellow-200 transition-colors duration-300">
+                  INSTAGRAM
                 </div>
+                <div className="text-orange-300 text-sm font-medium">@omarvonmuller</div>
+              </div>
+            </div>
+
+            <p className="text-orange-200 text-left mb-6 leading-relaxed font-medium group-hover:text-yellow-100 transition-colors duration-300 flex-grow text-sm">
+              Follow Monkey's artistic journey through stunning photos and videos of his painting process. See his
+              latest masterpieces and behind-the-scenes content.
+            </p>
+
+            <div className="grid grid-cols-1 gap-3 mb-6">
+              <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
+                <div className="text-orange-400 font-black text-xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
+                  640k+
+                </div>
+                <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Followers</div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
                 <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
-                  <div className="text-orange-400 font-black text-2xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
+                  <div className="text-orange-400 font-black text-lg italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
                     1000+
                   </div>
                   <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Posts</div>
                 </div>
                 <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
-                  <div className="text-orange-400 font-black text-2xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
+                  <div className="text-orange-400 font-black text-lg italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
                     4K+
                   </div>
                   <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Avg Likes</div>
                 </div>
               </div>
-
-              <Link
-                href="https://www.instagram.com/omarvonmuller?igsh=c2p6NDZqaTJkNHg1"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button className="w-full bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white font-black italic py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-orange-500/40 border-2 border-orange-400/40 hover:border-yellow-400 tracking-widest text-lg">
-                  <Instagram className="mr-2 h-5 w-5" />
-                  FOLLOW NOW
-                </Button>
-              </Link>
             </div>
 
-            {/* TikTok Card */}
-            <div className="group relative bg-gradient-to-br from-orange-900/80 via-black/90 to-yellow-900/80 rounded-2xl border-2 border-orange-400/40 p-6 hover:border-yellow-400/80 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/30 backdrop-blur-sm">
-              {/* Glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-yellow-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+            <Link
+              href="https://www.instagram.com/omarvonmuller?igsh=c2p6NDZqaTJkNHg1"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button className="w-full bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white font-black italic py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-orange-500/40 border-2 border-orange-400/40 hover:border-yellow-400 tracking-widest text-sm">
+                <Instagram className="mr-2 h-4 w-4" />
+                FOLLOW NOW
+              </Button>
+            </Link>
+          </div>
 
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-14 h-14 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-orange-500/50 transition-all duration-300 group-hover:scale-110">
-                  <TikTokIcon className="h-7 w-7 text-white drop-shadow-lg" />
-                </div>
-                <div className="text-left">
-                  <div className="text-white font-black text-xl italic tracking-wide group-hover:text-yellow-200 transition-colors duration-300">
-                    TIKTOK
-                  </div>
-                  <div className="text-orange-300 text-sm font-medium">@omarvonmuller</div>
-                </div>
+          {/* TikTok Card */}
+          <div className="group relative bg-gradient-to-br from-orange-900/80 via-black/90 to-yellow-900/80 rounded-2xl border-2 border-orange-400/40 p-6 hover:border-yellow-400/80 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/30 backdrop-blur-sm min-h-[480px] flex flex-col">
+            {/* Glow effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-yellow-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-orange-500/50 transition-all duration-300 group-hover:scale-110">
+                <TikTokIcon className="h-6 w-6 text-white drop-shadow-lg" />
               </div>
-
-              <p className="text-orange-200 text-left mb-8 leading-relaxed font-medium group-hover:text-yellow-100 transition-colors duration-300">
-                Watch viral videos of Monkey creating his masterpieces. His painting process has captivated millions of
-                viewers worldwide on this entertainment platform.
-              </p>
-
-              <div className="grid grid-cols-3 gap-4 mb-8">
-                <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
-                  <div className="text-orange-400 font-black text-2xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
-                    49K+
-                  </div>
-                  <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Followers</div>
+              <div className="text-left">
+                <div className="text-white font-black text-lg italic tracking-wide group-hover:text-yellow-200 transition-colors duration-300">
+                  TIKTOK
                 </div>
+                <div className="text-orange-300 text-sm font-medium">@omarvonmuller</div>
+              </div>
+            </div>
+
+            <p className="text-orange-200 text-left mb-6 leading-relaxed font-medium group-hover:text-yellow-100 transition-colors duration-300 flex-grow text-sm">
+              Watch viral videos of Monkey creating his masterpieces. His painting process has captivated millions of
+              viewers worldwide on this entertainment platform.
+            </p>
+
+            <div className="grid grid-cols-1 gap-3 mb-6">
+              <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
+                <div className="text-orange-400 font-black text-xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
+                  49K+
+                </div>
+                <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Followers</div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
                 <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
-                  <div className="text-orange-400 font-black text-2xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
+                  <div className="text-orange-400 font-black text-lg italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
                     60+
                   </div>
                   <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Videos</div>
                 </div>
                 <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
-                  <div className="text-orange-400 font-black text-2xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
+                  <div className="text-orange-400 font-black text-lg italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
                     6.4M+
                   </div>
                   <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Total Likes</div>
                 </div>
               </div>
-
-              <Link
-                href="https://www.tiktok.com/@omarvonmuller?_t=ZS-8xdCXISxYVV&_r=1"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button className="w-full bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white font-black italic py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-orange-500/40 border-2 border-orange-400/40 hover:border-yellow-400 tracking-widest text-lg">
-                  <TikTokIcon className="mr-2 h-5 w-5" />
-                  FOLLOW NOW
-                </Button>
-              </Link>
             </div>
 
-            {/* Facebook Card */}
-            <div className="group relative bg-gradient-to-br from-orange-900/80 via-black/90 to-yellow-900/80 rounded-2xl border-2 border-orange-400/40 p-6 hover:border-yellow-400/80 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/30 backdrop-blur-sm">
-              {/* Glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-yellow-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+            <Link
+              href="https://www.tiktok.com/@omarvonmuller?_t=ZS-8xdCXISxYVV&_r=1"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button className="w-full bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white font-black italic py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-orange-500/40 border-2 border-orange-400/40 hover:border-yellow-400 tracking-widest text-sm">
+                <TikTokIcon className="mr-2 h-4 w-4" />
+                FOLLOW NOW
+              </Button>
+            </Link>
+          </div>
 
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-14 h-14 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-orange-500/50 transition-all duration-300 group-hover:scale-110">
-                  <Facebook className="h-7 w-7 text-white drop-shadow-lg" />
-                </div>
-                <div className="text-left">
-                  <div className="text-white font-black text-xl italic tracking-wide group-hover:text-yellow-200 transition-colors duration-300">
-                    FACEBOOK
-                  </div>
-                  <div className="text-orange-300 text-sm font-medium">Omar and Monkey</div>
-                </div>
+          {/* Facebook Card */}
+          <div className="group relative bg-gradient-to-br from-orange-900/80 via-black/90 to-yellow-900/80 rounded-2xl border-2 border-orange-400/40 p-6 hover:border-yellow-400/80 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/30 backdrop-blur-sm min-h-[480px] flex flex-col">
+            {/* Glow effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-yellow-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-orange-500/50 transition-all duration-300 group-hover:scale-110">
+                <Facebook className="h-6 w-6 text-white drop-shadow-lg" />
               </div>
-
-              <p className="text-orange-200 text-left mb-8 leading-relaxed font-medium group-hover:text-yellow-100 transition-colors duration-300">
-                Join the official Monkey the Painting Dog Fan Club on Facebook. Connect with fellow fans, get updates on
-                Monkey's latest adventures, and support the token.
-              </p>
-
-              <div className="grid grid-cols-3 gap-4 mb-8">
-                <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
-                  <div className="text-orange-400 font-black text-2xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
-                    1.2M+
-                  </div>
-                  <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Members</div>
+              <div className="text-left">
+                <div className="text-white font-black text-lg italic tracking-wide group-hover:text-yellow-200 transition-colors duration-300">
+                  FACEBOOK
                 </div>
+                <div className="text-orange-300 text-sm font-medium">Omar and Monkey</div>
+              </div>
+            </div>
+
+            <p className="text-orange-200 text-left mb-6 leading-relaxed font-medium group-hover:text-yellow-100 transition-colors duration-300 flex-grow text-sm">
+              Join the official Monkey the Painting Dog Fan Club on Facebook. Connect with fellow fans, get updates on
+              Monkey's latest adventures, and support the token.
+            </p>
+
+            <div className="grid grid-cols-1 gap-3 mb-6">
+              <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
+                <div className="text-orange-400 font-black text-xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
+                  1.2M+
+                </div>
+                <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Members</div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
                 <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
-                  <div className="text-orange-400 font-black text-2xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
+                  <div className="text-orange-400 font-black text-lg italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
                     WEEKLY
                   </div>
                   <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Updates</div>
                 </div>
                 <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
-                  <div className="text-orange-400 font-black text-2xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
+                  <div className="text-orange-400 font-black text-lg italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
                     HIGH
                   </div>
                   <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Engagement</div>
                 </div>
               </div>
-
-              <Link href="https://www.facebook.com/people/Omar-and-Monkey/100088557324948/" target="" rel="noopener noreferrer">
-                <Button className="w-full bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white font-black italic py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-orange-500/40 border-2 border-orange-400/40 hover:border-yellow-400 tracking-widest text-lg">
-                  <Facebook className="mr-2 h-5 w-5" />
-                  FOLLOW NOW
-                </Button>
-              </Link>
             </div>
+
+            <Link href="https://www.facebook.com/people/Omar-and-Monkey/100088557324948/" target="_blank" rel="noopener noreferrer">
+              <Button className="w-full bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white font-black italic py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-orange-500/40 border-2 border-orange-400/40 hover:border-yellow-400 tracking-widest text-sm">
+                <Facebook className="mr-2 h-4 w-4" />
+                FOLLOW NOW
+              </Button>
+            </Link>
+          </div>
+
+          {/* YouTube Card */}
+          <div className="group relative bg-gradient-to-br from-orange-900/80 via-black/90 to-yellow-900/80 rounded-2xl border-2 border-orange-400/40 p-6 hover:border-yellow-400/80 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/30 backdrop-blur-sm min-h-[480px] flex flex-col">
+            {/* Glow effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-yellow-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-orange-500/50 transition-all duration-300 group-hover:scale-110">
+                <Youtube className="h-6 w-6 text-white drop-shadow-lg" />
+              </div>
+              <div className="text-left">
+                <div className="text-white font-black text-lg italic tracking-wide group-hover:text-yellow-200 transition-colors duration-300">
+                  YOUTUBE
+                </div>
+                <div className="text-orange-300 text-sm font-medium">@otheman62</div>
+              </div>
+            </div>
+
+            <p className="text-orange-200 text-left mb-6 leading-relaxed font-medium group-hover:text-yellow-100 transition-colors duration-300 flex-grow text-sm">
+              Subscribe to the official Monkey the Painting Dog YouTube channel for exclusive content and longer videos.
+            </p>
+
+            <div className="grid grid-cols-1 gap-3 mb-6">
+              <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
+                <div className="text-orange-400 font-black text-xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
+                  89K+
+                </div>
+                <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Subscribers</div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
+                  <div className="text-orange-400 font-black text-lg italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
+                    500+
+                  </div>
+                  <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Videos</div>
+                </div>
+                <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
+                  <div className="text-orange-400 font-black text-lg italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
+                    HIGH
+                  </div>
+                  <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Engagement</div>
+                </div>
+              </div>
+            </div>
+
+            <Link href="https://www.youtube.com/@otheman62/shorts" target="_blank" rel="noopener noreferrer">
+              <Button className="w-full bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white font-black italic py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-orange-500/40 border-2 border-orange-400/40 hover:border-yellow-400 tracking-widest text-sm">
+                <Youtube className="mr-2 h-4 w-4" />
+                FOLLOW NOW
+              </Button>
+            </Link>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
       {/* Monkey Paw Agent Section */}
       <section className="relative z-10 py-20 px-6">
