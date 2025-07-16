@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 export default function GamePage() {
   const [isMobile, setIsMobile] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  const gameURL = 'https://luxury-kheer-613993.netlify.app/';
+  const gameURL = 'https://monumental-fairy-c081a6.netlify.app';
 
   // useEffect(() => {
   //   const mobileRegex = /iPhone|iPad|iPod|Android/i;
