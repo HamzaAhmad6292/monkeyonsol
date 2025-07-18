@@ -355,11 +355,8 @@ export default function MonkeyEditor() {
     };
   }, []);
 
-  const handleShare = async () => {
-  if (!editorRef.current) {
-    console.log("No editor instance");
-    return;
-  }
+const handleShare = async () => {
+  if (!editorRef.current) return;
 
   const instance = editorRef.current.getInstance();
   const dataUrl = instance.toDataURL();
@@ -369,33 +366,43 @@ export default function MonkeyEditor() {
 
   img.onload = async () => {
     const finalCanvas = await warpImageOntoTemplate(img);
-    const finalDataUrl = finalCanvas.toDataURL("image/png");
 
-    const blob = await (await fetch(finalDataUrl)).blob();
+    // ↓↓↓ SCALE DOWN to 40% and use JPEG ↓↓↓
+    const scale = 0.4;
+    const smallCanvas = document.createElement("canvas");
+    smallCanvas.width = finalCanvas.width * scale;
+    smallCanvas.height = finalCanvas.height * scale;
+
+    const ctx = smallCanvas.getContext("2d");
+    ctx.drawImage(finalCanvas, 0, 0, smallCanvas.width, smallCanvas.height);
+
+    // Use JPEG and set quality to 0.7
+    const reducedDataUrl = smallCanvas.toDataURL("image/jpeg", 0.7);
+
+    const blob = await (await fetch(reducedDataUrl)).blob();
     const formData = new FormData();
-    formData.append("file", blob, "monkey_art.png");
+    formData.append("file", blob, "monkey_art.jpg");
 
-    // Upload to 0x0.st
-    const uploadResponse = await fetch("https://0x0.st", {
+    const uploadResponse = await fetch("/api/upload", {
       method: "POST",
       body: formData,
     });
 
-    const responseText = await uploadResponse.text();
+    const data = await uploadResponse.json();
 
-    if (!uploadResponse.ok || !responseText.startsWith("https://")) {
-      console.error("Upload failed", responseText);
-      alert("Upload failed.");
+    if (!data.success) {
+      console.error("Upload failed", data);
       return;
     }
 
     const tweetText = encodeURIComponent(
-      `My new art with Monkey The Picasso 🎨 #MonkeyCanvasPro\n${responseText}`
+      `My new art with Monkey The Picasso 🎨 #MonkeyCanvasPro\n${data.url}`
     );
     const tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
     window.open(tweetUrl, "_blank");
   };
 };
+
 
 
   const handleSave = async () => {
