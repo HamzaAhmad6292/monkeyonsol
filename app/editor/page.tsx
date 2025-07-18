@@ -355,55 +355,47 @@ export default function MonkeyEditor() {
     };
   }, []);
 
-const handleShare = async () => {
-  if (!editorRef.current) return;
-
-  const instance = editorRef.current.getInstance();
-  const dataUrl = instance.toDataURL();
-
-  const img = new Image();
-  img.src = dataUrl;
-
-  img.onload = async () => {
-    const finalCanvas = await warpImageOntoTemplate(img);
-
-    // Compress & downscale to avoid size issues
-    const scale = 0.4;
-    const smallCanvas = document.createElement("canvas");
-    smallCanvas.width = finalCanvas.width * scale;
-    smallCanvas.height = finalCanvas.height * scale;
-
-    const ctx = smallCanvas.getContext("2d");
-    ctx.drawImage(finalCanvas, 0, 0, smallCanvas.width, smallCanvas.height);
-
-    const reducedDataUrl = smallCanvas.toDataURL("image/jpeg", 0.8);
-    const blob = await (await fetch(reducedDataUrl)).blob();
-
-    const formData = new FormData();
-    formData.append("file", blob, "monkey_art.jpg");
-
-    // 🔁 Send to /api/upload, which returns { success, url, id }
-    const uploadResponse = await fetch("/api/upload", {
-      method: "POST",
-      body: formData,
+ const getFinalImage = async (): Promise<{ dataUrl: string }> => {
+    if (!editorRef.current) throw new Error("Editor not available");
+    
+    const instance = editorRef.current.getInstance();
+    const dataUrl = instance.toDataURL();
+    
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = async () => {
+        const finalCanvas = await warpImageOntoTemplate(img);
+        resolve({
+          dataUrl: finalCanvas.toDataURL("image/png")
+        });
+      };
+      img.src = dataUrl;
     });
-
-    const data = await uploadResponse.json();
-    if (!data.success || !data.id) {
-      console.error("Upload failed:", data);
-      return;
-    }
-
-    // ✅ Construct share link that Twitter will scrape
-    const sharePageUrl = `${window.location.origin}/share/${data.id}`;
-    const tweetText = encodeURIComponent("My new art with Monkey The Picasso 🎨 #MonkeyCanvasPro");
-    const tweetUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(sharePageUrl)}&text=${tweetText}`;
-
-    // 🐦 Open Twitter tweet composer
-    window.open(tweetUrl, "_blank");
   };
-};
 
+  const handleShare = async () => {
+    try {
+      const { dataUrl } = await getFinalImage();
+      
+      // Create temporary URL for sharing
+      const blob = await (await fetch(dataUrl)).blob();
+      const file = new File([blob], "monkey-art.png", { type: "image/png" });
+      const shareUrl = URL.createObjectURL(file);
+      
+      // Twitter Web Intent URL
+      const tweetText = "Check out my AI-generated art with Monkey Picasso! 🎨🐵 #AIArt #MonkeyPicasso";
+      const twitterIntentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareUrl)}`;
+      
+      // Open Twitter in new tab
+      window.open(twitterIntentUrl, "_blank");
+      
+      // Clean up after 10 mins
+      setTimeout(() => URL.revokeObjectURL(shareUrl), 600000);
+    } catch (error) {
+      console.error("Sharing failed:", error);
+      alert("Sharing failed. Please try again.");
+    }
+  };
 
   const handleSave = async () => {
     if (!editorRef.current) return;

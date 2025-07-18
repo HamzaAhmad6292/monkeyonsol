@@ -1,33 +1,28 @@
-// app/layout.tsx
-export const metadata = {
-  title: "My Site",
-  description: "A great site built with Next.js",
+import type { Metadata } from 'next'
+import './globals.css'
 
-  // You can nest openGraph and twitter configs:
-  openGraph: {
-    title: "My Site",
-    description: "A great site built with Next.js",
-    images: [
-      {
-        url: "https://example.com/og-image.jpg",
-        alt: "Site preview image",
-      },
-    ],
-  },
+export const metadata: Metadata = {
+  title: 'Monkey',
+  description: 'Created',
+  generator: 'dev',
   twitter: {
-    card: "summary_large_image",
-    site: "@YourSite",
-    creator: "@AuthorHandle",
-    title: "My Site",
-    description: "A great site built with Next.js",
-    images: ["https://example.com/og-image.jpg"],
+    card: 'monkeyonsol',
+    site: 'monkeyonsol',
+    creator: '@paw_agent',
+    title: 'Monkey Picasso Art',
+    description: 'Create and share your AI-generated art with Monkey Picasso!',
+    images: [{ url: '/images/twitter-card-default.jpg' }],
   },
-};
+}
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
   return (
     <html lang="en">
       <body>{children}</body>
     </html>
-  );
+  )
 }
