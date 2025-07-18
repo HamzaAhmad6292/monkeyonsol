@@ -367,7 +367,7 @@ const handleShare = async () => {
   img.onload = async () => {
     const finalCanvas = await warpImageOntoTemplate(img);
 
-    // ↓↓↓ SCALE DOWN to 40% and use JPEG ↓↓↓
+    // Compress & downscale to avoid size issues
     const scale = 0.4;
     const smallCanvas = document.createElement("canvas");
     smallCanvas.width = finalCanvas.width * scale;
@@ -376,33 +376,33 @@ const handleShare = async () => {
     const ctx = smallCanvas.getContext("2d");
     ctx.drawImage(finalCanvas, 0, 0, smallCanvas.width, smallCanvas.height);
 
-    // Use JPEG and set quality to 0.7
-    const reducedDataUrl = smallCanvas.toDataURL("image/jpeg", 0.7);
-
+    const reducedDataUrl = smallCanvas.toDataURL("image/jpeg", 0.8);
     const blob = await (await fetch(reducedDataUrl)).blob();
+
     const formData = new FormData();
     formData.append("file", blob, "monkey_art.jpg");
 
+    // 🔁 Send to /api/upload, which returns { success, url, id }
     const uploadResponse = await fetch("/api/upload", {
       method: "POST",
       body: formData,
     });
 
     const data = await uploadResponse.json();
-
-    if (!data.success) {
-      console.error("Upload failed", data);
+    if (!data.success || !data.id) {
+      console.error("Upload failed:", data);
       return;
     }
 
-    const tweetText = encodeURIComponent(
-      `My new art with Monkey The Picasso 🎨 #MonkeyCanvasPro\n${data.url}`
-    );
-    const tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
+    // ✅ Construct share link that Twitter will scrape
+    const sharePageUrl = `${window.location.origin}/share/${data.id}`;
+    const tweetText = encodeURIComponent("My new art with Monkey The Picasso 🎨 #MonkeyCanvasPro");
+    const tweetUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(sharePageUrl)}&text=${tweetText}`;
+
+    // 🐦 Open Twitter tweet composer
     window.open(tweetUrl, "_blank");
   };
 };
-
 
 
   const handleSave = async () => {
