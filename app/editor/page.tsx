@@ -438,7 +438,8 @@ const handleShare = async () => {
     console.log('Original size:', blob.size, 'Compressed size:', compressedBlob.size);
     
     // Upload to Vercel Blob
-    const blobUrl = await uploadToBlob(compressedBlob);
+    // const blobUrl = await uploadToBlob(compressedBlob);
+    const blobUrl="https://p3lqkk0bvslpvjet.public.blob.vercel-storage.com/1752927114762-fmxoj1-monkey-art.png"
     console.log(blobUrl)
     const shareUrl = `${window.location.origin}/share?image=${encodeURIComponent(blobUrl)}`;
 
