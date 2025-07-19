@@ -33,6 +33,9 @@ const customStyles = `
   
   /* Mobile-specific styles */
   @media (max-width: 768px) {
+    .tui-image-editor-header {
+      display: none !important;
+    }
     .tui-image-editor-button,
     .tui-image-editor-menu > .tui-image-editor-item,
     .tui-image-editor-submenu > .tui-image-editor-button {
@@ -50,7 +53,8 @@ const customStyles = `
     }
     
     .tui-image-editor-range-wrap input[type="range"] {
-      height: 44px !important;
+      height: 28px !important;
+      touch-action: auto !important;
     }
     
     .tui-image-editor-header-logo {
@@ -153,22 +157,23 @@ import PerspT from 'perspective-transform';
 async function warpImageOntoTemplate(uploadedImage: HTMLImageElement): Promise<HTMLCanvasElement> {
   return new Promise((resolve) => {
     const template = new Image();
-    template.src = "/images/new_template.png";
+    template.src = "/images/b_template.jpg";
 
     template.onload = () => {
       const canvas = document.createElement("canvas");
-      canvas.width = 1024;
-      canvas.height = 1024;
+      canvas.width = 978;
+      canvas.height = 990;
       const ctx = canvas.getContext("2d")!;
       ctx.drawImage(template, 0, 0);
 
       // Original 4 corners
       const original = {
-        topLeft:     { x: 485, y: 96 },
-        topRight:    { x: 985, y: 57 },
-        bottomRight: { x: 919, y: 799 },
-        bottomLeft:  { x: 405, y: 749 },
+        topLeft:     { x: 600, y: 310 },
+        topRight:    { x: 820, y: 300 },
+        bottomRight: { x: 775, y: 620 },
+        bottomLeft:  { x: 550, y: 610 },
       };
+
 
       // Compute center of the quadrilateral
       const center = {
@@ -264,7 +269,6 @@ export default function MonkeyEditor() {
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      e.preventDefault();
       const touch = e.touches[0];
       if (touch) {
         setMouse({ x: touch.clientX, y: touch.clientY });
@@ -441,17 +445,7 @@ const handleShare = async () => {
     // const blobUrl = await uploadToBlob(compressedBlob);
     const blobUrl="https://p3lqkk0bvslpvjet.public.blob.vercel-storage.com/1752927114762-fmxoj1-monkey-art.png"
     console.log(blobUrl)
-    const shareUrl = `${window.location.origin}/share?image=${encodeURIComponent(blobUrl)}`;
 
-    // Update Twitter meta tags
-    document.querySelector('meta[name="twitter:card"]')?.setAttribute('content', 'summary_large_image');
-    document.querySelector('meta[name="twitter:image"]')?.setAttribute('content', `${window.location.origin}/api/og?image=${encodeURIComponent(blobUrl)}`);
-
-    // Open share dialog
-    window.open(
-      `https://twitter.com/intent/tweet?text=${encodeURIComponent("Check out my monkey art!")}&url=${encodeURIComponent(shareUrl)}`,
-      '_blank'
-    );
     
   } catch (error) {
     console.error('Sharing error:', error);
@@ -480,6 +474,27 @@ const handleShare = async () => {
         console.error('Saving error:', error);
       }
     };
+  };
+
+  // Add undo, redo, reset handlers
+  const handleUndo = () => {
+    if (editorRef.current) {
+      const inst = editorRef.current.getInstance();
+      if (inst && inst.undo) inst.undo();
+    }
+  };
+  const handleRedo = () => {
+    if (editorRef.current) {
+      const inst = editorRef.current.getInstance();
+      if (inst && inst.redo) inst.redo();
+    }
+  };
+  const handleReset = () => {
+    if (editorRef.current) {
+      const inst = editorRef.current.getInstance();
+      if (inst && inst.clearUndoStack) inst.clearUndoStack();
+      if (inst && inst.reset) inst.reset();
+    }
   };
 
   // Mobile-specific configuration
@@ -525,7 +540,9 @@ const handleShare = async () => {
       <meta name="twitter:description" content="Create and share your monkey art!" />
       <meta name="twitter:image" content={imageUrl || '/default-image.png'} />
       
-      <div className="flex-1 min-h-0 overflow-auto relative">
+      <div className="flex-1 min-h-0 overflow-auto relative"
+        style={isMobile ? { paddingBottom: 80 } : {}} // Add bottom padding on mobile
+      >
         <ToastEditor
           ref={editorRef}
           onInit={handleEditorInit}
@@ -671,14 +688,64 @@ const handleShare = async () => {
       
       {/* Mobile action buttons */}
       {isMobile && (
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          background: '#2c2c2c',
-          padding: '12px 16px',
-          gap: 8,
-        }}>
+        <div
+          style={{
+            position: 'fixed',
+            left: 0,
+            bottom: 0,
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            background: '#2c2c2c',
+            padding: '12px 8px',
+            gap: 8,
+            zIndex: 100,
+          }}
+        >
+          {/* Undo */}
+          {/* <button
+            onClick={handleUndo}
+            style={{
+              background: '#444444',
+              color: 'white',
+              border: 'none',
+              borderRadius: 6,
+              padding: 0,
+              width: 44,
+              height: 44,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 24,
+              flex: 'none',
+            }}
+            aria-label="Undo"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 14L4 9l5-5"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+          </button>
+          {/* Redo */}
+          {/* <button
+            onClick={handleRedo}
+            style={{
+              background: '#444444',
+              color: 'white',
+              border: 'none',
+              borderRadius: 6,
+              padding: 0,
+              width: 44,
+              height: 44,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 24,
+              flex: 'none',
+            }}
+            aria-label="Redo"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 14l5-5-5-5"/><path d="M4 20v-7a4 4 0 0 1 4-4h12"/></svg>
+          </button> */} 
+          {/* Load */}
           <button
             onClick={() => {
               const input = document.createElement('input');
@@ -708,7 +775,7 @@ const handleShare = async () => {
           >
             Load
           </button>
-          
+          {/* Save */}
           <button
             onClick={handleSave}
             style={{
@@ -726,7 +793,7 @@ const handleShare = async () => {
           >
             Save
           </button>
-          
+          {/* Share */}
           <button
             onClick={handleShare}
             disabled={isUploading}
@@ -745,6 +812,27 @@ const handleShare = async () => {
           >
             {isUploading ? 'Uploading...' : 'Share'}
           </button>
+          {/* Reset */}
+          {/* <button
+            onClick={handleReset}
+            style={{
+              background: '#444444',
+              color: 'white',
+              border: 'none',
+              borderRadius: 6,
+              padding: 0,
+              width: 44,
+              height: 44,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 24,
+              flex: 'none',
+            }}
+            aria-label="Reset"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 4v6h6"/><path d="M3.51 9a9 9 0 1 1-2.13 9"/></svg>
+          </button> */}
         </div>
       )}
     </div>
