@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import Telegram from "@/components/icons/Telegram"
 import XIcon from "@/components/icons/XIcon" // <-- Add this import for your X logo SVG component
 import TikTokIcon from "@/components/icons/TikTokIcon"
+import {  Paintbrush, Palette, Download, ArrowRight } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 import { Card, CardContent } from "@/components/ui/card"
@@ -637,6 +638,136 @@ export default function MemeTokenGaming() {
           </div>
         </div>
       </section>
+      <section className="relative z-10 py-24 px-4 sm:px-6">
+  {/* Animated Background Elements */}
+  <div className="absolute inset-0 z-0">
+    <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gradient-to-r from-orange-500/10 to-yellow-500/10 rounded-full blur-3xl opacity-30 animate-pulse" />
+    <div className="absolute bottom-1/3 right-1/3 w-48 h-48 bg-gradient-to-r from-orange-400/15 to-yellow-400/15 rounded-full blur-2xl opacity-40 animate-ping-slow" />
+  </div>
+  
+  <div className="max-w-7xl mx-auto relative z-10">
+    {/* Section Header */}
+    <div className="text-center mb-16">
+      <h2 className="text-4xl md:text-5xl lg:text-6xl font-black italic mb-6 text-white drop-shadow-[0_2px_32px_orange] tracking-tight uppercase">
+        Unleash Your <span className="bg-gradient-to-r from-orange-400 via-yellow-400 to-amber-300 bg-clip-text text-transparent">Creativity</span>
+      </h2>
+      <div className="w-40 h-2 bg-gradient-to-r from-orange-500 to-yellow-500 mx-auto mb-6 rounded-full shadow-lg" />
+      <p className="text-lg lg:text-xl text-orange-200 font-medium italic leading-relaxed max-w-3xl mx-auto">
+        Create digital art with Monkey The Picasso . No experience needed - just pure creative expression!
+      </p>
+    </div>
+
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      {/* Text Content - Left Side */}
+      <div className="relative">
+        <div className="absolute -top-8 -left-8 w-32 h-32 bg-gradient-to-r from-orange-500/20 to-yellow-500/20 rounded-full blur-xl opacity-70 -z-10" />
+        <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-gradient-to-r from-orange-400/15 to-yellow-400/15 rounded-full blur-lg opacity-50 -z-10" />
+        
+        <div className="bg-gradient-to-br from-orange-900/50 via-black/70 to-yellow-900/50 rounded-3xl border-2 border-orange-400/30 p-8 backdrop-blur-sm shadow-2xl shadow-orange-500/20">
+          <h3 className="text-3xl lg:text-4xl font-black italic mb-6 text-white drop-shadow-[0_2px_24px_orange]">
+            Monkey <span className="text-yellow-300">Canvas</span> Pro
+          </h3>
+          
+          <div className="flex gap-4 mb-8">
+            <div className="w-5 h-5 bg-orange-500 rounded-full animate-pulse shadow-lg" />
+            <div className="w-5 h-5 bg-yellow-500 rounded-full animate-pulse" style={{ animationDelay: "0.5s" }} />
+            <div className="w-5 h-5 bg-amber-600 rounded-full animate-pulse" style={{ animationDelay: "1s" }} />
+          </div>
+          
+          <p className="text-lg text-orange-200 font-medium italic leading-relaxed mb-8">
+            Our editor brings professional tools to everyone. Inspired by Monkey's artistic journey, it's designed for creators at all levels.
+          </p>
+          
+          {/* Features Grid */}
+          <div className="grid grid-cols-2 gap-4 mb-8">
+            {[
+              { icon: Paintbrush, title: "Brushes", desc: "" },
+              { icon: Palette, title: "Colors", desc: "Unlimited palette" },
+              { icon: Download, title: "Export", desc: "High-res PNG/JPG" },
+              { icon: Zap, title: "Fast", desc: "" },
+            ].map((feature, index) => (
+              <div 
+                key={index} 
+                className="bg-gradient-to-r from-orange-900/40 via-black/50 to-yellow-900/40 rounded-xl border border-orange-400/20 p-4 hover:border-yellow-400/50 transition-colors group"
+              >
+                <feature.icon className="h-8 w-8 text-orange-400 mb-2 group-hover:text-yellow-300 transition-colors" />
+                <div className="font-bold text-white group-hover:text-yellow-200 transition-colors">{feature.title}</div>
+                <div className="text-sm text-orange-300 group-hover:text-yellow-100 transition-colors">{feature.desc}</div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Button
+              onClick={() => router.push("/editor")}
+              className="flex-1 bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500 text-white font-extrabold italic py-6 text-lg border-4 border-orange-400/60 shadow-xl shadow-orange-500/25 tracking-widest rounded-xl transition-all duration-300 hover:scale-[1.03] group"
+            >
+              <ArrowRight className="mr-3 h-6 w-6 group-hover:translate-x-1 transition-transform" />
+              Launch Editor
+            </Button>
+          </div>
+        </div>
+      </div>
+      
+      {/* Image Container - Right Side */}
+      <div className="relative flex justify-center">
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-4/5 bg-gradient-to-r from-orange-500/10 to-yellow-500/10 rounded-full blur-3xl opacity-30 -z-10" />
+        
+        <div className="relative w-full max-w-xl">
+          {/* Floating Elements */}
+          <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-gradient-to-r from-orange-500/20 to-yellow-500/20 backdrop-blur-sm border-2 border-orange-400/20 shadow-lg flex items-center justify-center z-10">
+            <div className="text-center">
+              <div className="text-3xl font-black text-yellow-300">Monkey</div>
+              <div className="text-sm text-orange-200 font-bold">Template</div>
+            </div>
+          </div>
+          
+          <div className="absolute -bottom-8 left-4 w-28 h-28 rounded-2xl bg-gradient-to-r from-orange-900/40 to-yellow-900/40 backdrop-blur-sm border-2 border-orange-400/20 shadow-lg flex items-center justify-center rotate-6 z-10">
+            <div className="text-center p-2">
+              <div className="text-xl font-black text-orange-300">Creativity</div>
+              <div className="text-xs text-orange-200">Powered</div>
+            </div>
+          </div>
+          
+          {/* Main Image */}
+          <div className="relative rounded-3xl overflow-hidden border-4 border-orange-400/40 shadow-2xl shadow-orange-500/30 bg-black/80">
+            {/* Floating tools */}
+            <div className="absolute top-6 left-6 w-12 h-12 bg-gradient-to-r from-orange-600 to-yellow-600 rounded-lg flex items-center justify-center shadow-lg rotate-12 z-10">
+              <Paintbrush className="h-6 w-6 text-white" />
+            </div>
+            <div className="absolute bottom-6 right-6 w-10 h-10 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center shadow-lg -rotate-12 z-10">
+              <Palette className="h-5 w-5 text-white" />
+            </div>
+            
+            {/* Image with gradient overlay */}
+            <div className="relative">
+              <img
+                src="/images/b_template.jpg"
+                alt="Monkey Editor Interface"
+                className="w-full h-auto object-contain rounded-2xl"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/80" />
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-yellow-500/10" />
+              
+              {/* Overlay text */}
+              <div className="absolute bottom-8 left-0 right-0 text-center">
+                <div className="text-3xl font-black italic text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-400 mb-2">
+                  MONKEY Canvas Pro
+                </div>
+                <div className="text-orange-200 italic text-lg">
+                  Professional tools for everyone
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    {/* Testimonials Carousel */}
+    
+  </div>
+</section>
 
       {/* Community Socials */}
       <section className="relative z-10 py-20 px-6">

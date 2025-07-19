@@ -505,7 +505,7 @@ const handleShare = async () => {
       size: { width: 800, height: 600 },
       useCanvasSize: true,
     },
-    menu: ['draw', 'shape', 'filter'],
+    menu: ['draw', 'shape',],
     initMenu: 'draw',
     uiSize: {
       width: '100%',
