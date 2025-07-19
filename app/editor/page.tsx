@@ -582,7 +582,7 @@ export default function MonkeyEditor() {
         </button>
 
         {/* 2. ADD TEXT */}
-        <button
+        {/* <button
           onClick={addTextBlock}
           style={{
             flex: 1,
@@ -602,7 +602,7 @@ export default function MonkeyEditor() {
           <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
             <path d="M5 4v3h5.5v12h3V7H19V4z" />
           </svg>
-        </button>
+        </button> */}
 
         {/* 3. SAVE */}
         <button
