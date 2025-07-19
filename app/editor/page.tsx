@@ -4,8 +4,9 @@ import dynamic from 'next/dynamic';
 import 'tui-image-editor/dist/tui-image-editor.css';
 import 'tui-color-picker/dist/tui-color-picker.css';
 import React, { useEffect, useRef, useState } from 'react';
+import { TwitterShareButton, TwitterIcon } from 'react-share';
 
-  // Enhanced mobile-friendly styling
+// Enhanced mobile-friendly styling
 const customStyles = `
   .tui-image-editor-button,
   .tui-image-editor-menu > .tui-image-editor-item,
@@ -225,25 +226,23 @@ async function warpImageOntoTemplate(uploadedImage: HTMLImageElement): Promise<H
 
           if (dx >= 0 && dy >= 0 && dx < canvas.width && dy < canvas.height) {
             ctx.fillStyle = `rgba(${r},${g},${b},${a / 255})`;
-            // ctx.fillStyle = "rgba(255, 102, 0, 0.08)";
-
             ctx.fillRect(dx, dy, 1, 1);
           }
         }
       }
       
-
       resolve(canvas);
     };
   });
 }
 
-
-
 export default function MonkeyEditor() {
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
   const [angle, setAngle] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [shareUrl, setShareUrl] = useState("");
   const imgRef = useRef<HTMLImageElement>(null);
   const editorRef = useRef<any>(null);
 
@@ -265,7 +264,6 @@ export default function MonkeyEditor() {
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      // Prevent default to avoid scrolling issues
       e.preventDefault();
       const touch = e.touches[0];
       if (touch) {
@@ -280,7 +278,6 @@ export default function MonkeyEditor() {
       }
     };
 
-    // Add both mouse and touch event listeners
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('touchmove', handleTouchMove, { passive: false });
     window.addEventListener('touchstart', handleTouchStart, { passive: false });
@@ -292,7 +289,7 @@ export default function MonkeyEditor() {
     };
   }, []);
 
-  // Updated angle calculation to work on both desktop and mobile
+  // Updated angle calculation
   useEffect(() => {
     if (!imgRef.current) return;
     
@@ -306,7 +303,6 @@ export default function MonkeyEditor() {
     const dy = mouse.y - imgCenter.y;
     const rad = Math.atan2(dy, dx);
     
-    // Different base angles for mobile vs desktop
     const baseAngle = isMobile ? 90 : 150;
     setAngle((rad * (180 / Math.PI)) + baseAngle);
   }, [mouse, isMobile]);
@@ -314,22 +310,19 @@ export default function MonkeyEditor() {
   const handleEditorInit = (editor: any) => {
     editorRef.current = editor;
     
-    // Override the default download button functionality
     setTimeout(() => {
       const downloadButton = document.querySelector('.tui-image-editor-download-btn');
       if (downloadButton) {
-        // Remove existing event listeners by cloning the element
         const newDownloadButton = downloadButton.cloneNode(true);
         downloadButton.parentNode?.replaceChild(newDownloadButton, downloadButton);
         
-        // Add our custom download functionality
         newDownloadButton.addEventListener('click', async (e) => {
           e.preventDefault();
           e.stopPropagation();
           await handleSave();
         });
       }
-    }, 1000); // Wait for Toast UI to fully initialize
+    }, 1000);
   };
 
   useEffect(() => {
@@ -355,46 +348,69 @@ export default function MonkeyEditor() {
     };
   }, []);
 
- const getFinalImage = async (): Promise<{ dataUrl: string }> => {
-    if (!editorRef.current) throw new Error("Editor not available");
-    
-    const instance = editorRef.current.getInstance();
-    const dataUrl = instance.toDataURL();
-    
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = async () => {
-        const finalCanvas = await warpImageOntoTemplate(img);
-        resolve({
-          dataUrl: finalCanvas.toDataURL("image/png")
-        });
-      };
-      img.src = dataUrl;
-    });
+  // Upload image to Vercel Blob Storage
+  const uploadToBlob = async (blob: Blob): Promise<string> => {
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', blob, 'monkey-art.png');
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const data = await response.json();
+      return data.url;
+    } catch (error) {
+      console.error('Upload error:', error);
+      throw error;
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleShare = async () => {
-    try {
-      const { dataUrl } = await getFinalImage();
-      
-      // Create temporary URL for sharing
-      const blob = await (await fetch(dataUrl)).blob();
-      const file = new File([blob], "monkey-art.png", { type: "image/png" });
-      const shareUrl = URL.createObjectURL(file);
-      
-      // Twitter Web Intent URL
-      const tweetText = "Check out my AI-generated art with Monkey Picasso! 🎨🐵 #AIArt #MonkeyPicasso";
-      const twitterIntentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareUrl)}`;
-      
-      // Open Twitter in new tab
-      window.open(twitterIntentUrl, "_blank");
-      
-      // Clean up after 10 mins
-      setTimeout(() => URL.revokeObjectURL(shareUrl), 600000);
-    } catch (error) {
-      console.error("Sharing failed:", error);
-      alert("Sharing failed. Please try again.");
-    }
+    if (!editorRef.current) return;
+  
+    const instance = editorRef.current.getInstance();
+    const dataUrl = instance.toDataURL();
+  
+    const img = new Image();
+    img.src = dataUrl;
+  
+    img.onload = async () => {
+      try {
+        const finalCanvas = await warpImageOntoTemplate(img);
+        finalCanvas.toBlob(async (blob) => {
+          if (!blob) return;
+          
+          const blobUrl = await uploadToBlob(blob);
+          setImageUrl(blobUrl);
+          setShareUrl(`${window.location.origin}/share?image=${encodeURIComponent(blobUrl)}`);
+          
+          // Update Twitter Card meta tags
+          document.querySelector('meta[name="twitter:card"]')?.setAttribute('content', 'summary_large_image');
+          document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', 'My Monkey Art');
+          document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', 'Check out my creation!');
+          document.querySelector('meta[name="twitter:image"]')?.setAttribute('content', blobUrl);
+          
+          // Auto-open share dialog on mobile after upload
+          if (isMobile) {
+            window.open(
+              `https://twitter.com/intent/tweet?text=${encodeURIComponent("Check out my monkey art! 🎨🐵 #MemeArt")}&url=${encodeURIComponent(`${window.location.origin}/share?image=${encodeURIComponent(blobUrl)}`)}`,
+              '_blank'
+            );
+          }
+        }, 'image/png');
+      } catch (error) {
+        console.error('Sharing error:', error);
+      }
+    };
   };
 
   const handleSave = async () => {
@@ -407,15 +423,17 @@ export default function MonkeyEditor() {
     img.src = dataUrl;
   
     img.onload = async () => {
-      const finalCanvas = await warpImageOntoTemplate(img);
-      const link = document.createElement("a");
-      link.download = "my-monkey-art.png";
-      link.href = finalCanvas.toDataURL("image/png");
-      link.click();
+      try {
+        const finalCanvas = await warpImageOntoTemplate(img);
+        const link = document.createElement("a");
+        link.download = "my-monkey-art.png";
+        link.href = finalCanvas.toDataURL("image/png");
+        link.click();
+      } catch (error) {
+        console.error('Saving error:', error);
+      }
     };
   };
-  
-  
 
   // Mobile-specific configuration
   const mobileConfig = {
@@ -425,8 +443,7 @@ export default function MonkeyEditor() {
       size: { width: 800, height: 600 },
       useCanvasSize: true,
     },
-    // menu: ['draw', 'text', 'filter', 'crop'],
-    menu: ['draw', 'shape', 'filter', ],
+    menu: ['draw', 'shape', 'filter'],
     initMenu: 'draw',
     uiSize: {
       width: '100%',
@@ -452,10 +469,15 @@ export default function MonkeyEditor() {
     menuBarPosition: 'left',
   };
 
-
-
   return (
     <div className="h-screen flex flex-col">
+      {/* Twitter Card Meta Tags */}
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:site" content="@YourTwitterHandle" />
+      <meta name="twitter:title" content="Monkey Picasso Art" />
+      <meta name="twitter:description" content="Create and share your monkey art!" />
+      <meta name="twitter:image" content={imageUrl || '/default-image.png'} />
+      
       <div className="flex-1 min-h-0 overflow-auto relative">
         <ToastEditor
           ref={editorRef}
@@ -514,37 +536,65 @@ export default function MonkeyEditor() {
             display: 'flex',
             justifyContent: 'center',
           }}>
-            <button
-              onClick={handleShare}
-              style={{
-                background: '#1da1f2',
-                color: 'white',
-                border: 'none',
-                borderRadius: 8,
-                padding: '12px 24px',
-                fontWeight: 600,
-                fontSize: 18,
-                cursor: 'pointer',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                marginTop: 12,
-                width: '100%',
-                transition: 'background 0.2s',
-              }}
-              onMouseOver={e => (e.currentTarget.style.background = '#0d8ddb')}
-              onMouseOut={e => (e.currentTarget.style.background = '#1da1f2')}
-            >
-              Share to Twitter
-            </button>
+            {imageUrl ? (
+              <TwitterShareButton
+                url={shareUrl}
+                title="Check out my monkey art! 🎨🐵 #MonkeyPicasso"
+                via="YourTwitterHandle"
+                hashtags={['Art', 'DigitalArt']}
+                related={['twitterapi']}
+                style={{
+                  background: '#1da1f2',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 8,
+                  padding: '12px 24px',
+                  fontWeight: 600,
+                  fontSize: 18,
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                  marginTop: 12,
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                }}
+              >
+                <TwitterIcon size={24} round />
+                <span>Share to Twitter</span>
+              </TwitterShareButton>
+            ) : (
+              <button
+                onClick={handleShare}
+                disabled={isUploading}
+                style={{
+                  background: isUploading ? '#aaa' : '#1da1f2',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 8,
+                  padding: '12px 24px',
+                  fontWeight: 600,
+                  fontSize: 18,
+                  cursor: isUploading ? 'not-allowed' : 'pointer',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                  marginTop: 12,
+                  width: '100%',
+                }}
+              >
+                {isUploading ? 'Uploading...' : 'Share to Twitter'}
+              </button>
+            )}
           </div>
         )}
 
-        {/* Mobile floating monkey image - now with rotation */}
+        {/* Mobile floating monkey image */}
         {isMobile && (
           <div
             style={{
               position: 'fixed',
               right: 0,
-              bottom: 300, // Above the native toolbar
+              bottom: 300,
               zIndex: 50,
               pointerEvents: 'none',
               width: 100,
@@ -572,7 +622,7 @@ export default function MonkeyEditor() {
         )}
       </div>
       
-      {/* Mobile action buttons - below editor content, scrollable */}
+      {/* Mobile action buttons */}
       {isMobile && (
         <div style={{
           display: 'flex',
@@ -613,15 +663,6 @@ export default function MonkeyEditor() {
           </button>
           
           <button
-            // onClick={() => {
-            //   if (editorRef.current) {
-            //     const dataUrl = editorRef.current.getInstance().toDataURL();
-            //     const link = document.createElement('a');
-            //     link.download = 'my-art.png';
-            //     link.href = dataUrl;
-            //     link.click();
-            //   }
-            // }}
             onClick={handleSave}
             style={{
               background: '#444444',
@@ -641,20 +682,21 @@ export default function MonkeyEditor() {
           
           <button
             onClick={handleShare}
+            disabled={isUploading}
             style={{
-              background: '#444444',
+              background: isUploading ? '#aaa' : '#444444',
               color: 'white',
               border: 'none',
               borderRadius: 6,
               padding: '12px 20px',
               fontWeight: 600,
               fontSize: 14,
-              cursor: 'pointer',
+              cursor: isUploading ? 'not-allowed' : 'pointer',
               flex: 1,
               minHeight: 44,
             }}
           >
-            Share
+            {isUploading ? 'Uploading...' : 'Share'}
           </button>
         </div>
       )}
