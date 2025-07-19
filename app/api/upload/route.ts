@@ -10,20 +10,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
-    const blob = await put(file.name, file, {
+    // Generate unique filename with timestamp and random string
+    const uniqueFilename = `${Date.now()}-${Math.random()
+      .toString(36)
+      .substring(2, 8)}-${file.name}`;
+
+    const blob = await put(uniqueFilename, file, {
       access: 'public',
       token: process.env.BLOB_READ_WRITE_TOKEN,
     });
 
-    // Add CORS headers here - this is where you should add the code
     return NextResponse.json(blob, {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'POST',
-        'Access-Control-Allow-Headers': 'Content-Type',
       }
     });
-
   } catch (error) {
     console.error('Upload error:', error);
     return NextResponse.json(
