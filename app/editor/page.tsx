@@ -377,32 +377,7 @@ export default function MonkeyEditor() {
       setIsUploading(false);
     }
   };
-  async function compressImage(blob: Blob, maxSizeMB = 4): Promise<Blob> {
-  return new Promise((resolve) => {
-    const img = new Image();
-    const url = URL.createObjectURL(blob);
-    
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d')!;
-      
-      // Calculate new dimensions
-      const scale = Math.min(1, maxSizeMB * 1024 * 1024 / (blob.size || 1));
-      canvas.width = img.width * scale;
-      canvas.height = img.height * scale;
-      
-      // Draw and compress
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      canvas.toBlob(
-        (compressedBlob) => resolve(compressedBlob || blob),
-        'image/jpeg',
-        0.8 // Quality
-      );
-    };
-    
-    img.src = url;
-  });
-}
+
 const handleShare = async () => {
   if (!editorRef.current) return;
   
@@ -438,13 +413,10 @@ const handleShare = async () => {
     if (!blob) throw new Error('Failed to create image blob');
     
     // Compress image for upload
-    const compressedBlob = await compressImage(blob);
-    console.log('Original size:', blob.size, 'Compressed size:', compressedBlob.size);
     
     // Upload to Vercel Blob
     // const blobUrl = await uploadToBlob(compressedBlob);
-    const blobUrl="https://p3lqkk0bvslpvjet.public.blob.vercel-storage.com/1752927114762-fmxoj1-monkey-art.png"
-    console.log(blobUrl)
+  
 
     
   } catch (error) {
