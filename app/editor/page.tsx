@@ -5,12 +5,15 @@ import PerspT from 'perspective-transform';
 import dynamic from 'next/dynamic';
 import 'tui-image-editor/dist/tui-image-editor.css';
 import 'tui-color-picker/dist/tui-color-picker.css';
+import { ITextConfig } from 'tui-image-editor';   // TS types only – no runtime cost
 import React, { useEffect, useRef, useState } from 'react';
 import { TwitterShareButton, TwitterIcon } from 'react-share';
 
 /* ------------------------------------------------------------------ */
 /* 1. Custom CSS (mobile-only overrides)                               */
 /* ------------------------------------------------------------------ */
+/* ------------- Custom text for mobile ------------- */
+
 const customStyles = `
   /* Base touch-friendly hit-slots */
   .tui-image-editor-button,
@@ -114,6 +117,34 @@ const customStyles = `
     background-color: #e55100 !important;
     color: white !important;
   }
+
+  @media (max-width: 768px) {
+  /* --- make resize handles always visible --- */
+  .tui-image-editor-canvas-container .tui-image-editor-size-grip,
+  .tui-image-editor-canvas-container .tui-image-editor-rotate-grip,
+  .tui-image-editor-canvas-container .tui-image-editor-controls {
+    display: block !important;
+    opacity: 1 !important;
+  }
+
+  /* thicker corner handles so they’re easier to grab */
+  .tui-image-editor-canvas-container .tui-image-editor-rect-corner {
+    width: 12px !important;
+    height: 12px !important;
+    border: 2px solid #ff6600 !important;
+    background: #ffffff !important;
+    border-radius: 50% !important;
+  }
+
+  /* thicker edge handles */
+  .tui-image-editor-canvas-container .tui-image-editor-rect-mid {
+    width: 12px !important;
+    height: 12px !important;
+    background: #ff6600 !important;
+    border-radius: 50% !important;
+  }
+}
+    
 `;
 
 /* ------------------------------------------------------------------ */
@@ -258,6 +289,26 @@ export default function MonkeyEditor() {
     };
   }, []);
 
+  const addTextBlock = () => {
+  if (!editorRef.current) return;
+
+  const instance = editorRef.current.getInstance();
+  const { width, height } = instance.getCanvasSize();
+
+  // reasonable mobile-first defaults
+  const textOpts: ITextConfig = {
+    text: 'Tap to edit',
+    left: width / 2 - 60,
+    top: height / 2 - 20,
+    fontSize: 48,
+    fontFamily: 'Arial',
+    fill: '#000000',
+    styles: { fontWeight: 'bold' },
+  };
+  instance.addText(textOpts.text, textOpts);
+};
+
+
   /* Configs ---------------------------------------------------------- */
   const mobileConfig = {
     loadImage: { path: '/images/big_white.png', name: 'White Canvas' },
@@ -312,7 +363,7 @@ export default function MonkeyEditor() {
       URL.revokeObjectURL(link.href);
 
       // Twitter intent
-      const text = encodeURIComponent('Check out my art on Monkey Canvas Pro! #MonkeyGoodBoy #$Monkey');
+      const text = encodeURIComponent('Check out my art on Monkey Canvas Pro! #MonkeyGoodBoy #Monkey');
       const twitterUrl = `https://twitter.com/intent/tweet?text=${text}`;
       window.open(twitterUrl, '_blank', 'noopener,noreferrer');
     } catch (err: any) {
@@ -479,90 +530,129 @@ export default function MonkeyEditor() {
       </div>
 
       {/* Mobile fixed action bar */}
-      {isMobile && (
-        <div
-          style={{
-            position: 'fixed',
-            left: 0,
-            bottom: 0,
-            width: '100%',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            background: '#2c2c2c',
-            padding: '12px 8px',
-            gap: 8,
-            zIndex: 100,
+    {isMobile && (
+      <div
+        style={{
+          position: 'fixed',
+          left: 0,
+          bottom: 0,
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-evenly',
+          gap: 4,
+          padding: 10,
+          background: '#2c2c2c',
+          zIndex: 100,
+        }}
+      >
+        {/* 1. LOAD */}
+        <button
+          onClick={() => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = (e) => {
+              const file = (e.target as HTMLInputElement).files?.[0];
+              if (file && editorRef.current) {
+                const url = URL.createObjectURL(file);
+                editorRef.current.getInstance().loadImageFromURL(url, file.name);
+              }
+            };
+            input.click();
           }}
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: '#444',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 8,
+            minHeight: 52,
+            transition: 'background .2s',
+          }}
+          onMouseDown={(e) => (e.currentTarget.style.background = '#666')}
+          onMouseUp={(e) => (e.currentTarget.style.background = '#444')}
         >
-          <button
-            onClick={() => {
-              const input = document.createElement('input');
-              input.type = 'file';
-              input.accept = 'image/*';
-              input.onchange = (e) => {
-                const file = (e.target as HTMLInputElement).files?.[0];
-                if (file && editorRef.current) {
-                  const url = URL.createObjectURL(file);
-                  editorRef.current.getInstance().loadImageFromURL(url, file.name);
-                }
-              };
-              input.click();
-            }}
-            style={{
-              background: '#444444',
-              color: 'white',
-              border: 'none',
-              borderRadius: 6,
-              padding: '12px 20px',
-              fontWeight: 600,
-              fontSize: 16,
-              cursor: 'pointer',
-              flex: 1,
-              minHeight: 48,
-            }}
-          >
-            Load
-          </button>
+          <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z" />
+          </svg>
+        </button>
 
-          <button
-            onClick={handleSave}
-            style={{
-              background: '#444444',
-              color: 'white',
-              border: 'none',
-              borderRadius: 6,
-              padding: '12px 20px',
-              fontWeight: 600,
-              fontSize: 16,
-              cursor: 'pointer',
-              flex: 1,
-              minHeight: 48,
-            }}
-          >
-            Save
-          </button>
+        {/* 2. ADD TEXT */}
+        <button
+          onClick={addTextBlock}
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: '#444',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 8,
+            minHeight: 52,
+            transition: 'background .2s',
+          }}
+          onMouseDown={(e) => (e.currentTarget.style.background = '#666')}
+          onMouseUp={(e) => (e.currentTarget.style.background = '#444')}
+        >
+          <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M5 4v3h5.5v12h3V7H19V4z" />
+          </svg>
+        </button>
 
-          <button
-            onClick={handleShare}
-            disabled={isUploading}
-            style={{
-              background: isUploading ? '#aaa' : '#444444',
-              color: 'white',
-              border: 'none',
-              borderRadius: 6,
-              padding: '12px 20px',
-              fontWeight: 600,
-              fontSize: 16,
-              cursor: isUploading ? 'not-allowed' : 'pointer',
-              flex: 1,
-              minHeight: 48,
-            }}
-          >
-            {isUploading ? 'Uploading…' : 'Share'}
-          </button>
-        </div>
-      )}
+        {/* 3. SAVE */}
+        <button
+          onClick={handleSave}
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: '#444',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 8,
+            minHeight: 52,
+            transition: 'background .2s',
+          }}
+          onMouseDown={(e) => (e.currentTarget.style.background = '#666')}
+          onMouseUp={(e) => (e.currentTarget.style.background = '#444')}
+        >
+          <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M19 12v7H5v-7H3v7a2 2 0 002 2h14a2 2 0 002-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z" />
+          </svg>
+        </button>
+
+        {/* 4. SHARE */}
+        <button
+          onClick={handleShare}
+          disabled={isUploading}
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: isUploading ? '#666' : '#444',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 8,
+            minHeight: 52,
+            transition: 'background .2s',
+            cursor: isUploading ? 'not-allowed' : 'pointer',
+          }}
+          onMouseDown={(e) => !isUploading && (e.currentTarget.style.background = '#666')}
+          onMouseUp={(e) => !isUploading && (e.currentTarget.style.background = '#444')}
+        >
+          <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z" />
+          </svg>
+        </button>
+      </div>
+    )}
     </div>
   );
 }
