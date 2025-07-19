@@ -380,45 +380,40 @@ export default function MonkeyEditor() {
 
 const handleShare = async () => {
   if (!editorRef.current) return;
-  
-  // Start loading state
+
   setIsUploading(true);
-  
+
   try {
-    // Get image from editor
+    // 1. Get the warped image
     const instance = editorRef.current.getInstance();
     const dataUrl = instance.toDataURL();
-    
-    // Create image element
+
     const img = new Image();
     img.src = dataUrl;
-    
-    // Wait for image to load
-    await new Promise((resolve) => {
-      img.onload = resolve;
-    });
-    
-    // Process image with warp transformation
-    const finalCanvas = await warpImageOntoTemplate(img);
-    
-    // Convert canvas to blob
-    const blob: Blob | null = await new Promise((resolve) => {
-      finalCanvas.toBlob(
-        (blob) => resolve(blob),
-        'image/jpeg',
-        0.85 // Quality
-      );
-    });
-    
-    if (!blob) throw new Error('Failed to create image blob');
-    
-    // Compress image for upload
-    
-    // Upload to Vercel Blob
-    // const blobUrl = await uploadToBlob(compressedBlob);
-  
+    await new Promise<void>((r) => (img.onload = () => r()));
 
-    
+    const finalCanvas = await warpImageOntoTemplate(img);
+
+    // 2. Convert canvas → blob → file
+    const blob: Blob | null = await new Promise((res) =>
+      finalCanvas.toBlob(res, 'image/jpeg', 0.85)
+    );
+    if (!blob) throw new Error('Failed to create image blob');
+    const file = new File([blob], 'my-image.jpg', { type: 'image/jpeg' });
+
+    // 3. Trigger browser download
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(file);
+    link.download = file.name;
+    link.click();
+    URL.revokeObjectURL(link.href);
+
+    // 4. Open Twitter share intent (works on desktop & mobile)
+    const text = encodeURIComponent(
+      'Check out my art on Monkey Canvas Pro! #MonkeyGoodBoy #$Monkey'
+    );
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${text}`;
+    window.open(twitterUrl, '_blank', 'noopener,noreferrer');
   } catch (error) {
     console.error('Sharing error:', error);
     alert(`Sharing failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
