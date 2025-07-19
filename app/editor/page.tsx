@@ -373,6 +373,32 @@ export default function MonkeyEditor() {
       setIsUploading(false);
     }
   };
+  async function compressImage(blob: Blob, maxSizeMB = 4): Promise<Blob> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(blob);
+    
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d')!;
+      
+      // Calculate new dimensions
+      const scale = Math.min(1, maxSizeMB * 1024 * 1024 / (blob.size || 1));
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      
+      // Draw and compress
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(
+        (compressedBlob) => resolve(compressedBlob || blob),
+        'image/jpeg',
+        0.8 // Quality
+      );
+    };
+    
+    img.src = url;
+  });
+}
 
   const handleShare = async () => {
     if (!editorRef.current) return;
@@ -389,7 +415,9 @@ export default function MonkeyEditor() {
         finalCanvas.toBlob(async (blob) => {
           if (!blob) return;
           
-          const blobUrl = await uploadToBlob(blob);
+          // Compress image before upload
+          const compressedBlob = await compressImage(blob);
+          const blobUrl = await uploadToBlob(compressedBlob);
           setImageUrl(blobUrl);
           setShareUrl(`${window.location.origin}/share?image=${encodeURIComponent(blobUrl)}`);
           

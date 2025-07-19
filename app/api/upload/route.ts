@@ -1,8 +1,6 @@
 import { put } from '@vercel/blob';
 import { NextResponse } from 'next/server';
 
-export const runtime = 'edge';
-
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
@@ -17,7 +15,15 @@ export async function POST(request: Request) {
       token: process.env.BLOB_READ_WRITE_TOKEN,
     });
 
-    return NextResponse.json(blob);
+    // Add CORS headers here - this is where you should add the code
+    return NextResponse.json(blob, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      }
+    });
+
   } catch (error) {
     console.error('Upload error:', error);
     return NextResponse.json(
