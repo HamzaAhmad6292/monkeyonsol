@@ -399,48 +399,66 @@ export default function MonkeyEditor() {
     img.src = url;
   });
 }
-
-  const handleShare = async () => {
-    if (!editorRef.current) return;
+const handleShare = async () => {
+  if (!editorRef.current) return;
   
+  // Start loading state
+  setIsUploading(true);
+  
+  try {
+    // Get image from editor
     const instance = editorRef.current.getInstance();
     const dataUrl = instance.toDataURL();
-  
+    
+    // Create image element
     const img = new Image();
     img.src = dataUrl;
-  
-    img.onload = async () => {
-      try {
-        const finalCanvas = await warpImageOntoTemplate(img);
-        finalCanvas.toBlob(async (blob) => {
-          if (!blob) return;
-          
-          // Compress image before upload
-          const compressedBlob = await compressImage(blob);
-          const blobUrl = await uploadToBlob(compressedBlob);
-          setImageUrl(blobUrl);
-          setShareUrl(`${window.location.origin}/share?image=${encodeURIComponent(blobUrl)}`);
-          
-          // Update Twitter Card meta tags
-          document.querySelector('meta[name="twitter:card"]')?.setAttribute('content', 'summary_large_image');
-          document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', 'My Monkey Art');
-          document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', 'Check out my creation!');
-          document.querySelector('meta[name="twitter:image"]')?.setAttribute('content', blobUrl);
-          
-          // Auto-open share dialog on mobile after upload
-          if (isMobile) {
-            window.open(
-              `https://twitter.com/intent/tweet?text=${encodeURIComponent("Check out my monkey art! 🎨🐵 #MemeArt")}&url=${encodeURIComponent(`${window.location.origin}/share?image=${encodeURIComponent(blobUrl)}`)}`,
-              '_blank'
-            );
-          }
-        }, 'image/png');
-      } catch (error) {
-        console.error('Sharing error:', error);
-      }
-    };
-  };
+    
+    // Wait for image to load
+    await new Promise((resolve) => {
+      img.onload = resolve;
+    });
+    
+    // Process image with warp transformation
+    const finalCanvas = await warpImageOntoTemplate(img);
+    
+    // Convert canvas to blob
+    const blob: Blob | null = await new Promise((resolve) => {
+      finalCanvas.toBlob(
+        (blob) => resolve(blob),
+        'image/jpeg',
+        0.85 // Quality
+      );
+    });
+    
+    if (!blob) throw new Error('Failed to create image blob');
+    
+    // Compress image for upload
+    const compressedBlob = await compressImage(blob);
+    console.log('Original size:', blob.size, 'Compressed size:', compressedBlob.size);
+    
+    // Upload to Vercel Blob
+    const blobUrl = await uploadToBlob(compressedBlob);
+    console.log(blobUrl)
+    const shareUrl = `${window.location.origin}/share?image=${encodeURIComponent(blobUrl)}`;
 
+    // Update Twitter meta tags
+    document.querySelector('meta[name="twitter:card"]')?.setAttribute('content', 'summary_large_image');
+    document.querySelector('meta[name="twitter:image"]')?.setAttribute('content', `${window.location.origin}/api/og?image=${encodeURIComponent(blobUrl)}`);
+
+    // Open share dialog
+    window.open(
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent("Check out my monkey art!")}&url=${encodeURIComponent(shareUrl)}`,
+      '_blank'
+    );
+    
+  } catch (error) {
+    console.error('Sharing error:', error);
+    alert(`Sharing failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  } finally {
+    setIsUploading(false);
+  }
+};
   const handleSave = async () => {
     if (!editorRef.current) return;
   
