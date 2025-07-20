@@ -34,11 +34,16 @@ const customStyles = `
 
   /* ---------- Mobile only ---------- */
   @media (max-width: 768px) {
+  .tui-image-editor-range-wrap {
+    display: none !important;
+  }
+
     /* Hide header & logo on small screens */
     .tui-image-editor-header,
     .tui-image-editor-header-logo {
       display: none !important;
     }
+
 
     /* Bigger buttons & text */
     .tui-image-editor-button,
@@ -165,7 +170,7 @@ const ToastEditor: any = dynamic(
 async function warpImageOntoTemplate(uploadedImage: HTMLImageElement): Promise<HTMLCanvasElement> {
   return new Promise((resolve) => {
     const template = new Image();
-    template.src = '/images/b_template.jpg';
+    template.src = '/images/s_template.jpg';
     template.onload = () => {
       const canvas = document.createElement('canvas');
       canvas.width = 978;
@@ -174,10 +179,10 @@ async function warpImageOntoTemplate(uploadedImage: HTMLImageElement): Promise<H
       ctx.drawImage(template, 0, 0);
 
       const original = {
-        topLeft: { x: 600, y: 310 },
-        topRight: { x: 820, y: 300 },
-        bottomRight: { x: 775, y: 620 },
-        bottomLeft: { x: 550, y: 610 },
+        topLeft: { x: 548, y: 260 },
+        topRight: { x: 875, y: 250 },
+        bottomRight: { x: 825, y: 635 },
+        bottomLeft: { x: 498, y: 620 },
       };
 
       const center = {
@@ -327,51 +332,105 @@ export default function MonkeyEditor() {
   } as const;
 
   /* Save / Share helpers -------------------------------------------- */
-  const handleSave = async () => {
-    if (!editorRef.current) return;
-    const dataUrl = editorRef.current.getInstance().toDataURL();
-    const img = new Image();
-    img.src = dataUrl;
-    img.onload = async () => {
-      const canvas = await warpImageOntoTemplate(img);
+const handleSave = async () => {
+  if (!editorRef.current) return;
+  const dataUrl = editorRef.current.getInstance().toDataURL();
+  const img = new Image();
+  img.src = dataUrl;
+  img.onload = async () => {
+    // Create a temporary canvas
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = img.width;
+    tempCanvas.height = img.height;
+    const tempCtx = tempCanvas.getContext('2d');
+    
+    if (!tempCtx) return;
+    
+    // Fill canvas with the blend color
+    tempCtx.fillStyle = '#f3dfac';
+    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    
+    // Draw the original image on top with desired blending
+    tempCtx.globalCompositeOperation = 'multiply'; // or another blend mode
+    tempCtx.drawImage(img, 0, 0);
+    
+    // Reset composite operation
+    tempCtx.globalCompositeOperation = 'source-over';
+    
+    // Create a new image with the blended result
+    const blendedImg = new Image();
+    blendedImg.src = tempCanvas.toDataURL();
+    blendedImg.onload = async () => {
+      // Pass the blended image to the warp function
+      const canvas = await warpImageOntoTemplate(blendedImg);
       const link = document.createElement('a');
       link.download = 'my-monkey-art.png';
       link.href = canvas.toDataURL('image/png');
       link.click();
     };
   };
+};
 
-  const handleShare = async () => {
-    if (!editorRef.current) return;
-    setIsUploading(true);
-    try {
-      const dataUrl = editorRef.current.getInstance().toDataURL();
-      const img = new Image();
-      img.src = dataUrl;
-      await new Promise<void>((r) => (img.onload = () => r()));
-      const canvas = await warpImageOntoTemplate(img);
+const handleShare = async () => {
+  if (!editorRef.current) return;
+  setIsUploading(true);
+  try {
+    const dataUrl = editorRef.current.getInstance().toDataURL();
+    const img = new Image();
+    img.src = dataUrl;
+    await new Promise<void>((r) => (img.onload = () => r()));
 
-      const blob: Blob | null = await new Promise((res) => canvas.toBlob(res, 'image/jpeg', 0.99));
-      if (!blob) throw new Error('blob error');
-      const file = new File([blob], 'my-image.jpg', { type: 'image/jpeg' });
+    // Create a temporary canvas for blending
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = img.width;
+    tempCanvas.height = img.height;
+    const tempCtx = tempCanvas.getContext('2d');
+    
+    if (!tempCtx) throw new Error('Could not create canvas context');
+    
+    // Fill canvas with the blend color
+    tempCtx.fillStyle = '#f3dfac';
+    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    
+    // Draw the original image on top with blending
+    tempCtx.globalCompositeOperation = 'multiply'; // or another blend mode
+    tempCtx.drawImage(img, 0, 0);
+    
+    // Reset composite operation
+    tempCtx.globalCompositeOperation = 'source-over';
+    
+    // Create a new image with the blended result
+    const blendedImg = new Image();
+    blendedImg.src = tempCanvas.toDataURL();
+    await new Promise<void>((r) => (blendedImg.onload = () => r()));
 
-      // Download
+    // Pass the blended image to the warp function
+    const canvas = await warpImageOntoTemplate(blendedImg);
+
+    const blob: Blob | null = await new Promise((res) => canvas.toBlob(res, 'image/jpeg', 0.99));
+    if (!blob) throw new Error('blob error');
+    const file = new File([blob], 'my-image.jpg', { type: 'image/jpeg' });
+
+    // ✅ Download only on desktop
+    if (!isMobile) {
       const link = document.createElement('a');
       link.href = URL.createObjectURL(file);
       link.download = file.name;
       link.click();
       URL.revokeObjectURL(link.href);
-
-      // Twitter intent
-      const text = encodeURIComponent('Check out my art on Monkey Canvas Pro! #MonkeyGoodBoy #Monkey');
-      const twitterUrl = `https://twitter.com/intent/tweet?text=${text}`;
-      window.open(twitterUrl, '_blank', 'noopener,noreferrer');
-    } catch (err: any) {
-      alert(`Sharing failed: ${err.message}`);
-    } finally {
-      setIsUploading(false);
     }
-  };
+
+    // Twitter share intent (works on both desktop and mobile)
+    const text = encodeURIComponent('$Monkey');
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${text}`;
+    window.open(twitterUrl, '_blank', 'noopener,noreferrer');
+  } catch (err: any) {
+    alert(`Sharing failed: ${err.message}`);
+  } finally {
+    setIsUploading(false);
+  }
+};
+
 
   /* ------------------------------------------------------------------ */
   /* 5. Render --------------------------------------------------------- */
