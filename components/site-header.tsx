@@ -19,7 +19,7 @@ const navLinks: NavLink[] = [
   { href: "#monkey-paw-agent", label: "Paw Agent" },
   { href: "#creativity", label: "Canvas Pro" },
   { href: "#community", label: "Community" },
-  { href: "/game", label: "Game", isExternal: true }, // Link to game page
+  { href: "/game", label: "Art Gallery", isExternal: true }, // Link to game page
   { href: "/editor", label: "Editor", isExternal: true }, // Link to editor page
 ]
 

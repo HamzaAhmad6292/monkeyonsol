@@ -699,7 +699,7 @@ export default function MemeTokenGaming() {
             </div>
 
             {/* Image Container - Right Side */}
-            <div className="relative flex justify-center">
+            <div className="relative flex justify-center"   style={{ cursor: 'pointer' }} onClick={() => router.push("/editor")}>
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-4/5 bg-gradient-to-r from-orange-500/10 to-yellow-500/10 rounded-full blur-3xl opacity-30 -z-10" />
 
               <div className="relative w-full max-w-xl">
