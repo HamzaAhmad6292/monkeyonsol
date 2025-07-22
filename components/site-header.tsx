@@ -21,6 +21,8 @@ const navLinks: NavLink[] = [
   { href: "#creativity", label: "Art Tool" },
   // { href: "#community", label: "Community" },
   { href: "/game", label: "Art Gallery", isExternal: true }, // Link to game page
+  { href: "/whitepaper", label: "White Paper", isExternal: true }, // Link to game page
+
 ]
 
 export function SiteHeader() {
