@@ -13,14 +13,13 @@ interface NavLink {
 }
 
 const navLinks: NavLink[] = [
-  { href: "#tokenomics", label: "Tokenomics" }, 
-  { href: "#about", label: "About" },
-  { href: "#social-media", label: "Socials" },
+  // { href: "#tokenomics", label: "Tokenomics" }, 
+  // { href: "#about", label: "About" },
+  // { href: "#social-media", label: "Socials" }, 
   { href: "#monkey-paw-agent", label: "Paw Agent" },
-  { href: "#creativity", label: "Canvas Pro" },
+  { href: "#creativity", label: "Art Tool" },
   { href: "#community", label: "Community" },
   { href: "/game", label: "Art Gallery", isExternal: true }, // Link to game page
-  { href: "/editor", label: "Editor", isExternal: true }, // Link to editor page
 ]
 
 export function SiteHeader() {
