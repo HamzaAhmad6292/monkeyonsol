@@ -22,6 +22,8 @@ const navLinks: NavLink[] = [
   // { href: "#community", label: "Community" },
   { href: "/game", label: "Art Gallery", isExternal: true }, // Link to game page
   { href: "/whitepaper", label: "White Paper", isExternal: true }, // Link to game page
+  { href: "/monkeycompanion", label: "Companion", isExternal: true }, // Link to game page
+
 
 ]
 
