@@ -1,10 +1,10 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useGroqChat } from "@/components/groqChat"
 import { Send } from "lucide-react"
 import Link from "next/link"
 
@@ -16,71 +16,26 @@ interface Message {
 }
 
 export default function MonkeyCompanionPage() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      content:
-        "Woof! Hi there! I'm Monkey, your AI art companion! 🎨 I'm here to chat about art, creativity, and help you with your artistic journey. What would you like to create today?",
-      isUser: false,
-      timestamp: new Date(),
-    },
-  ])
-  const [inputMessage, setInputMessage] = useState("")
-  const [isTyping, setIsTyping] = useState(false)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const { messages, isTyping, sendMessage } = useGroqChat({
+    systemPrompt: "You are Monkey, a friendly and playful AI art companion dog who loves painting and helping with creative ideas. You respond like a cheerful, enthusiastic dog artist who gets excited about creativity and art. Use dog-like expressions occasionally (like 'woof!' or 'that's pawsome!') but keep it natural and helpful. You're knowledgeable about art techniques, color theory, composition, and creative inspiration.",
+    model: "llama3-8b-8192",
+    temperature: 0.8,
+    maxTokens: 1024,
+    maxHistoryTokens: 4000,
+  });
 
-  // Auto scroll to bottom
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
+  const [inputMessage, setInputMessage] = useState("")
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const chatContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    scrollToBottom()
-  }, [messages])
-
-  // Simulate AI response
-  const generateAIResponse = (userMessage: string): string => {
-    const responses = [
-      "That's a fantastic idea! 🎨 As an artistic dog, I love when humans get creative. What colors are you thinking of using?",
-      "Woof woof! That reminds me of when I painted my famous Ferrari piece! 🚗 Art is all about expressing yourself freely.",
-      "Oh, I'm wagging my tail with excitement! 🐕 That sounds like it could be a masterpiece. Have you tried using different brush techniques?",
-      "Pawsome question! 🐾 In my experience painting (yes, I actually paint!), the best art comes from the heart. What's inspiring you today?",
-      "Arf arf! That's exactly the kind of creative thinking I love to see! 🌟 You know, when I'm painting, I always follow my instincts.",
-      "Tail-wagging good idea! 🎭 Art should be fun and expressive. Don't worry about making it perfect - just let your creativity flow!",
-      "Woof! That's giving me some serious artistic inspiration! 🎨 Have you seen my latest paintings? I love experimenting with bold colors!",
-      "Bark bark! You're speaking my language now! 🎪 Art is like play for me - the more fun you have, the better it turns out!",
-    ]
-    return responses[Math.floor(Math.random() * responses.length)]
-  }
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages, isTyping])
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      content: inputMessage,
-      isUser: true,
-      timestamp: new Date(),
-    }
-
-    setMessages((prev) => [...prev, userMessage])
+    await sendMessage(inputMessage)
     setInputMessage("")
-    setIsTyping(true)
-
-    // Simulate AI thinking time
-    setTimeout(
-      () => {
-        const aiResponse: Message = {
-          id: (Date.now() + 1).toString(),
-          content: generateAIResponse(inputMessage),
-          isUser: false,
-          timestamp: new Date(),
-        }
-        setMessages((prev) => [...prev, aiResponse])
-        setIsTyping(false)
-      },
-      1000 + Math.random() * 2000,
-    )
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -94,7 +49,6 @@ export default function MonkeyCompanionPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* Building/Construction Animation */}
         <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-orange-500/20 animate-pulse" />
         <div
           className="absolute top-1/3 left-1/3 w-1 h-1 bg-yellow-500/30 animate-ping"
@@ -156,34 +110,32 @@ export default function MonkeyCompanionPage() {
       </div>
 
       {/* Header */}
-      <header className="relative z-10 backdrop-blur-sm bg-black/20 border-b border-white/10 p-6">
+      <header className="relative z-10 backdrop-blur-sm bg-black/20 border-b border-white/10 p-4 md:p-6">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <Link href="/">
             <Button
               variant="outline"
-              className="border-white/20 text-gray-300 hover:bg-white/10 bg-transparent backdrop-blur-sm"
+              className="border-white/20 text-gray-300 hover:bg-white/10 bg-transparent backdrop-blur-sm text-xs md:text-base"
             >
-              ← Back to Home
+              ← Back
             </Button>
           </Link>
           <div className="text-center">
-            <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-500 bg-clip-text text-transparent">
+            <h1 className="text-xl md:text-3xl font-bold bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-500 bg-clip-text text-transparent">
               Monkey Companion
             </h1>
           </div>
-          <div className="w-32" />
+          <div className="w-8 md:w-32" />
         </div>
       </header>
 
-      <div className="flex h-[calc(100vh-120px)] relative z-10">
+      <div className="flex flex-col lg:flex-row h-[calc(100vh-68px)] md:h-[calc(100vh-84px)] relative z-10">
         {/* Left Side - Coming Soon with Animated Text */}
-        <div className="flex-1 flex items-center justify-center relative">
-          {/* Fade overlay */}
+        <div className="hidden lg:flex flex-1 items-center justify-center relative">
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/20 to-black/40" />
 
           <div className="text-center relative z-10">
             <div className="space-y-12">
-              {/* Animated Coming Soon Text */}
               <div className="relative">
                 <h2 className="text-7xl lg:text-8xl font-black bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-500 bg-clip-text text-transparent animate-pulse">
                   {"COMING".split("").map((char, i) => (
@@ -215,13 +167,11 @@ export default function MonkeyCompanionPage() {
                 </h2>
               </div>
 
-              {/* Animated gradient line */}
               <div className="relative w-32 h-1 mx-auto overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-yellow-500 animate-pulse" />
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent animate-ping" />
               </div>
 
-              {/* Animated subtitle */}
               <div className="space-y-4">
                 <p className="text-2xl text-gray-300 animate-pulse">
                   {"3D Interactive Experience".split("").map((char, i) => (
@@ -244,7 +194,6 @@ export default function MonkeyCompanionPage() {
                 </p>
               </div>
 
-              {/* Loading animation */}
               <div className="flex justify-center gap-3 mt-16">
                 <div className="w-4 h-4 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full animate-bounce" />
                 <div
@@ -261,90 +210,115 @@ export default function MonkeyCompanionPage() {
         </div>
 
         {/* Right Side - Modern Chat Panel */}
-        <div className="w-2/5 relative">
-          {/* Glassmorphism background */}
+        <div className="w-full lg:w-2/5 relative flex flex-col h-full">
+          {/* Glass background */}
           <div className="absolute inset-0 backdrop-blur-xl bg-gradient-to-b from-white/5 to-white/2 border-l border-white/10" />
 
           <div className="relative z-10 flex flex-col h-full">
             {/* Chat Header */}
-            <div className="border-b border-white/10 p-6 backdrop-blur-sm">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center shadow-lg">
-                  <span className="text-xl">🐕</span>
+            <div className="border-b border-white/10 p-4 md:p-6 backdrop-blur-sm">
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className="w-8 h-8 md:w-12 md:h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center shadow-lg">
+                  <span className="text-sm md:text-xl">🐕</span>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white text-lg">Monkey AI</h3>
+                  <h3 className="font-semibold text-white text-base md:text-lg">Monkey AI</h3>
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                    <p className="text-gray-300 text-sm">Online & Ready</p>
+                    <div className={`w-2 h-2 rounded-full animate-pulse ${isTyping ? 'bg-yellow-400' : 'bg-green-400'}`} />
+                    <p className="text-gray-300 text-xs md:text-sm">
+                      {isTyping ? 'Thinking...' : 'Online & Ready'}
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
-              {messages.map((message) => (
-                <div key={message.id} className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}>
-                  <div
-                    className={`max-w-[85%] px-6 py-4 backdrop-blur-sm ${
-                      message.isUser
-                        ? "bg-gradient-to-r from-orange-500/80 to-yellow-500/80 text-white shadow-lg"
-                        : "bg-white/10 text-gray-100 border border-white/20 shadow-lg"
-                    }`}
-                    style={{ borderRadius: "24px" }}
-                  >
-                    <p className="text-sm leading-relaxed">{message.content}</p>
-                    <div className="text-xs opacity-60 mt-2">
-                      {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+            {/* Messages Area with Fading Effect */}
+            <div 
+              ref={chatContainerRef}
+              className="flex-1 overflow-y-auto p-4 md:p-6 relative"
+            >
+              {/* Fade overlay - top gradient */}
+              <div className="sticky top-0 left-0 w-full h-20 bg-gradient-to-b from-gray-900/90 to-transparent z-10 pointer-events-none" />
+              
+              <div className="space-y-4 md:space-y-6 pt-4">
+                {/* Welcome message */}
+                {messages.length === 0 && (
+                  <div className="flex justify-start">
+                    <div
+                      className="bg-white/10 text-gray-100 border border-white/20 shadow-lg max-w-[85%] px-4 py-3 md:px-6 md:py-4 backdrop-blur-sm"
+                      style={{ borderRadius: "24px" }}
+                    >
+                      <p className="text-xs md:text-sm leading-relaxed">
+                        Woof! Hi there! I'm Monkey, your AI art companion! 🎨 I love helping with creative ideas, painting techniques, and all things artistic. What would you like to create today?
+                      </p>
                     </div>
                   </div>
-                </div>
-              ))}
+                )}
 
-              {/* Typing Indicator */}
-              {isTyping && (
-                <div className="flex justify-start">
-                  <div
-                    className="bg-white/10 backdrop-blur-sm border border-white/20 px-6 py-4 max-w-[85%] shadow-lg"
-                    style={{ borderRadius: "24px" }}
-                  >
-                    <div className="flex gap-2">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                      <div
-                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                        style={{ animationDelay: "0.2s" }}
-                      />
-                      <div
-                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                        style={{ animationDelay: "0.4s" }}
-                      />
+                {/* Messages */}
+                {messages.map((message) => (
+                  <div key={message.id} className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}>
+                    <div
+                      className={`max-w-[85%] px-4 py-3 md:px-6 md:py-4 backdrop-blur-sm ${
+                        message.isUser
+                          ? "bg-gradient-to-r from-orange-500/80 to-yellow-500/80 text-white shadow-lg"
+                          : "bg-white/10 text-gray-100 border border-white/20 shadow-lg"
+                      }`}
+                      style={{ borderRadius: "24px" }}
+                    >
+                      <p className="text-xs md:text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                      <div className="text-[10px] md:text-xs opacity-60 mt-1 md:mt-2">
+                        {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
+                ))}
+
+                {/* Typing Indicator */}
+                {isTyping && (
+                  <div className="flex justify-start">
+                    <div
+                      className="bg-white/10 backdrop-blur-sm border border-white/20 px-4 py-3 md:px-6 md:py-4 max-w-[85%] shadow-lg"
+                      style={{ borderRadius: "24px" }}
+                    >
+                      <div className="flex gap-2">
+                        <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-gray-400 rounded-full animate-bounce" />
+                        <div
+                          className="w-1.5 h-1.5 md:w-2 md:h-2 bg-gray-400 rounded-full animate-bounce"
+                          style={{ animationDelay: "0.2s" }}
+                        />
+                        <div
+                          className="w-1.5 h-1.5 md:w-2 md:h-2 bg-gray-400 rounded-full animate-bounce"
+                          style={{ animationDelay: "0.4s" }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
             </div>
 
-            {/* Input Area */}
-            <div className="border-t border-white/10 p-6 backdrop-blur-sm">
-              <div className="flex gap-4">
+            {/* Input Area - Sticky at bottom */}
+            <div className="sticky bottom-0 border-t border-white/10 p-4 backdrop-blur-sm bg-black/50">
+              <div className="flex gap-3 md:gap-4">
                 <Input
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Message Monkey..."
-                  className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-orange-500/50 focus:ring-orange-500/20 backdrop-blur-sm"
+                  className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-orange-500/50 focus:ring-orange-500/20 backdrop-blur-sm text-xs md:text-base"
                   style={{ borderRadius: "20px" }}
                   disabled={isTyping}
                 />
                 <Button
                   onClick={handleSendMessage}
                   disabled={!inputMessage.trim() || isTyping}
-                  className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-400 hover:to-yellow-400 text-white px-6 shadow-lg backdrop-blur-sm"
+                  className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-400 hover:to-yellow-400 text-white px-4 md:px-6 shadow-lg backdrop-blur-sm disabled:opacity-50"
                   style={{ borderRadius: "20px" }}
                 >
-                  <Send className="w-4 h-4" />
+                  <Send className="w-3 h-3 md:w-4 md:h-4" />
                 </Button>
               </div>
             </div>
