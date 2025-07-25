@@ -7,6 +7,20 @@ import { Input } from "@/components/ui/input"
 import { useGroqChat } from "@/components/groqChat"
 import { Send } from "lucide-react"
 import Link from "next/link"
+import { Orbitron, Rajdhani } from 'next/font/google'
+
+// Define creative Google Fonts
+const headingFont = Orbitron({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  variable: '--font-heading'
+})
+
+const bodyFont = Rajdhani({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-body'
+})
 
 interface Message {
   id: string
@@ -45,21 +59,21 @@ export default function MonkeyCompanionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white relative overflow-hidden">
+    <div className={`min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white relative overflow-hidden ${headingFont.variable} ${bodyFont.variable}`}>
       {/* Header */}
-      <header className="relative z-30 bg-black/30 border-b border-white/10 p-4 md:p-6">
+      <header className="relative z-30 bg-gradient-to-b from-black/40 to-transparent p-4 md:p-6">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <Link href="/">
             <Button
-              variant="outline"
-              className="border-white/20 text-gray-300 hover:bg-white/10 bg-transparent text-xs md:text-base"
+              variant="ghost"
+              className="text-gray-300 hover:bg-white/10 bg-transparent text-xs md:text-base px-3 py-1 font-sans"
             >
               ← Back
             </Button>
           </Link>
           <div className="text-center">
-            <h1 className="text-xl md:text-3xl font-bold bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-500 bg-clip-text text-transparent">
-              Monkey Companion
+            <h1 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-500 bg-clip-text text-transparent tracking-wider font-heading">
+              MONKEY COMPANION
             </h1>
           </div>
           <div className="w-8 md:w-32" />
@@ -72,7 +86,7 @@ export default function MonkeyCompanionPage() {
           <div className="text-center relative z-0 w-full">
             <div className="space-y-8 md:space-y-12">
               <div className="relative">
-                <h2 className="text-4xl sm:text-6xl lg:text-8xl font-black bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-500 bg-clip-text text-transparent animate-pulse">
+                <h2 className="text-5xl sm:text-7xl lg:text-9xl font-extrabold bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-500 bg-clip-text text-transparent animate-pulse tracking-tighter font-heading">
                   {"COMING".split("").map((char, i) => (
                     <span
                       key={i}
@@ -86,7 +100,7 @@ export default function MonkeyCompanionPage() {
                     </span>
                   ))}
                 </h2>
-                <h2 className="text-4xl sm:text-6xl lg:text-8xl font-black bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-500 bg-clip-text text-transparent animate-pulse mt-2 lg:mt-4">
+                <h2 className="text-5xl sm:text-7xl lg:text-9xl font-extrabold bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-500 bg-clip-text text-transparent animate-pulse mt-2 lg:mt-4 tracking-tighter font-heading">
                   {"SOON".split("").map((char, i) => (
                     <span
                       key={i}
@@ -102,13 +116,13 @@ export default function MonkeyCompanionPage() {
                 </h2>
               </div>
 
-              <div className="relative w-24 lg:w-32 h-1 mx-auto overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-yellow-500 animate-pulse" />
+              <div className="relative w-24 lg:w-32 h-0.5 mx-auto overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-orange-500/80 to-transparent animate-pulse" />
               </div>
 
               <div className="space-y-2 md:space-y-4">
-                <p className="text-lg sm:text-xl lg:text-2xl text-gray-300 animate-pulse">
-                  {"3D Interactive Experience".split("").map((char, i) => (
+                <p className="text-xl sm:text-2xl lg:text-3xl text-gray-300 font-medium animate-pulse tracking-wider font-body">
+                  {"3D INTERACTIVE EXPERIENCE".split("").map((char, i) => (
                     <span
                       key={i}
                       className="inline-block opacity-0 animate-pulse"
@@ -122,8 +136,8 @@ export default function MonkeyCompanionPage() {
                   ))}
                 </p>
 
-                <p className="text-sm lg:text-lg text-gray-400 animate-pulse" style={{ animationDelay: "3s" }}>
-                  🔥 Dev Team is Cooking...
+                <p className="text-sm lg:text-lg text-gray-400 animate-pulse tracking-widest font-body" style={{ animationDelay: "3s" }}>
+                  🔥 DEV TEAM IS COOKING...
                 </p>
               </div>
 
@@ -144,22 +158,22 @@ export default function MonkeyCompanionPage() {
 
         {/* Chat Panel - Transparent overlay */}
         <div className="absolute inset-0 lg:left-auto lg:w-2/5 flex flex-col h-full">
-          {/* Semi-transparent background with reduced blur */}
-          <div className="absolute inset-0 bg-black/20 border-l border-white/10" />
+          {/* Semi-transparent background with subtle gradient */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/10" />
 
           <div className="relative z-10 flex flex-col h-full">
             {/* Chat Header */}
-            <div className="border-b border-white/20 p-4 md:p-6 bg-black/30">
+            <div className="bg-gradient-to-b from-black/40 to-transparent p-4 md:p-6">
               <div className="flex items-center gap-3 md:gap-4">
                 <div className="w-8 h-8 md:w-12 md:h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center shadow-lg">
                   <span className="text-sm md:text-xl">🐕</span>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white text-base md:text-lg">Monkey AI</h3>
+                  <h3 className="font-bold text-white text-lg md:text-xl tracking-wider font-heading">MONKEY AI</h3>
                   <div className="flex items-center gap-2">
                     <div className={`w-2 h-2 rounded-full animate-pulse ${isTyping ? 'bg-yellow-400' : 'bg-green-400'}`} />
-                    <p className="text-gray-300 text-xs md:text-sm">
-                      {isTyping ? 'Thinking...' : 'Online & Ready'}
+                    <p className="text-gray-300 text-xs md:text-sm tracking-wider font-body">
+                      {isTyping ? 'THINKING...' : 'ONLINE & READY'}
                     </p>
                   </div>
                 </div>
@@ -179,11 +193,11 @@ export default function MonkeyCompanionPage() {
                 {messages.length === 0 && (
                   <div className="flex justify-start">
                     <div
-                      className="bg-white/20 text-gray-100 border border-white/30 shadow-lg max-w-[85%] px-4 py-3 md:px-6 md:py-4"
+                      className="bg-gradient-to-br from-white/10 to-white/5 text-gray-100 shadow-lg max-w-[85%] px-4 py-3 md:px-6 md:py-4"
                       style={{ borderRadius: "24px" }}
                     >
-                      <p className="text-xs md:text-sm leading-relaxed">
-                        Woof! Hi there! I'm Monkey, your AI art companion! 🎨 I love helping with creative ideas...
+                      <p className="text-xs md:text-sm leading-relaxed tracking-wide font-body">
+                        WOOF! HI THERE! I'M MONKEY, YOUR AI ART COMPANION! 🎨 I LOVE HELPING WITH CREATIVE IDEAS...
                       </p>
                     </div>
                   </div>
@@ -195,13 +209,13 @@ export default function MonkeyCompanionPage() {
                     <div
                       className={`max-w-[85%] px-4 py-3 md:px-6 md:py-4 ${
                         message.isUser
-                          ? "bg-gradient-to-r from-orange-500/70 to-yellow-500/70 text-white shadow-lg"
-                          : "bg-white/20 text-gray-100 border border-white/30 shadow-lg"
+                          ? "bg-gradient-to-br from-orange-500/80 to-yellow-500/80 text-white shadow-lg"
+                          : "bg-gradient-to-br from-white/10 to-white/5 text-gray-100 shadow-lg"
                       }`}
                       style={{ borderRadius: "24px" }}
                     >
-                      <p className="text-xs md:text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
-                      <div className="text-[10px] md:text-xs opacity-60 mt-1 md:mt-2">
+                      <p className="text-xs md:text-sm leading-relaxed whitespace-pre-wrap tracking-wide font-body">{message.content}</p>
+                      <div className="text-[10px] md:text-xs opacity-60 mt-1 md:mt-2 tracking-wider font-body">
                         {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                       </div>
                     </div>
@@ -212,7 +226,7 @@ export default function MonkeyCompanionPage() {
                 {isTyping && (
                   <div className="flex justify-start">
                     <div
-                      className="bg-white/20 border border-white/30 px-4 py-3 md:px-6 md:py-4 max-w-[85%] shadow-lg"
+                      className="bg-gradient-to-br from-white/10 to-white/5 px-4 py-3 md:px-6 md:py-4 max-w-[85%] shadow-lg"
                       style={{ borderRadius: "24px" }}
                     >
                       <div className="flex gap-2">
@@ -233,21 +247,21 @@ export default function MonkeyCompanionPage() {
             </div>
 
             {/* Input Area */}
-            <div className="sticky bottom-0 border-t border-white/20 p-4 bg-black/30">
+            <div className="sticky bottom-0 bg-gradient-to-t from-black/40 to-transparent p-4">
               <div className="flex gap-3 md:gap-4">
                 <Input
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Message Monkey..."
-                  className="flex-1 bg-white/20 border-white/30 text-white placeholder:text-gray-400 focus:border-orange-500/50 text-xs md:text-base"
+                  placeholder="MESSAGE MONKEY..."
+                  className="flex-1 bg-white/20 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-orange-500/30 text-xs md:text-base tracking-wide uppercase font-body"
                   style={{ borderRadius: "20px" }}
                   disabled={isTyping}
                 />
                 <Button
                   onClick={handleSendMessage}
                   disabled={!inputMessage.trim() || isTyping}
-                  className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-400 hover:to-yellow-400 text-white px-4 md:px-6 shadow-lg disabled:opacity-50"
+                  className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-400 hover:to-yellow-400 text-white px-4 md:px-6 shadow-lg disabled:opacity-50 tracking-wider uppercase font-body"
                   style={{ borderRadius: "20px" }}
                 >
                   <Send className="w-3 h-3 md:w-4 md:h-4" />
