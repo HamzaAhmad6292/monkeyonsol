@@ -7,12 +7,12 @@ import { Input } from "@/components/ui/input"
 import { useGroqChat } from "@/components/groqChat"
 import { Send } from "lucide-react"
 import Link from "next/link"
-import { Orbitron, Rajdhani } from 'next/font/google'
+import { Pacifico, Rajdhani } from 'next/font/google'
 
 // Define creative Google Fonts
-const headingFont = Orbitron({
+const headingFont = Pacifico({
   subsets: ['latin'],
-  weight: ['400', '700'],
+  weight: ['400'],
   variable: '--font-heading'
 })
 
@@ -80,9 +80,10 @@ export default function MonkeyCompanionPage() {
         </div>
       </header>
 
-      <div className="relative h-[calc(100vh-68px)] md:h-[calc(100vh-84px)]">
-        {/* Coming Soon Background - Full page */}
-        <div className="absolute inset-0 flex items-center justify-center">
+      {/* Responsive container: row on large screens, overlay on mobile */}
+      <div className="relative h-[calc(100vh-68px)] md:h-[calc(100vh-84px)] flex flex-col lg:flex-row">
+        {/* Coming Soon Section */}
+        <div className="absolute inset-0 flex items-center justify-center lg:static lg:flex-1 lg:flex lg:items-center lg:justify-center">
           <div className="text-center relative z-0 w-full">
             <div className="space-y-8 md:space-y-12">
               <div className="relative">
@@ -156,10 +157,10 @@ export default function MonkeyCompanionPage() {
           </div>
         </div>
 
-        {/* Chat Panel - Transparent overlay */}
-        <div className="absolute inset-0 lg:left-auto lg:w-2/5 flex flex-col h-full">
+        {/* Chat Panel */}
+        <div className="absolute inset-0 lg:static lg:flex-1 lg:flex lg:flex-col h-full">
           {/* Semi-transparent background with subtle gradient */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/10 lg:static lg:bg-none" />
 
           <div className="relative z-10 flex flex-col h-full">
             {/* Chat Header */}
