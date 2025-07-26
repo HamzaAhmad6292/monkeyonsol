@@ -1,3 +1,8 @@
+// monkeycompanion/page.tsx
+
+
+
+
 "use client"
 
 import type React from "react"
@@ -7,14 +12,18 @@ import { Input } from "@/components/ui/input"
 import { useGroqChat } from "@/components/groqChat"
 import { Send } from "lucide-react"
 import Link from "next/link"
+import * as THREE from 'three'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import SceneInit from '@/lib/SceneInit'
 import { Pacifico, Rajdhani } from 'next/font/google'
 
 // Define creative Google Fonts
-const headingFont = Pacifico({
-  subsets: ['latin'],
-  weight: ['400'],
-  variable: '--font-heading'
-})
+const headingFont = Pacifico(
+  {
+    subsets: ['latin'],
+    weight: ['400'],
+    variable: '--font-heading'
+  })
 
 const bodyFont = Rajdhani({
   subsets: ['latin'],
@@ -29,6 +38,14 @@ interface Message {
   timestamp: Date
 }
 
+interface LoadedModel {
+  scene: THREE.Group;
+  animations: THREE.AnimationClip[];
+  scenes: THREE.Group[];
+  cameras: THREE.Camera[];
+  asset: any;
+}
+
 export default function MonkeyCompanionPage() {
   const { messages, isTyping, sendMessage } = useGroqChat({
     systemPrompt: "You are Monkey, a friendly and playful AI art companion dog...",
@@ -40,10 +57,77 @@ export default function MonkeyCompanionPage() {
 
   const [inputMessage, setInputMessage] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const sceneInitRef = useRef<SceneInit | null>(null)
+  const [modelLoaded, setModelLoaded] = useState(false)
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages, isTyping])
+
+  // 3D Scene Setup
+  useEffect(() => {
+    // Initialize the scene
+    const test = new SceneInit('myThreeJsCanvas');
+    test.initialize();
+    test.animate();
+
+    // Store reference for cleanup
+    sceneInitRef.current = test;
+
+    let loadedModel: LoadedModel | null = null;
+    const gltfLoader = new GLTFLoader();
+
+    // Load the GLTF model
+    gltfLoader.load(
+      '/assets/shiba/scene.gltf',
+      (gltfScene: LoadedModel) => {
+        loadedModel = gltfScene;
+
+        // Apply transformations - exact same as your working code
+        gltfScene.scene.rotation.y = Math.PI / 8;
+        gltfScene.scene.position.set(0, 3, 0);
+        gltfScene.scene.scale.set(12, 12, 12);
+
+        // Add to scene - now we can safely access test.scene
+        if (test.scene) {
+          test.scene.add(gltfScene.scene);
+        }
+
+        setModelLoaded(true);
+      },
+      (progress) => {
+        // Optional: Handle loading progress
+        console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%');
+      },
+      (error) => {
+        // Handle loading errors
+        console.error('Error loading GLTF model:', error);
+      }
+    );
+
+    // Cleanup function
+    return () => {
+      if (sceneInitRef.current) {
+        sceneInitRef.current.dispose();
+      }
+
+      // Clean up loaded model
+      if (loadedModel) {
+        loadedModel.scene.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            if (child.geometry) child.geometry.dispose();
+            if (child.material) {
+              if (Array.isArray(child.material)) {
+                child.material.forEach(material => material.dispose());
+              } else {
+                child.material.dispose();
+              }
+            }
+          }
+        });
+      }
+    };
+  }, [])
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return
@@ -80,89 +164,36 @@ export default function MonkeyCompanionPage() {
         </div>
       </header>
 
-      {/* Responsive container: row on large screens, overlay on mobile */}
-      <div className="relative h-[calc(100vh-68px)] md:h-[calc(100vh-84px)] flex flex-col lg:flex-row">
-        {/* Coming Soon Section */}
-        <div className="absolute inset-0 flex items-center justify-center lg:static lg:flex-1 lg:flex lg:items-center lg:justify-center">
-          <div className="text-center relative z-0 w-full">
-            <div className="space-y-8 md:space-y-12">
-              <div className="relative">
-                <h2 className="text-5xl sm:text-7xl lg:text-9xl font-extrabold bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-500 bg-clip-text text-transparent animate-pulse tracking-tighter font-heading">
-                  {"COMING".split("").map((char, i) => (
-                    <span
-                      key={i}
-                      className="inline-block animate-bounce"
-                      style={{
-                        animationDelay: `${i * 0.1}s`,
-                        animationDuration: "2s",
-                      }}
-                    >
-                      {char}
-                    </span>
-                  ))}
-                </h2>
-                <h2 className="text-5xl sm:text-7xl lg:text-9xl font-extrabold bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-500 bg-clip-text text-transparent animate-pulse mt-2 lg:mt-4 tracking-tighter font-heading">
-                  {"SOON".split("").map((char, i) => (
-                    <span
-                      key={i}
-                      className="inline-block animate-bounce"
-                      style={{
-                        animationDelay: `${(i + 6) * 0.1}s`,
-                        animationDuration: "2s",
-                      }}
-                    >
-                      {char}
-                    </span>
-                  ))}
-                </h2>
-              </div>
+      {/* Main Content Container - Fixed height calculation */}
+      <div className="flex h-[calc(100vh-68px)] md:h-[calc(100vh-84px)] w-screen overflow-hidden md:flex-row flex-col">
+        {/* Left side - 3D Model Container */}
+        <div className="flex-1 md:min-w-[50%] h-full md:h-full overflow-hidden relative bg-gradient-to-br from-indigo-500 via-purple-500 to-purple-700 model-container">
+          <canvas id="myThreeJsCanvas" />
 
-              <div className="relative w-24 lg:w-32 h-0.5 mx-auto overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-orange-500/80 to-transparent animate-pulse" />
-              </div>
-
-              <div className="space-y-2 md:space-y-4">
-                <p className="text-xl sm:text-2xl lg:text-3xl text-gray-300 font-medium animate-pulse tracking-wider font-body">
-                  {"3D INTERACTIVE EXPERIENCE".split("").map((char, i) => (
-                    <span
-                      key={i}
-                      className="inline-block opacity-0 animate-pulse"
-                      style={{
-                        animationDelay: `${i * 0.05 + 1}s`,
-                        animationFillMode: "forwards",
-                      }}
-                    >
-                      {char === " " ? "\u00A0" : char}
-                    </span>
-                  ))}
-                </p>
-
-                <p className="text-sm lg:text-lg text-gray-400 animate-pulse tracking-widest font-body" style={{ animationDelay: "3s" }}>
-                  🔥 DEV TEAM IS COOKING...
-                </p>
-              </div>
-
-              <div className="flex justify-center gap-3 mt-8 lg:mt-16">
-                <div className="w-3 h-3 lg:w-4 lg:h-4 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full animate-bounce" />
-                <div
-                  className="w-3 h-3 lg:w-4 lg:h-4 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full animate-bounce"
-                  style={{ animationDelay: "0.2s" }}
-                />
-                <div
-                  className="w-3 h-3 lg:w-4 lg:h-4 bg-gradient-to-r from-orange-400 to-yellow-400 rounded-full animate-bounce"
-                  style={{ animationDelay: "0.4s" }}
-                />
+          {/* 3D Model Loading Indicator */}
+          {!modelLoaded && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+                <p className="text-white font-body tracking-wider">LOADING 3D MONKEY...</p>
               </div>
             </div>
-          </div>
+          )}
+
+          {/* 3D Model Status */}
+          {modelLoaded && (
+            <div className="absolute top-4 left-4 bg-black/60 px-3 py-2 rounded-full">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-white text-xs font-body tracking-wider">3D MONKEY READY</span>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Chat Panel */}
-        <div className="absolute inset-0 lg:static lg:flex-1 lg:flex lg:flex-col h-full">
-          {/* Semi-transparent background with subtle gradient */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/10 lg:static lg:bg-none" />
-
-          <div className="relative z-10 flex flex-col h-full">
+        {/* Right side - Chatbot - Fixed to use h-full instead of h-screen */}
+        <div className="flex-1 h-full bg-black flex items-center justify-center p-5">
+          <div className="w-full h-full flex flex-col">
             {/* Chat Header */}
             <div className="bg-gradient-to-b from-black/40 to-transparent p-4 md:p-6">
               <div className="flex items-center gap-3 md:gap-4">
@@ -182,14 +213,11 @@ export default function MonkeyCompanionPage() {
             </div>
 
             {/* Messages Area */}
-            <div 
+            <div
               ref={messagesEndRef}
               className="flex-1 overflow-y-auto p-4 md:p-6 relative"
             >
-              {/* Fade overlay at top */}
-              <div className="sticky top-0 left-0 w-full h-32 bg-gradient-to-b from-black/80 to-transparent z-10 pointer-events-none" />
-              
-              <div className="space-y-4 md:space-y-6 pt-4">
+              <div className="space-y-4 md:space-y-6">
                 {/* Welcome message */}
                 {messages.length === 0 && (
                   <div className="flex justify-start">
@@ -198,7 +226,7 @@ export default function MonkeyCompanionPage() {
                       style={{ borderRadius: "24px" }}
                     >
                       <p className="text-xs md:text-sm leading-relaxed tracking-wide font-body">
-                        WOOF! HI THERE! I'M MONKEY, YOUR AI ART COMPANION! 🎨 I LOVE HELPING WITH CREATIVE IDEAS...
+                        WOOF! HI THERE! I'M MONKEY, YOUR AI ART COMPANION! 🎨 I LOVE HELPING WITH CREATIVE IDEAS AND NOW I'M IN 3D! PRETTY COOL, RIGHT?
                       </p>
                     </div>
                   </div>
@@ -208,11 +236,10 @@ export default function MonkeyCompanionPage() {
                 {messages.map((message) => (
                   <div key={message.id} className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}>
                     <div
-                      className={`max-w-[85%] px-4 py-3 md:px-6 md:py-4 ${
-                        message.isUser
-                          ? "bg-gradient-to-br from-orange-500/80 to-yellow-500/80 text-white shadow-lg"
-                          : "bg-gradient-to-br from-white/10 to-white/5 text-gray-100 shadow-lg"
-                      }`}
+                      className={`max-w-[85%] px-4 py-3 md:px-6 md:py-4 ${message.isUser
+                        ? "bg-gradient-to-br from-orange-500/80 to-yellow-500/80 text-white shadow-lg"
+                        : "bg-gradient-to-br from-white/10 to-white/5 text-gray-100 shadow-lg"
+                        }`}
                       style={{ borderRadius: "24px" }}
                     >
                       <p className="text-xs md:text-sm leading-relaxed whitespace-pre-wrap tracking-wide font-body">{message.content}</p>
