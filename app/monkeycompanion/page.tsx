@@ -8,6 +8,7 @@ import { useGroqChat } from "@/components/groqChat"
 import { Send } from "lucide-react"
 import Link from "next/link"
 import { Orbitron, Rajdhani } from 'next/font/google'
+import ThreeScene from '@/components/ThreeScene'
 
 // Define creative Google Fonts
 const headingFont = Orbitron({
@@ -66,7 +67,7 @@ export default function MonkeyCompanionPage() {
       <div className="relative h-screen flex flex-col lg:flex-row">
         {/* Coming Soon Section */}
         <div className="absolute inset-0 flex items-center justify-center lg:static lg:flex-1 lg:flex lg:items-center lg:justify-center bg-gradient-to-b from-gray-900/80 via-black/60 to-gray-800/80">
-          <div className="text-center relative z-0 w-full">
+          {/* <div className="text-center relative z-0 w-full">
             <div className="space-y-8 md:space-y-12">
               <div className="relative">
                 <h2 className="text-5xl sm:text-7xl lg:text-9xl font-extrabold bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-500 bg-clip-text text-transparent animate-pulse tracking-tighter" style={{ fontFamily: 'var(--font-heading)' }}>
@@ -136,7 +137,11 @@ export default function MonkeyCompanionPage() {
                 />
               </div>
             </div>
-          </div>
+          </div> */}
+          <ThreeScene
+          canvasId="myThreeJsCanvas"
+          modelPath="/assets/shiba/scene.gltf"
+        />
         </div>
 
         {/* Chat Panel */}

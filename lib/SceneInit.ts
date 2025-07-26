@@ -1,7 +1,6 @@
 // lib/SceneInit.ts
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import Stats from 'three/examples/jsm/libs/stats.module';
 
 export default class SceneInit {
   // Core components to initialize Three.js app
@@ -18,7 +17,6 @@ export default class SceneInit {
 
   // Additional components
   private clock: THREE.Clock | undefined;
-  private stats: Stats | undefined;
   private controls: OrbitControls | undefined;
 
   // Lighting
@@ -65,14 +63,6 @@ export default class SceneInit {
     this.clock = new THREE.Clock();
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
-    // Append stats to the model container instead of body
-    this.stats = new Stats();
-    this.stats.dom.style.position = 'absolute';
-    this.stats.dom.style.top = '10px';
-    this.stats.dom.style.left = '10px';
-    this.stats.dom.style.zIndex = '100';
-    container.appendChild(this.stats.dom);
-
     // Ambient light which is for the whole scene
     this.ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
     this.scene.add(this.ambientLight);
@@ -90,10 +80,6 @@ export default class SceneInit {
     const animateLoop = () => {
       this.animationId = window.requestAnimationFrame(animateLoop);
       this.render();
-
-      if (this.stats) {
-        this.stats.update();
-      }
 
       if (this.controls) {
         this.controls.update();
@@ -135,9 +121,7 @@ export default class SceneInit {
     window.removeEventListener('resize', this.onWindowResize.bind(this));
 
     // Remove stats from DOM
-    if (this.stats && this.stats.dom && this.stats.dom.parentNode) {
-      this.stats.dom.parentNode.removeChild(this.stats.dom);
-    }
+    // (removed, no longer needed)
 
     // Dispose of controls
     if (this.controls) {
@@ -170,7 +154,6 @@ export default class SceneInit {
     this.camera = undefined;
     this.renderer = undefined;
     this.controls = undefined;
-    this.stats = undefined;
     this.clock = undefined;
     this.ambientLight = undefined;
     this.directionalLight = undefined;
