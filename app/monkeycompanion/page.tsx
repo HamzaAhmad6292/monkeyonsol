@@ -62,10 +62,10 @@ export default function MonkeyCompanionPage() {
     <div className={`min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white relative overflow-hidden ${headingFont.variable} ${bodyFont.variable}`}>
 
 
-      {/* Responsive container: row on large screens, overlay on mobile */}
-      <div className="relative h-screen flex flex-col lg:flex-row">
+      {/* Full screen overlay layout for all screen sizes */}
+      <div className="relative h-screen flex flex-col">
         {/* Coming Soon Section */}
-        <div className="absolute inset-0 flex items-center justify-center lg:static lg:flex-1 lg:flex lg:items-center lg:justify-center bg-gradient-to-b from-gray-900/80 via-black/60 to-gray-800/80">
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-gray-900/80 via-black/60 to-gray-800/80">
           <div className="text-center relative z-0 w-full">
             <div className="space-y-8 md:space-y-12">
               <div className="relative">
@@ -140,9 +140,9 @@ export default function MonkeyCompanionPage() {
         </div>
 
         {/* Chat Panel */}
-        <div className="absolute inset-0 lg:static lg:flex-1 lg:flex lg:flex-col h-full min-h-0">
+        <div className="absolute inset-0 h-full min-h-0">
           {/* Consistent background overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from--900/60 via-black/40 to-gray-800/60 lg:static lg:bg-none" />
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 via-black/40 to-gray-800/60" />
 
           <div className="relative z-10 flex flex-col h-full">
             {/* Chat Header */}
