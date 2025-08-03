@@ -175,19 +175,19 @@ export default function MonkeyCompanionPage() {
             </div>
 
             {/* Messages Area */}
-            <div 
+            <div
               className="flex-1 overflow-y-auto p-4 md:p-6 relative bg-gradient-to-b from-black/20 via-black/10 to-black/20 min-h-0"
             >
               {/* Fade overlay at top */}
               <div className="sticky top-0 left-0 w-full h-32 bg-gradient-to-b from-black/20 to-transparent z-10 pointer-events-none" />
-              
+
               <div className="space-y-4 md:space-y-6 pt-4">
                 {/* Welcome message */}
                 {messages.length === 0 && (
                   <div className="flex justify-start animate-in slide-in-from-left-4 duration-500 ease-out">
                     <div
                       className="backdrop-blur-sm bg-white/3 text-gray-100 shadow-lg max-w-[85%] px-4 py-3 md:px-6 md:py-4 relative overflow-hidden"
-                      style={{ 
+                      style={{
                         borderRadius: "24px",
                         border: "1px solid rgba(255, 255, 255, 0.1)",
                         boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)"
@@ -205,39 +205,36 @@ export default function MonkeyCompanionPage() {
 
                 {/* Messages */}
                 {messages.map((message, index) => (
-                  <div 
-                    key={message.id} 
-                    className={`flex ${message.isUser ? "justify-end" : "justify-start"} animate-in ${
-                      message.isUser 
-                        ? "slide-in-from-right-4 fade-in" 
-                        : "slide-in-from-left-4 fade-in"
-                    } duration-500 ease-out`}
-                    style={{ 
+                  <div
+                    key={message.id}
+                    className={`flex ${message.isUser ? "justify-end" : "justify-start"} animate-in ${message.isUser
+                      ? "slide-in-from-right-4 fade-in"
+                      : "slide-in-from-left-4 fade-in"
+                      } duration-500 ease-out`}
+                    style={{
                       animationDelay: `${index * 0.1}s`,
                       animationFillMode: "both"
                     }}
                   >
                     <div
-                      className={`max-w-[85%] px-4 py-3 md:px-6 md:py-4 shadow-lg backdrop-blur-sm relative overflow-hidden ${
-                        message.isUser
-                          ? "bg-gradient-to-br from-orange-500/10 to-yellow-500/8 text-white"
-                          : "bg-gradient-to-br from-gray-800/10 to-gray-900/8 text-gray-100"
-                      }`}
-                      style={{ 
+                      className={`max-w-[85%] px-4 py-3 md:px-6 md:py-4 shadow-lg backdrop-blur-sm relative overflow-hidden ${message.isUser
+                        ? "bg-gradient-to-br from-orange-500/10 to-yellow-500/8 text-white"
+                        : "bg-gradient-to-br from-gray-800/10 to-gray-900/8 text-gray-100"
+                        }`}
+                      style={{
                         borderRadius: "24px",
-                        border: message.isUser 
-                          ? "1px solid rgba(255, 165, 0, 0.2)" 
+                        border: message.isUser
+                          ? "1px solid rgba(255, 165, 0, 0.2)"
                           : "1px solid rgba(255, 255, 255, 0.1)",
                         boxShadow: message.isUser
                           ? "0 8px 32px rgba(255, 165, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)"
                           : "0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)"
                       }}
                     >
-                      <div className={`absolute inset-0 bg-gradient-to-br ${
-                        message.isUser 
-                          ? "from-orange-400/10 via-transparent to-yellow-400/10" 
-                          : "from-white/5 via-transparent to-white/5"
-                      } opacity-50`}></div>
+                      <div className={`absolute inset-0 bg-gradient-to-br ${message.isUser
+                        ? "from-orange-400/10 via-transparent to-yellow-400/10"
+                        : "from-white/5 via-transparent to-white/5"
+                        } opacity-50`}></div>
                       <div className="relative z-10">
                         <p className="text-xs md:text-sm leading-relaxed whitespace-pre-wrap tracking-wide font-body">{message.content}</p>
                         <div className="text-[10px] md:text-xs opacity-60 mt-1 md:mt-2 tracking-wider font-body">
@@ -253,7 +250,7 @@ export default function MonkeyCompanionPage() {
                   <div className="flex justify-start animate-in slide-in-from-left-4 fade-in duration-300 ease-out">
                     <div
                       className="backdrop-blur-sm bg-gradient-to-br from-gray-800/10 to-gray-900/8 px-4 py-3 md:px-6 md:py-4 max-w-[85%] shadow-lg relative overflow-hidden"
-                      style={{ 
+                      style={{
                         borderRadius: "24px",
                         border: "1px solid rgba(255, 255, 255, 0.1)",
                         boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)"
