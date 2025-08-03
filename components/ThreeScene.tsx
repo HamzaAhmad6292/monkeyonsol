@@ -1,18 +1,50 @@
-    // components/ThreeScene.tsx
+// components/ThreeScene.tsx
 "use client"
 
 import { useRef, useEffect, useState } from "react"
 import * as THREE from 'three'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js'
 import SceneInit from '@/lib/SceneInit'
 
-interface LoadedModel {
-    scene: THREE.Group;
-    animations: THREE.AnimationClip[];
-    scenes: THREE.Group[];
-    cameras: THREE.Camera[];
-    asset: any;
+// Animation Configuration
+interface AnimationConfig {
+    name: string;
+    fileName: string;
+    displayName: string;
+    icon: string;
+    color: string;
 }
+
+const ANIMATION_CONFIG: AnimationConfig[] = [
+    {
+        name: 'casual',
+        fileName: 'Animation_Casual_Walk_withSkin.fbx',
+        displayName: 'Casual',
+        icon: '🚶‍♂️',
+        color: 'from-purple-500 to-purple-600'
+    },
+    {
+        name: 'walking',
+        fileName: 'Animation_Walking_withSkin.fbx',
+        displayName: 'Walk',
+        icon: '🚶',
+        color: 'from-blue-500 to-blue-600'
+    },
+    {
+        name: 'running',
+        fileName: 'Animation_Running_withSkin.fbx',
+        displayName: 'Run',
+        icon: '🏃',
+        color: 'from-green-500 to-green-600'
+    },
+    {
+        name: 'dance',
+        fileName: 'Animation_Boom_Dance_withSkin.fbx',
+        displayName: 'Dance',
+        icon: '💃',
+        color: 'from-pink-500 to-pink-600'
+    }
+];
 
 interface ThreeSceneProps {
     canvasId?: string;
@@ -22,11 +54,15 @@ interface ThreeSceneProps {
 
 export default function ThreeScene({
     canvasId = 'myThreeJsCanvas',
-    modelPath = '/assets/shiba/scene.gltf',
+    modelPath = '/assets/biped/Character_output.fbx',
     className = ""
 }: ThreeSceneProps) {
     const sceneInitRef = useRef<SceneInit | null>(null)
+    const mixerRef = useRef<THREE.AnimationMixer | null>(null)
+    const actionsRef = useRef<{ [key: string]: THREE.AnimationAction }>({})
     const [modelLoaded, setModelLoaded] = useState(false)
+    const [currentAnimation, setCurrentAnimation] = useState<string>('walking')
+    const [loadingAnimations, setLoadingAnimations] = useState<Set<string>>(new Set())
 
     useEffect(() => {
         // Initialize the scene
@@ -37,32 +73,44 @@ export default function ThreeScene({
         // Store reference for cleanup
         sceneInitRef.current = test;
 
-        let loadedModel: LoadedModel | null = null;
-        const gltfLoader = new GLTFLoader();
+        let loadedModel: THREE.Group | null = null;
+        const fbxLoader = new FBXLoader();
 
-        // Load the GLTF model
-        gltfLoader.load(
+        // Load the character model first
+        fbxLoader.load(
             modelPath,
-            (gltfScene: LoadedModel) => {
-                loadedModel = gltfScene;
+            (fbxModel: THREE.Group) => {
+                loadedModel = fbxModel;
 
                 // Apply transformations
-                gltfScene.scene.rotation.y = Math.PI / 8;
-                gltfScene.scene.position.set(0, 3, 0);
-                gltfScene.scene.scale.set(12, 12, 12);
+                fbxModel.rotation.y = Math.PI / 8;
+                fbxModel.position.set(-15, -80, -250);
+                // fbxModel.scale.set(12, 12, 12);
 
                 // Add to scene
                 if (test.scene) {
-                    test.scene.add(gltfScene.scene);
+                    test.scene.add(fbxModel);
                 }
+
+                // Create animation mixer
+                const mixer = new THREE.AnimationMixer(fbxModel);
+                mixerRef.current = mixer;
+
+                // Pass mixer to SceneInit for animation updates
+                if (test.setAnimationMixer) {
+                    test.setAnimationMixer(mixer);
+                }
+
+                // Load all animations
+                loadAnimations(mixer, fbxLoader);
 
                 setModelLoaded(true);
             },
             (progress) => {
-                console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%');
+                console.log('Model loading progress:', (progress.loaded / progress.total * 100) + '%');
             },
             (error) => {
-                console.error('Error loading GLTF model:', error);
+                console.error('Error loading FBX model:', error);
             }
         );
 
@@ -72,9 +120,18 @@ export default function ThreeScene({
                 sceneInitRef.current.dispose();
             }
 
+            // Stop and dispose animation mixer
+            if (mixerRef.current) {
+                mixerRef.current.stopAllAction();
+                mixerRef.current = null;
+            }
+
+            // Clear actions
+            actionsRef.current = {};
+
             // Clean up loaded model
             if (loadedModel) {
-                loadedModel.scene.traverse((child) => {
+                loadedModel.traverse((child) => {
                     if (child instanceof THREE.Mesh) {
                         if (child.geometry) child.geometry.dispose();
                         if (child.material) {
@@ -89,6 +146,72 @@ export default function ThreeScene({
             }
         };
     }, [canvasId, modelPath])
+
+    // Function to load all animations
+    const loadAnimations = (mixer: THREE.AnimationMixer, fbxLoader: FBXLoader) => {
+        ANIMATION_CONFIG.forEach((config) => {
+            setLoadingAnimations(prev => new Set([...prev, config.name]));
+
+            const animationPath = `/assets/biped/${config.fileName}`;
+            fbxLoader.load(
+                animationPath,
+                (animationFBX: THREE.Group) => {
+                    // Get the animation clip from the loaded animation file
+                    if (animationFBX.animations && animationFBX.animations.length > 0) {
+                        const animationClip = animationFBX.animations[0];
+                        const action = mixer.clipAction(animationClip);
+
+                        // Configure animation
+                        action.setLoop(THREE.LoopRepeat, Infinity);
+                        action.clampWhenFinished = true;
+
+                        // Store the action
+                        actionsRef.current[config.name] = action;
+
+                        // Start the first animation (walking) by default
+                        if (config.name === 'walking') {
+                            action.play();
+                        }
+                    }
+
+                    setLoadingAnimations(prev => {
+                        const newSet = new Set(prev);
+                        newSet.delete(config.name);
+                        return newSet;
+                    });
+                },
+                (progress) => {
+                    console.log(`${config.displayName} animation loading progress:`, (progress.loaded / progress.total * 100) + '%');
+                },
+                (error) => {
+                    console.warn(`Could not load ${config.displayName} animation:`, error);
+                    setLoadingAnimations(prev => {
+                        const newSet = new Set(prev);
+                        newSet.delete(config.name);
+                        return newSet;
+                    });
+                }
+            );
+        });
+    };
+
+    // Function to switch animations
+    const switchAnimation = (animationName: string) => {
+        const mixer = mixerRef.current;
+        const actions = actionsRef.current;
+
+        if (!mixer || !actions[animationName]) return;
+
+        // Fade out current animation
+        if (actions[currentAnimation]) {
+            actions[currentAnimation].fadeOut(0.3);
+        }
+
+        // Fade in new animation
+        actions[animationName].reset().fadeIn(0.3).play();
+
+        setCurrentAnimation(animationName);
+    };
 
     return (
         <div className={`flex-1 md:min-w-[50%] h-full md:h-full overflow-hidden relative bg-gradient-to-br from-indigo-500 via-purple-500 to-purple-700 model-container ${className}`}>
@@ -110,6 +233,45 @@ export default function ThreeScene({
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                         <span className="text-white text-xs font-body tracking-wider">3D MONKEY READY</span>
+                    </div>
+                </div>
+            )}
+
+            {/* Desktop Animation Controls */}
+            {modelLoaded && (
+                <div className="hidden md:block absolute bottom-4 left-1/2 transform -translate-x-1/2">
+                    <div className="bg-black/60 backdrop-blur-sm rounded-full px-4 py-3 border border-white/10">
+                        <div className="flex items-center gap-2">
+                            <span className="text-white text-xs font-body tracking-wider mr-2">ANIMATIONS:</span>
+                            {ANIMATION_CONFIG.map((config) => (
+                                <button
+                                    key={config.name}
+                                    onClick={() => switchAnimation(config.name)}
+                                    disabled={loadingAnimations.has(config.name)}
+                                    className={`
+                                        relative flex items-center gap-2 px-3 py-2 rounded-full text-xs font-body tracking-wider
+                                        transition-all duration-300 border border-transparent
+                                        ${currentAnimation === config.name
+                                            ? `bg-gradient-to-r ${config.color} text-white shadow-lg border-white/20 scale-105`
+                                            : 'bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white hover:scale-105'
+                                        }
+                                        ${loadingAnimations.has(config.name) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                                    `}
+                                >
+                                    {loadingAnimations.has(config.name) ? (
+                                        <div className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" />
+                                    ) : (
+                                        <span className="text-sm">{config.icon}</span>
+                                    )}
+                                    <span className="hidden lg:inline">{config.displayName}</span>
+
+                                    {/* Active indicator */}
+                                    {currentAnimation === config.name && (
+                                        <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
+                                    )}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
             )}

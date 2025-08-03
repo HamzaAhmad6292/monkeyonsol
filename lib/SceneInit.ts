@@ -28,6 +28,9 @@ export default class SceneInit {
   // Animation frame ID for cleanup
   private animationId: number | null = null;
 
+  // Animation mixer reference
+  public animationMixer: THREE.AnimationMixer | null = null;
+
   constructor(canvasId: string, containerId: string = 'model-container') {
     this.canvasId = canvasId;
     this.containerId = containerId;
@@ -98,6 +101,16 @@ export default class SceneInit {
       if (this.controls) {
         this.controls.update();
       }
+
+      // Update animation mixer if it exists
+      if (this.animationMixer && this.clock) {
+        this.animationMixer.update(this.clock.getDelta());
+      }
+
+      // Update animation mixer if it exists
+      if (this.animationMixer && this.clock) {
+        this.animationMixer.update(this.clock.getDelta());
+      }
     };
     animateLoop();
   }
@@ -123,6 +136,16 @@ export default class SceneInit {
     }
   }
 
+  // Method to set the animation mixer from ThreeScene
+  setAnimationMixer(mixer: THREE.AnimationMixer): void {
+    this.animationMixer = mixer;
+  }
+
+  // Method to set the animation mixer from ThreeScene
+  setAnimationMixer(mixer: THREE.AnimationMixer): void {
+    this.animationMixer = mixer;
+  }
+
   // ADD THIS METHOD - This was missing and causing the error
   dispose(): void {
     // Stop animation loop
@@ -142,6 +165,12 @@ export default class SceneInit {
     // Dispose of controls
     if (this.controls) {
       this.controls.dispose();
+    }
+
+    // Stop animation mixer
+    if (this.animationMixer) {
+      this.animationMixer.stopAllAction();
+      this.animationMixer = null;
     }
 
     // Dispose of Three.js objects in the scene
