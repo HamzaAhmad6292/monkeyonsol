@@ -1,7 +1,6 @@
 // lib/SceneInit.ts
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import Stats from 'three/examples/jsm/libs/stats.module';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 export default class SceneInit {
   // Core components to initialize Three.js app
@@ -10,7 +9,7 @@ export default class SceneInit {
   public renderer: THREE.WebGLRenderer | undefined;
 
   // Camera params
-  private fov: number = 45;
+  private fov: number = 50;
   private nearPlane: number = 1;
   private farPlane: number = 1000;
   private canvasId: string;
@@ -18,7 +17,7 @@ export default class SceneInit {
 
   // Additional components
   private clock: THREE.Clock | undefined;
-  private stats: Stats | undefined;
+  // private stats: Stats | undefined;
   private controls: OrbitControls | undefined;
 
   // Lighting
@@ -40,7 +39,7 @@ export default class SceneInit {
     this.scene = new THREE.Scene();
 
     // Get container dimensions instead of window dimensions
-    const container = document.querySelector('.model-container') || document.body;
+    const container = document.querySelector('.model-container') as HTMLElement || document.body;
     const containerRect = container.getBoundingClientRect();
 
     this.camera = new THREE.PerspectiveCamera(
@@ -68,22 +67,25 @@ export default class SceneInit {
     this.clock = new THREE.Clock();
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
-    // Append stats to the model container instead of body
-    this.stats = new Stats();
-    this.stats.dom.style.position = 'absolute';
-    this.stats.dom.style.top = '10px';
-    this.stats.dom.style.left = '10px';
-    this.stats.dom.style.zIndex = '100';
-    container.appendChild(this.stats.dom);
+    // Disable zooming and scrolling
+    this.controls.enableZoom = false;
+    this.controls.enablePan = false;
+    this.controls.enableRotate = false; // This disables rotation as well
+    this.controls.enableDamping = false;
 
     // Ambient light which is for the whole scene
-    this.ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+    this.ambientLight = new THREE.AmbientLight(0xffffff, 2.5);
     this.scene.add(this.ambientLight);
 
     // Directional light - parallel sun rays
     this.directionalLight = new THREE.DirectionalLight(0xffffff, 2);
-    this.directionalLight.position.set(0, 32, 64);
+    this.directionalLight.position.set(0, 32, 64); // Adjust position for better illumination
     this.scene.add(this.directionalLight);
+
+    // Add a secondary directional light from another angle for better coverage
+    const secondaryLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    secondaryLight.position.set(0, -50, -100);
+    // this.scene.add(secondaryLight);
 
     // If window resizes, update based on container size
     window.addEventListener('resize', this.onWindowResize.bind(this), false);
@@ -94,9 +96,9 @@ export default class SceneInit {
       this.animationId = window.requestAnimationFrame(animateLoop);
       this.render();
 
-      if (this.stats) {
-        this.stats.update();
-      }
+      // if (this.stats) {
+      //   this.stats.update();
+      // }
 
       if (this.controls) {
         this.controls.update();
@@ -141,11 +143,6 @@ export default class SceneInit {
     this.animationMixer = mixer;
   }
 
-  // Method to set the animation mixer from ThreeScene
-  setAnimationMixer(mixer: THREE.AnimationMixer): void {
-    this.animationMixer = mixer;
-  }
-
   // ADD THIS METHOD - This was missing and causing the error
   dispose(): void {
     // Stop animation loop
@@ -158,9 +155,9 @@ export default class SceneInit {
     window.removeEventListener('resize', this.onWindowResize.bind(this));
 
     // Remove stats from DOM
-    if (this.stats && this.stats.dom && this.stats.dom.parentNode) {
-      this.stats.dom.parentNode.removeChild(this.stats.dom);
-    }
+    // if (this.stats && this.stats.dom && this.stats.dom.parentNode) {
+    // this.stats.dom.parentNode.removeChild(this.stats.dom);
+    // }
 
     // Dispose of controls
     if (this.controls) {
@@ -199,7 +196,7 @@ export default class SceneInit {
     this.camera = undefined;
     this.renderer = undefined;
     this.controls = undefined;
-    this.stats = undefined;
+    // this.stats = undefined;
     this.clock = undefined;
     this.ambientLight = undefined;
     this.directionalLight = undefined;
