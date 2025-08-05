@@ -9,9 +9,9 @@ export default class SceneInit {
   public renderer: THREE.WebGLRenderer | undefined;
 
   // Camera params
-  private fov: number = 50;
+  private fov: number = 75; // Increased FOV for wider view
   private nearPlane: number = 1;
-  private farPlane: number = 1000;
+  private farPlane: number = 2000; // Increased far plane
   private canvasId: string;
   private containerId: string;
 
@@ -23,6 +23,7 @@ export default class SceneInit {
   // Lighting
   private ambientLight: THREE.AmbientLight | undefined;
   private directionalLight: THREE.DirectionalLight | undefined;
+  private rimLight: THREE.DirectionalLight | undefined;
 
   // Animation frame ID for cleanup
   private animationId: number | null = null;
@@ -48,7 +49,8 @@ export default class SceneInit {
       this.nearPlane,
       this.farPlane
     );
-    this.camera.position.z = 48;
+    // Position camera much further back and elevated for better view
+    this.camera.position.set(0, 200, 600); // Higher camera position
 
     // Specify a canvas which is already created in the HTML
     const canvas = document.getElementById(this.canvasId) as HTMLCanvasElement;
@@ -73,19 +75,19 @@ export default class SceneInit {
     this.controls.enableRotate = false; // This disables rotation as well
     this.controls.enableDamping = false;
 
-    // Ambient light which is for the whole scene
-    this.ambientLight = new THREE.AmbientLight(0xffffff, 2.5);
+    // Neutral white ambient light - provides base illumination without color shift
+    this.ambientLight = new THREE.AmbientLight(0xffffff, 0.8); // Pure white, moderate intensity
     this.scene.add(this.ambientLight);
 
-    // Directional light - parallel sun rays
-    this.directionalLight = new THREE.DirectionalLight(0xffffff, 2);
-    this.directionalLight.position.set(0, 32, 64); // Adjust position for better illumination
+    // Main directional light - pure white but positioned strategically
+    this.directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    this.directionalLight.position.set(0, 100, 100); // Front-top lighting for even coverage
     this.scene.add(this.directionalLight);
 
-    // Add a secondary directional light from another angle for better coverage
-    const secondaryLight = new THREE.DirectionalLight(0xffffff, 1.5);
-    secondaryLight.position.set(0, -50, -100);
-    // this.scene.add(secondaryLight);
+    // Fill light from opposite side to reduce harsh shadows
+    this.rimLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    this.rimLight.position.set(0, 50, -100); // Behind lighting for fill
+    this.scene.add(this.rimLight);
 
     // If window resizes, update based on container size
     window.addEventListener('resize', this.onWindowResize.bind(this), false);
@@ -200,5 +202,6 @@ export default class SceneInit {
     this.clock = undefined;
     this.ambientLight = undefined;
     this.directionalLight = undefined;
+    this.rimLight = undefined;
   }
 }
