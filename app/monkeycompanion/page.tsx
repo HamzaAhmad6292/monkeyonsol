@@ -8,6 +8,7 @@ import { useGroqChat } from "@/components/groqChat"
 import { Send } from "lucide-react"
 import Link from "next/link"
 import { Orbitron, Rajdhani } from 'next/font/google'
+import ThreeScene from '@/components/ThreeScene'
 
 // Define creative Google Fonts
 const headingFont = Orbitron({
@@ -60,89 +61,21 @@ export default function MonkeyCompanionPage() {
 
   return (
     <div className={`min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white relative overflow-hidden ${headingFont.variable} ${bodyFont.variable}`}>
-
-
       {/* Responsive container: row on large screens, overlay on mobile */}
       <div className="relative h-screen flex flex-col lg:flex-row">
-        {/* Coming Soon Section */}
-        <div className="absolute inset-0 flex items-center justify-center lg:static lg:flex-1 lg:flex lg:items-center lg:justify-center bg-gradient-to-b from-gray-900/80 via-black/60 to-gray-800/80">
-          <div className="text-center relative z-0 w-full">
-            <div className="space-y-8 md:space-y-12">
-              <div className="relative">
-                <h2 className="text-5xl sm:text-7xl lg:text-9xl font-extrabold bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-500 bg-clip-text text-transparent animate-pulse tracking-tighter" style={{ fontFamily: 'var(--font-heading)' }}>
-                  {"COMING".split("").map((char, i) => (
-                    <span
-                      key={i}
-                      className="inline-block animate-bounce"
-                      style={{
-                        animationDelay: `${i * 0.1}s`,
-                        animationDuration: "2s",
-                      }}
-                    >
-                      {char}
-                    </span>
-                  ))}
-                </h2>
-                <h2 className="text-5xl sm:text-7xl lg:text-9xl font-extrabold bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-500 bg-clip-text text-transparent animate-pulse mt-2 lg:mt-4 tracking-tighter" style={{ fontFamily: 'var(--font-heading)' }}>
-                  {"SOON".split("").map((char, i) => (
-                    <span
-                      key={i}
-                      className="inline-block animate-bounce"
-                      style={{
-                        animationDelay: `${(i + 6) * 0.1}s`,
-                        animationDuration: "2s",
-                      }}
-                    >
-                      {char}
-                    </span>
-                  ))}
-                </h2>
-              </div>
-
-              <div className="relative w-24 lg:w-32 h-0.5 mx-auto overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-orange-500/80 to-transparent animate-pulse" />
-              </div>
-
-              <div className="space-y-2 md:space-y-4">
-                <p className="text-xl sm:text-2xl lg:text-3xl text-gray-300 font-medium animate-pulse tracking-wider font-body">
-                  {"3D INTERACTIVE EXPERIENCE".split("").map((char, i) => (
-                    <span
-                      key={i}
-                      className="inline-block opacity-0 animate-pulse"
-                      style={{
-                        animationDelay: `${i * 0.05 + 1}s`,
-                        animationFillMode: "forwards",
-                      }}
-                    >
-                      {char === " " ? "\u00A0" : char}
-                    </span>
-                  ))}
-                </p>
-
-                <p className="text-sm lg:text-lg text-gray-400 animate-pulse tracking-widest font-body" style={{ animationDelay: "3s" }}>
-                  🔥 DEV TEAM IS COOKING...
-                </p>
-              </div>
-
-              <div className="flex justify-center gap-3 mt-8 lg:mt-16">
-                <div className="w-3 h-3 lg:w-4 lg:h-4 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full animate-bounce" />
-                <div
-                  className="w-3 h-3 lg:w-4 lg:h-4 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full animate-bounce"
-                  style={{ animationDelay: "0.2s" }}
-                />
-                <div
-                  className="w-3 h-3 lg:w-4 lg:h-4 bg-gradient-to-r from-orange-400 to-yellow-400 rounded-full animate-bounce"
-                  style={{ animationDelay: "0.4s" }}
-                />
-              </div>
-            </div>
-          </div>
+        {/* 3D Model Section - replaces Coming Soon */}
+        <div className="absolute inset-0 lg:static lg:flex-1 lg:flex lg:items-center lg:justify-center">
+          <ThreeScene
+            canvasId="myThreeJsCanvas"
+            modelPath="/assets/biped/Character_output.fbx"
+            className="w-full h-full"
+          />
         </div>
 
         {/* Chat Panel */}
         <div className="absolute inset-0 lg:static lg:flex-1 lg:flex lg:flex-col h-full min-h-0">
           {/* Consistent background overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from--900/60 via-black/40 to-gray-800/60 lg:static lg:bg-none" />
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 via-black/40 to-gray-800/60 lg:static lg:bg-none" />
 
           <div className="relative z-10 flex flex-col h-full">
             {/* Chat Header */}
