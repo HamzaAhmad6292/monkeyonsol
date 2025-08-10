@@ -67,7 +67,7 @@ export default function MonkeyCompanionPage() {
         <div className="absolute inset-0 lg:static lg:flex-1 lg:flex lg:items-center lg:justify-center">
           <ThreeScene
             canvasId="myThreeJsCanvas"
-            modelPath="/assets/biped/Character_output.fbx"
+            // modelPath="/assets/biped/Character_output.fbx"
             className="w-full h-full"
           />
         </div>
