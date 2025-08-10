@@ -67,7 +67,7 @@ export default function ThreeScene({
 
         group.rotation.y = 0;
         // Move slightly down and scale up a bit
-        group.position.set(0, -460, -350);
+        group.position.set(0, -650, -350);
         group.scale.set(460, 460, 4.6);
 
         // Improve perceived realism: enable shadows and tune material reflection
@@ -181,7 +181,7 @@ export default function ThreeScene({
                 playRole('speak');
                 break;
             }
-          } catch {}
+          } catch { }
         };
         window.addEventListener('avatar:state', onAvatarState as EventListener);
         windowEventHandlerRef.current = onAvatarState;
@@ -202,7 +202,7 @@ export default function ThreeScene({
       sceneInitRef.current?.dispose();
       if (mixerRef.current) {
         if (mixerFinishedHandlerRef.current) {
-          try { mixerRef.current.removeEventListener('finished', mixerFinishedHandlerRef.current); } catch {}
+          try { mixerRef.current.removeEventListener('finished', mixerFinishedHandlerRef.current); } catch { }
         }
         mixerRef.current.stopAllAction();
         mixerRef.current = null;
@@ -212,7 +212,7 @@ export default function ThreeScene({
 
       // Remove window listener
       if (windowEventHandlerRef.current) {
-        try { window.removeEventListener('avatar:state', windowEventHandlerRef.current as EventListener); } catch {}
+        try { window.removeEventListener('avatar:state', windowEventHandlerRef.current as EventListener); } catch { }
       }
 
       if (baseModel) {
@@ -231,14 +231,21 @@ export default function ThreeScene({
   return (
     <div
       className={`flex-1 md:min-w-[50%] h-full md:h-full overflow-hidden relative model-container ${className}`}
-      style={{
-        backgroundImage: "url('/images/3d_bg.avif')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }}
     >
-      <canvas id={canvasId} />
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: "url('/images/3d_bg.avif')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          filter: 'brightness(0.2)' // darkens without reducing model opacity
+
+        }}
+      />
+
+
+      <canvas id={canvasId} className="relative z-10" />
 
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/70">
@@ -261,7 +268,7 @@ export default function ThreeScene({
           </div>
         </div>
       )}
-
+      {/* 
       {!loading && available.length > 0 && (
         <div className="absolute bottom-0 inset-x-0 p-3 bg-black/40 backdrop-blur-sm">
           <div className="flex flex-wrap items-center justify-center gap-2">
@@ -284,7 +291,10 @@ export default function ThreeScene({
             ))}
           </div>
         </div>
-      )}
+      )} */}
+
+
+
     </div>
   )
 }
