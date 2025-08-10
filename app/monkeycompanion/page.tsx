@@ -3,12 +3,15 @@
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch"
 import { Input } from "@/components/ui/input"
 import { useGroqChat } from "@/components/groqChat"
-import { Send } from "lucide-react"
+import { Send, Mic, AlertCircle, Square } from "lucide-react"
 import Link from "next/link"
 import { Orbitron, Rajdhani } from 'next/font/google'
 import ThreeScene from '@/components/ThreeScene'
+import { useToast } from "@/hooks/use-toast"
+import { playSpeech } from "@/components/tts"
 
 // Define creative Google Fonts
 const headingFont = Orbitron({
@@ -41,6 +44,24 @@ export default function MonkeyCompanionPage() {
 
   const [inputMessage, setInputMessage] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [isChatHidden, setIsChatHidden] = useState(false)
+  const { toast } = useToast()
+
+  // Voice recording state
+  const [isRecording, setIsRecording] = useState(false)
+  const [isTranscribing, setIsTranscribing] = useState(false)
+  const [hasTranscriptionError, setHasTranscriptionError] = useState<string | null>(null)
+  const [inputPulse, setInputPulse] = useState(false)
+
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const audioStreamRef = useRef<MediaStream | null>(null)
+  const recordedChunksRef = useRef<BlobPart[]>([])
+  const lastAudioBlobRef = useRef<Blob | null>(null)
+  const cancelNextStopRef = useRef<boolean>(false)
+  const lastSpokenAssistantIdRef = useRef<string | null>(null)
+
+  // Use same-origin proxy to avoid CORS
+  const STT_PROXY_ENDPOINT = "/api/speech-to-text"
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -59,16 +80,147 @@ export default function MonkeyCompanionPage() {
     }
   }
 
+  // Cleanup media stream on unmount
+  useEffect(() => {
+    return () => {
+      try {
+        mediaRecorderRef.current?.stop()
+      } catch {}
+      audioStreamRef.current?.getTracks().forEach((t) => t.stop())
+      audioStreamRef.current = null
+      mediaRecorderRef.current = null
+    }
+  }, [])
+
+  const startRecording = async () => {
+    try {
+      setHasTranscriptionError(null)
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      audioStreamRef.current = stream
+
+      const options: MediaRecorderOptions = {}
+      // Prefer webm/opus when available
+      if (typeof MediaRecorder !== 'undefined') {
+        const preferred = 'audio/webm;codecs=opus'
+        if (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(preferred)) {
+          options.mimeType = preferred
+        }
+      }
+
+      const recorder = new MediaRecorder(stream, options)
+      recordedChunksRef.current = []
+      cancelNextStopRef.current = false
+
+      recorder.ondataavailable = (event: BlobEvent) => {
+        if (event.data && event.data.size > 0) {
+          recordedChunksRef.current.push(event.data)
+        }
+      }
+
+      recorder.onstop = async () => {
+        const wasCancelled = cancelNextStopRef.current
+        const blob = new Blob(recordedChunksRef.current, { type: recorder.mimeType || 'audio/webm' })
+        lastAudioBlobRef.current = blob
+
+        // Release mic
+        audioStreamRef.current?.getTracks().forEach((t) => t.stop())
+        audioStreamRef.current = null
+        mediaRecorderRef.current = null
+
+        setIsRecording(false)
+
+        if (!wasCancelled && blob.size > 0) {
+          await transcribeAudio(blob)
+        }
+      }
+
+      mediaRecorderRef.current = recorder
+      recorder.start()
+      setIsRecording(true)
+    } catch (err) {
+      setHasTranscriptionError('Microphone access denied or unavailable')
+      toast({ title: 'Microphone error', description: 'Please allow mic access and try again.' })
+    }
+  }
+
+  const stopRecording = (cancel = false) => {
+    try {
+      cancelNextStopRef.current = cancel
+      mediaRecorderRef.current?.state === 'recording' && mediaRecorderRef.current.stop()
+    } catch {}
+  }
+
+  const retryTranscription = async () => {
+    if (lastAudioBlobRef.current) {
+      setHasTranscriptionError(null)
+      await transcribeAudio(lastAudioBlobRef.current)
+    }
+  }
+
+  const transcribeAudio = async (blob: Blob) => {
+    try {
+      setIsTranscribing(true)
+      const form = new FormData()
+      form.append('file', blob, 'recording.webm')
+      form.append('model_id', 'scribe_v1')
+
+      const response = await fetch(STT_PROXY_ENDPOINT, {
+        method: 'POST',
+        body: form,
+      })
+
+      if (!response.ok) {
+        const errJson = await response.json().catch(() => ({}))
+        throw new Error(errJson?.detail || 'Transcription failed')
+      }
+
+      const data = await response.json()
+      const transcript: string = data?.text || ''
+      if (!transcript) {
+        throw new Error('Empty transcript')
+      }
+
+      // Add to chat internally and request response
+      await sendMessage(transcript)
+
+      // Pulse input to signal new text available
+      setInputPulse(true)
+      setTimeout(() => setInputPulse(false), 1200)
+
+      toast({ title: 'Transcribed!', description: 'Your voice message was added to the chat.' })
+    } catch (e: any) {
+      setHasTranscriptionError(e?.message || 'Transcription failed')
+      toast({ title: 'Transcription error', description: 'Tap retry to try again.' })
+    } finally {
+      setIsTranscribing(false)
+    }
+  }
+
+  // Automatically speak the latest assistant message (production behavior)
+  useEffect(() => {
+    const lastAssistant = [...messages].reverse().find((m) => !m.isUser)
+    if (!lastAssistant) return
+    if (lastSpokenAssistantIdRef.current === lastAssistant.id) return
+    lastSpokenAssistantIdRef.current = lastAssistant.id
+
+    // Default to OpenAI provider and alloy voice; handled server-side as well
+    playSpeech({ text: lastAssistant.content, provider: 'openai', voice_name: 'alloy', format: 'mp3', playbackRate: 0.9 })
+      .catch((e: any) => {
+        // If autoplay is blocked, inform user
+        toast({ title: 'Tap to enable audio', description: e?.message || 'Autoplay blocked by browser.' })
+      })
+  }, [messages, toast])
+
   return (
     <div className={`min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white relative overflow-hidden ${headingFont.variable} ${bodyFont.variable}`}>
       {/* Responsive container: row on large screens, overlay on mobile */}
-      <div className="relative h-screen flex flex-col lg:flex-row">
+        <div className="relative h-[100svh] min-h-[640px] flex flex-col lg:flex-row">
         {/* 3D Model Section - replaces Coming Soon */}
         <div className="absolute inset-0 lg:static lg:flex-1 lg:flex lg:items-center lg:justify-center">
           <ThreeScene
             canvasId="myThreeJsCanvas"
-            modelPath="/assets/biped/Character_output.fbx"
-            className="w-full h-full"
+            // modelPath="/assets/model/files/walk.fbx"
+            className="w-full h-full min-h-[640px]"
           />
         </div>
 
@@ -104,6 +256,23 @@ export default function MonkeyCompanionPage() {
                     </p>
                   </div>
                 </div>
+
+                {/* Hide/Show Chat Toggle */}
+                <div className="ml-auto flex items-center gap-3">
+                  <label
+                    htmlFor="hide-chat-toggle"
+                    className={`text-xs md:text-sm tracking-wider font-body ${isChatHidden ? 'bg-gradient-to-r from-orange-500 to-yellow-500 bg-clip-text text-transparent' : 'text-gray-300'}`}
+                  >
+                    Hide Chat
+                  </label>
+                  <Switch
+                    id="hide-chat-toggle"
+                    checked={isChatHidden}
+                    onCheckedChange={setIsChatHidden}
+                    aria-label="Hide chat toggle"
+                    className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-orange-500 data-[state=checked]:to-yellow-500"
+                  />
+                </div>
               </div>
             </div>
 
@@ -111,10 +280,14 @@ export default function MonkeyCompanionPage() {
             <div
               className="flex-1 overflow-y-auto p-4 md:p-6 relative bg-gradient-to-b from-black/20 via-black/10 to-black/20 min-h-0"
             >
-              {/* Fade overlay at top */}
-              <div className="sticky top-0 left-0 w-full h-32 bg-gradient-to-b from-black/20 to-transparent z-10 pointer-events-none" />
+              {/* Messages visibility wrapper with smooth transitions */}
+              <div
+                className={`transition-all duration-200 ease-in-out ${isChatHidden ? 'opacity-0 -translate-y-2 pointer-events-none' : 'opacity-100 translate-y-0'}`}
+              >
+                {/* Fade overlay at top */}
+                <div className="sticky top-0 left-0 w-full h-32 bg-gradient-to-b from-black/20 to-transparent z-10 pointer-events-none" />
 
-              <div className="space-y-4 md:space-y-6 pt-4">
+                <div className="space-y-4 md:space-y-6 pt-4">
                 {/* Welcome message */}
                 {messages.length === 0 && (
                   <div className="flex justify-start animate-in slide-in-from-left-4 duration-500 ease-out">
@@ -204,19 +377,73 @@ export default function MonkeyCompanionPage() {
                     </div>
                   </div>
                 )}
+                </div>
               </div>
+              {/* Former centered mic overlay removed; mic now sits above input bar */}
               <div ref={messagesEndRef} />
             </div>
 
             {/* Input Area */}
             <div className="sticky bottom-0 bg-gradient-to-t from-black/60 to-black/20 p-4">
-              <div className="flex gap-3 md:gap-4">
+              {isChatHidden && (
+                <div className="flex w-full justify-center mb-2">
+                  <button
+                    type="button"
+                    onClick={() => (isRecording ? stopRecording(false) : startRecording())}
+                    onKeyDown={(e) => {
+                      if (e.key === ' ') {
+                        e.preventDefault()
+                        isRecording ? stopRecording(false) : startRecording()
+                      }
+                      if (e.key.toLowerCase() === 'c') {
+                        if (isRecording) stopRecording(true)
+                      }
+                    }}
+                    aria-label={isRecording ? 'Stop voice recording' : 'Start voice recording'}
+                    aria-pressed={isRecording}
+                    className={`relative w-14 h-14 md:w-16 md:h-16 rounded-full shadow-lg flex items-center justify-center transition transform duration-150 focus:outline-none focus:ring-2 focus:ring-orange-300/60 ${
+                      isRecording
+                        ? 'bg-gradient-to-br from-orange-500 to-yellow-500 hover:from-orange-400 hover:to-yellow-400 scale-100'
+                        : 'bg-gradient-to-br from-orange-500/20 to-yellow-500/20 hover:from-orange-500/30 hover:to-yellow-500/30 border border-orange-400/40 hover:scale-105 hover:shadow-xl'
+                    }`}
+                  >
+                    {isRecording && (
+                      <span className="absolute -inset-1 rounded-full border-2 border-orange-300/40 animate-ping" />
+                    )}
+                    <div className="relative z-10">
+                      {hasTranscriptionError ? (
+                        <AlertCircle className="w-7 h-7 text-red-300" />
+                      ) : isRecording ? (
+                        <Square className="w-7 h-7 text-white" />
+                      ) : (
+                        <Mic className="w-7 h-7 text-white" />
+                      )}
+                    </div>
+                  </button>
+                </div>
+              )}
+              {/* Recording pill removed per request */}
+              {/* Retry action if last transcription failed */}
+              {isChatHidden && hasTranscriptionError && (
+                <div className="-mt-2 mb-2 flex w-full justify-center">
+                  <Button
+                    onClick={retryTranscription}
+                    aria-label="Retry transcription"
+                    size="sm"
+                    className="h-7 px-3 bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-400 hover:to-yellow-400 text-white border-0"
+                    style={{ borderRadius: '12px' }}
+                  >
+                    Retry
+                  </Button>
+                </div>
+              )}
+              <div className="flex items-center gap-3 md:gap-4">
                 <Input
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="MESSAGE MONKEY..."
-                  className="flex-1 bg-gray-800/60 border border-gray-700/40 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500/50 text-xs md:text-base tracking-wide font-body"
+                  className={`flex-1 bg-gray-800/60 border border-gray-700/40 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500/50 text-xs md:text-base tracking-wide font-body ${inputPulse ? 'ring-2 ring-yellow-400 animate-pulse' : ''}`}
                   style={{ borderRadius: "20px" }}
                   disabled={isTyping}
                 />
