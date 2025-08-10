@@ -11,7 +11,10 @@ import Link from "next/link"
 import { Orbitron, Rajdhani } from 'next/font/google'
 import ThreeScene from '@/components/ThreeScene'
 import { useToast } from "@/hooks/use-toast"
-import { playSpeech } from "@/components/tts"
+import { synthesizeSpeech } from "@/components/tts"
+
+// Expose optional STT model from env (build-time)
+const STT_MODEL_ID = process.env.NEXT_PUBLIC_STT_MODEL_ID?.trim()
 
 // Define creative Google Fonts
 const headingFont = Orbitron({
@@ -35,7 +38,6 @@ interface Message {
 
 export default function MonkeyCompanionPage() {
   const { messages, isTyping, sendMessage } = useGroqChat({
-    // systemPrompt: "You are Monkey, a friendly and playful AI art companion dog...",
     model: "meta-llama/llama-4-scout-17b-16e-instruct",
     temperature: 0.8,
     maxTokens: 1024,
@@ -78,6 +80,13 @@ export default function MonkeyCompanionPage() {
       e.preventDefault()
       handleSendMessage()
     }
+  }
+
+  // Helper: dispatch avatar state events for 3D model
+  const setAvatarState = (state: 'walk' | 'idle' | 'think' | 'speaking' | 'speak' | 'thinking') => {
+    try {
+      window.dispatchEvent(new CustomEvent('avatar:state', { detail: { state } }))
+    } catch {}
   }
 
   // Cleanup media stream on unmount
@@ -129,7 +138,12 @@ export default function MonkeyCompanionPage() {
 
         setIsRecording(false)
 
-        if (!wasCancelled && blob.size > 0) {
+        if (wasCancelled) {
+          setAvatarState('idle')
+          return
+        }
+
+        if (blob.size > 0) {
           await transcribeAudio(blob)
         }
       }
@@ -137,15 +151,19 @@ export default function MonkeyCompanionPage() {
       mediaRecorderRef.current = recorder
       recorder.start()
       setIsRecording(true)
+      // Enter thinking state while recording/transcribing/LLM is responding
+      setAvatarState('thinking')
     } catch (err) {
       setHasTranscriptionError('Microphone access denied or unavailable')
       toast({ title: 'Microphone error', description: 'Please allow mic access and try again.' })
+      setAvatarState('idle')
     }
   }
 
   const stopRecording = (cancel = false) => {
     try {
       cancelNextStopRef.current = cancel
+      if (cancel) setAvatarState('idle')
       mediaRecorderRef.current?.state === 'recording' && mediaRecorderRef.current.stop()
     } catch {}
   }
@@ -162,7 +180,10 @@ export default function MonkeyCompanionPage() {
       setIsTranscribing(true)
       const form = new FormData()
       form.append('file', blob, 'recording.webm')
-      form.append('model_id', 'scribe_v1')
+      // Only send model_id if configured for this deployment
+      if (STT_MODEL_ID) {
+        form.append('model_id', STT_MODEL_ID)
+      }
 
       const response = await fetch(STT_PROXY_ENDPOINT, {
         method: 'POST',
@@ -188,9 +209,11 @@ export default function MonkeyCompanionPage() {
       setTimeout(() => setInputPulse(false), 1200)
 
       toast({ title: 'Transcribed!', description: 'Your voice message was added to the chat.' })
+      // Remain in thinking until TTS begins playing
     } catch (e: any) {
       setHasTranscriptionError(e?.message || 'Transcription failed')
       toast({ title: 'Transcription error', description: 'Tap retry to try again.' })
+      setAvatarState('idle')
     } finally {
       setIsTranscribing(false)
     }
@@ -203,12 +226,44 @@ export default function MonkeyCompanionPage() {
     if (lastSpokenAssistantIdRef.current === lastAssistant.id) return
     lastSpokenAssistantIdRef.current = lastAssistant.id
 
-    // Default to OpenAI provider and alloy voice; handled server-side as well
-    playSpeech({ text: lastAssistant.content, provider: 'openai', voice_name: 'alloy', format: 'mp3', playbackRate: 0.9 })
-      .catch((e: any) => {
-        // If autoplay is blocked, inform user
+    ;(async () => {
+      try {
+        // Fetch audio first (still in thinking)
+        const blob = await synthesizeSpeech({ text: lastAssistant.content, provider: 'openai', voice_name: 'ballad', format: 'mp3', playbackRate: 0.9 })
+        const url = URL.createObjectURL(blob)
+        const audio = new Audio(url)  
+
+        // Preserve pitch where supported
+        try {
+          // @ts-ignore
+          if (typeof (audio as any).preservesPitch !== 'undefined') (audio as any).preservesPitch = true
+          // @ts-ignore
+          if (typeof (audio as any).mozPreservesPitch !== 'undefined') (audio as any).mozPreservesPitch = true
+          // @ts-ignore
+          if (typeof (audio as any).webkitPreservesPitch !== 'undefined') (audio as any).webkitPreservesPitch = true
+        } catch {}
+        audio.playbackRate = 0.9
+
+        // Switch to speaking now that TTS response is ready
+        setAvatarState('speaking')
+
+        // When finished, go back to idle and cleanup URL
+        audio.addEventListener('ended', () => {
+          URL.revokeObjectURL(url)
+          setAvatarState('idle')
+        }, { once: true })
+        audio.addEventListener('error', () => {
+          URL.revokeObjectURL(url)
+          setAvatarState('idle')
+        }, { once: true })
+
+        await audio.play()
+      } catch (e: any) {
+        // If autoplay is blocked or TTS failed, inform user and return to idle
         toast({ title: 'Tap to enable audio', description: e?.message || 'Autoplay blocked by browser.' })
-      })
+        setAvatarState('idle')
+      }
+    })()
   }, [messages, toast])
 
   return (
@@ -226,8 +281,7 @@ export default function MonkeyCompanionPage() {
 
         {/* Chat Panel */}
         <div className="absolute inset-0 lg:static lg:flex-1 lg:flex lg:flex-col h-full min-h-0">
-          {/* Consistent background overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 via-black/40 to-gray-800/60 lg:static lg:bg-none" />
+          {/* Removed mobile dark overlay to keep 3D bright */}
 
           <div className="relative z-10 flex flex-col h-full">
             {/* Chat Header */}
@@ -237,7 +291,7 @@ export default function MonkeyCompanionPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="text-gray-300 hover:bg-white/10 bg-transparent rounded-full w-8 h-8 md:w-10 md:h-10"
+                    className="text-gray-300 hover:bg.white/10 bg-transparent rounded-full w-8 h-8 md:w-10 md:h-10"
                   >
                     <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -248,7 +302,7 @@ export default function MonkeyCompanionPage() {
                   <span className="text-sm md:text-xl">🐕</span>
                 </div>
                 <div>
-                  <h3 className="font-bold text-white text-lg md:text-xl tracking-wider" style={{ fontFamily: 'var(--font-heading)' }}>MONKEY AI</h3>
+                  <h3 className="font-bold text.white text-lg md:text-xl tracking-wider" style={{ fontFamily: 'var(--font-heading)' }}>MONKEY AI</h3>
                   <div className="flex items-center gap-2">
                     <div className={`w-2 h-2 rounded-full animate-pulse ${isTyping ? 'bg-yellow-400' : 'bg-green-400'}`} />
                     <p className="text-gray-300 text-xs md:text-sm tracking-wider font-body">
@@ -450,7 +504,7 @@ export default function MonkeyCompanionPage() {
                 <Button
                   onClick={handleSendMessage}
                   disabled={!inputMessage.trim() || isTyping}
-                  className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-400 hover:to-yellow-400 text-white px-4 md:px-6 shadow-lg disabled:opacity-50 tracking-wider uppercase font-body border-0"
+                  className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-400 hover:to-yellow-500 text-white px-4 md:px-6 shadow-lg disabled:opacity-50 tracking-wider uppercase font-body border-0"
                   style={{ borderRadius: "20px" }}
                 >
                   <Send className="w-3 h-3 md:w-4 md:h-4" />

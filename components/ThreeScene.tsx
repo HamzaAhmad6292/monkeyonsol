@@ -24,6 +24,10 @@ export default function ThreeScene({
   const actionsRef = useRef<Record<string, THREE.AnimationAction>>({})
   const currentActionRef = useRef<THREE.AnimationAction | null>(null)
 
+  const roleLabelsRef = useRef<{ walk?: string; idle?: string; think?: string; speak?: string }>({})
+  const mixerFinishedHandlerRef = useRef<((e: any) => void) | null>(null)
+  const windowEventHandlerRef = useRef<((e: Event) => void) | null>(null)
+
   const [loading, setLoading] = useState(true)
   const [loadingProgress, setLoadingProgress] = useState(0)
   const [currentName, setCurrentName] = useState<string | null>(null)
@@ -39,6 +43,12 @@ export default function ThreeScene({
     setCurrentName(name);
   };
 
+  const playRole = (role: 'walk' | 'idle' | 'think' | 'speak') => {
+    const label = roleLabelsRef.current[role];
+    if (!label) return;
+    play(label);
+  };
+
   useEffect(() => {
     const scene = new SceneInit(canvasId);
     scene.initialize();
@@ -50,14 +60,35 @@ export default function ThreeScene({
 
     gltfLoader.load(
       modelPath,
-      (gltf) => {
+      (gltf: any) => {
         const group = gltf.scene as THREE.Group;
         baseModel = group;
         modelRef.current = group;
 
         group.rotation.y = 0;
-        group.position.set(0, -400, -350);
-        group.scale.set(400, 400, 4);
+        // Move slightly down and scale up a bit
+        group.position.set(0, -460, -350);
+        group.scale.set(460, 460, 4.6);
+
+        // Improve perceived realism: enable shadows and tune material reflection
+        group.traverse((child: THREE.Object3D) => {
+          const maybeMesh = child as THREE.Mesh;
+          if ((maybeMesh as any).isMesh) {
+            maybeMesh.castShadow = true;
+            maybeMesh.receiveShadow = true;
+            const materialOrArray = maybeMesh.material as THREE.Material | THREE.Material[] | undefined;
+            const materials = Array.isArray(materialOrArray) ? materialOrArray : materialOrArray ? [materialOrArray] : [];
+            materials.forEach((mat) => {
+              const std = mat as unknown as THREE.MeshStandardMaterial;
+              if (std && (std as any).isMeshStandardMaterial) {
+                // Keep reflections subtle to avoid washing out skin
+                std.envMapIntensity = Math.min(1.25, (std.envMapIntensity ?? 1.0) * 1.0);
+                if (typeof std.roughness === 'number') std.roughness = Math.max(0.2, Math.min(0.95, std.roughness));
+                if (typeof std.metalness === 'number') std.metalness = Math.min(0.6, (std.metalness ?? 0.0) + 0.05);
+              }
+            });
+          }
+        });
 
         scene.scene?.add(group);
 
@@ -75,6 +106,7 @@ export default function ThreeScene({
         const names: string[] = [];
         picks.forEach(({ label, clip }) => {
           const action = mixer.clipAction(clip);
+          action.enabled = true;
           actionsRef.current[label] = action;
           names.push(label);
         });
@@ -83,31 +115,108 @@ export default function ThreeScene({
         setLoading(false);
         setLoadingProgress(100);
 
-        // Autoplay the first selected animation
-        if (names.length) play(names[0]);
+        // Map roles in the order required: 1st=walk, 2nd=idle, 3rd=think, 4th=speak
+        roleLabelsRef.current = {
+          walk: names[0],
+          idle: names[1],
+          think: names[2],
+          speak: names[3],
+        };
+
+        // Configure looping behavior
+        const walk = roleLabelsRef.current.walk ? actionsRef.current[roleLabelsRef.current.walk] : null;
+        const idle = roleLabelsRef.current.idle ? actionsRef.current[roleLabelsRef.current.idle] : null;
+        const think = roleLabelsRef.current.think ? actionsRef.current[roleLabelsRef.current.think] : null;
+        const speak = roleLabelsRef.current.speak ? actionsRef.current[roleLabelsRef.current.speak] : null;
+
+        if (walk) {
+          walk.setLoop(THREE.LoopOnce, 1);
+          walk.clampWhenFinished = true;
+        }
+        if (idle) {
+          idle.setLoop(THREE.LoopRepeat, Infinity);
+        }
+        if (think) {
+          think.setLoop(THREE.LoopRepeat, Infinity);
+        }
+        if (speak) {
+          speak.setLoop(THREE.LoopRepeat, Infinity);
+        }
+
+        // When any action finishes, if it was walk, go to idle
+        const onFinished = (e: any) => {
+          if (!e?.action) return;
+          if (walk && e.action === walk && roleLabelsRef.current.idle) {
+            playRole('idle');
+          }
+        };
+        mixer.addEventListener('finished', onFinished);
+        mixerFinishedHandlerRef.current = onFinished;
+
+        // Autoplay walk once, then switch to idle via finished handler
+        if (roleLabelsRef.current.walk) {
+          playRole('walk');
+        } else if (roleLabelsRef.current.idle) {
+          playRole('idle');
+        }
+
+        // Listen for global avatar state changes
+        const onAvatarState = (evt: Event) => {
+          try {
+            const detail = (evt as CustomEvent).detail as { state?: string } | undefined;
+            const state = detail?.state;
+            switch (state) {
+              case 'walk':
+                playRole('walk');
+                break;
+              case 'idle':
+                playRole('idle');
+                break;
+              case 'thinking':
+              case 'think':
+                playRole('think');
+                break;
+              case 'speaking':
+              case 'speak':
+                playRole('speak');
+                break;
+            }
+          } catch {}
+        };
+        window.addEventListener('avatar:state', onAvatarState as EventListener);
+        windowEventHandlerRef.current = onAvatarState;
       },
-      (progress) => {
+      (progress: any) => {
         const total = (progress as ProgressEvent).total || 0;
         const loaded = (progress as ProgressEvent).loaded || 0;
         setLoadingProgress(total > 0 ? (loaded / total * 100) : 0);
       },
-      (err) => {
+      (err: any) => {
         console.error('Error loading idle1a GLTF:', err);
         setLoading(false);
       }
     );
 
     return () => {
+      // Cleanup three scene
       sceneInitRef.current?.dispose();
       if (mixerRef.current) {
+        if (mixerFinishedHandlerRef.current) {
+          try { mixerRef.current.removeEventListener('finished', mixerFinishedHandlerRef.current); } catch {}
+        }
         mixerRef.current.stopAllAction();
         mixerRef.current = null;
       }
       actionsRef.current = {};
       currentActionRef.current = null;
 
+      // Remove window listener
+      if (windowEventHandlerRef.current) {
+        try { window.removeEventListener('avatar:state', windowEventHandlerRef.current as EventListener); } catch {}
+      }
+
       if (baseModel) {
-        baseModel.traverse((child) => {
+        baseModel.traverse((child: any) => {
           const mesh = child as THREE.Mesh;
           if ((mesh as any).isMesh) {
             mesh.geometry?.dispose();
@@ -120,7 +229,15 @@ export default function ThreeScene({
   }, [canvasId, modelPath]);
 
   return (
-    <div className={`flex-1 md:min-w-[50%] h-full md:h-full overflow-hidden relative bg-black model-container ${className}`}>
+    <div
+      className={`flex-1 md:min-w-[50%] h-full md:h-full overflow-hidden relative model-container ${className}`}
+      style={{
+        backgroundImage: "url('/images/3d_bg.avif')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
       <canvas id={canvasId} />
 
       {loading && (
