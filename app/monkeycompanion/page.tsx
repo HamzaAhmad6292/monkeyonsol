@@ -83,7 +83,7 @@ export default function MonkeyCompanionPage() {
   }
 
   // Helper: dispatch avatar state events for 3D model
-  const setAvatarState = (state: 'walk' | 'idle' | 'think' | 'speaking' | 'speak' | 'thinking') => {
+  const setAvatarState = (state: 'idle1' | 'idle2' | 'talking') => {
     try {
       window.dispatchEvent(new CustomEvent('avatar:state', { detail: { state } }))
     } catch { }
@@ -138,8 +138,10 @@ export default function MonkeyCompanionPage() {
 
         setIsRecording(false)
 
+        // Always trigger Idle_1 animation when recording stops
+        setAvatarState('idle1')
+
         if (wasCancelled) {
-          setAvatarState('idle')
           return
         }
 
@@ -151,21 +153,48 @@ export default function MonkeyCompanionPage() {
       mediaRecorderRef.current = recorder
       recorder.start()
       setIsRecording(true)
-      // Enter thinking state while recording/transcribing/LLM is responding
-      setAvatarState('thinking')
+
+      // Trigger Idle_2 animation when recording starts
+      setAvatarState('idle2')
     } catch (err) {
       setHasTranscriptionError('Microphone access denied or unavailable')
       // toast({ title: 'Microphone error', description: 'Please allow mic access and try again.' })
-      setAvatarState('idle')
+      setAvatarState('idle1')
     }
   }
 
   const stopRecording = (cancel = false) => {
     try {
       cancelNextStopRef.current = cancel
-      if (cancel) setAvatarState('idle')
-      mediaRecorderRef.current?.state === 'recording' && mediaRecorderRef.current.stop()
-    } catch { }
+
+      // Always trigger idle1 when stopping recording, regardless of cancel state
+      setAvatarState('idle1')
+
+      if (mediaRecorderRef.current?.state === 'recording') {
+        mediaRecorderRef.current.stop()
+      } else {
+        // If recorder isn't recording, still clean up and set state
+        setIsRecording(false)
+
+        // Release mic immediately
+        audioStreamRef.current?.getTracks().forEach((t) => t.stop())
+        audioStreamRef.current = null
+        mediaRecorderRef.current = null
+      }
+    } catch (error) {
+      console.error('Error stopping recording:', error)
+
+      // Ensure we always return to idle1 even on error
+      setAvatarState('idle1')
+      setIsRecording(false)
+
+      // Cleanup on error
+      try {
+        audioStreamRef.current?.getTracks().forEach((t) => t.stop())
+        audioStreamRef.current = null
+        mediaRecorderRef.current = null
+      } catch { }
+    }
   }
 
   const retryTranscription = async () => {
@@ -213,7 +242,7 @@ export default function MonkeyCompanionPage() {
     } catch (e: any) {
       setHasTranscriptionError(e?.message || 'Transcription failed')
       // toast({ title: 'Transcription error', description: 'Tap retry to try again.' })
-      setAvatarState('idle')
+      setAvatarState('idle1')
     } finally {
       setIsTranscribing(false)
     }
@@ -244,24 +273,24 @@ export default function MonkeyCompanionPage() {
           } catch { }
           audio.playbackRate = 0.9
 
-          // Switch to speaking now that TTS response is ready
-          setAvatarState('speaking')
+          // Switch to talking now that TTS response is ready
+          setAvatarState('talking')
 
-          // When finished, go back to idle and cleanup URL
+          // When finished, go back to idle1 and cleanup URL
           audio.addEventListener('ended', () => {
             URL.revokeObjectURL(url)
-            setAvatarState('idle')
+            setAvatarState('idle1')
           }, { once: true })
           audio.addEventListener('error', () => {
             URL.revokeObjectURL(url)
-            setAvatarState('idle')
+            setAvatarState('idle1')
           }, { once: true })
 
           await audio.play()
         } catch (e: any) {
-          // If autoplay is blocked or TTS failed, inform user and return to idle
+          // If autoplay is blocked or TTS failed, inform user and return to idle1
           toast({ title: 'Tap to enable audio', description: e?.message || 'Autoplay blocked by browser.' })
-          setAvatarState('idle')
+          setAvatarState('idle1')
         }
       })()
   }, [messages, toast])

@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useState } from "react"
 import * as THREE from 'three'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import SceneInit from '@/lib/SceneInit'
 
 interface ThreeSceneProps {
@@ -11,7 +11,21 @@ interface ThreeSceneProps {
   className?: string;
 }
 
-const WALKING_PATH = '/assets/skib/walking2.glb';
+const WALKING_PATH = '/assets/skib/final.glb';
+
+// Animation mapping for buttons and triggering
+const animationButtonMap: { key: string; label: string }[] = [
+  { key: "Idle_1", label: "Idle 1" },
+  { key: "Idle_2", label: "Idle 2" },
+  { key: "Talking", label: "Talking" },
+];
+
+// Helper: map animation names to display labels
+const animationDisplayLabels: Record<string, string> = {
+  Idle_1: "Idle 1",
+  Idle_2: "Idle 2",
+  Talking: "Talking",
+};
 
 export default function ThreeScene({
   canvasId = 'myThreeJsCanvas',
@@ -23,215 +37,244 @@ export default function ThreeScene({
   const mixerRef = useRef<THREE.AnimationMixer | null>(null)
   const actionsRef = useRef<Record<string, THREE.AnimationAction>>({})
   const currentActionRef = useRef<THREE.AnimationAction | null>(null)
-
-  const roleLabelsRef = useRef<{ walk?: string; idle?: string; think?: string; speak?: string }>({})
-  const mixerFinishedHandlerRef = useRef<((e: any) => void) | null>(null)
   const windowEventHandlerRef = useRef<((e: Event) => void) | null>(null)
 
   const [loading, setLoading] = useState(true)
   const [loadingProgress, setLoadingProgress] = useState(0)
   const [currentName, setCurrentName] = useState<string | null>(null)
   const [available, setAvailable] = useState<string[]>([])
+  const [error, setError] = useState<string | null>(null)
 
   const play = (name: string) => {
-    const next = actionsRef.current[name]; if (!next) return;
+    const next = actionsRef.current[name];
+    if (!next) return;
+
     const prev = currentActionRef.current;
     if (prev === next) return;
-    next.reset().fadeIn(0.2).play();
+
     if (prev) prev.fadeOut(0.2);
+    next.reset().fadeIn(0.2).play();
     currentActionRef.current = next;
     setCurrentName(name);
-  };
 
-  const playRole = (role: 'walk' | 'idle' | 'think' | 'speak') => {
-    const label = roleLabelsRef.current[role];
-    if (!label) return;
-    play(label);
+    // Log animation trigger
+    console.log(
+      `[ThreeScene] Animation triggered:`,
+      `name="${name}", display="${animationButtonMap.find(anim => anim.key === name)?.label || name}"`
+    );
   };
 
   useEffect(() => {
-    const scene = new SceneInit(canvasId);
-    scene.initialize();
-    scene.animate();
-    sceneInitRef.current = scene;
+    try {
+      const scene = new SceneInit(canvasId);
+      scene.initialize();
+      scene.animate();
+      sceneInitRef.current = scene;
+    } catch (err) {
+      console.error('Scene initialization failed:', err);
+      setError('Failed to initialize 3D scene');
+      setLoading(false);
+      return;
+    }
 
     const gltfLoader = new GLTFLoader();
     let baseModel: THREE.Group | null = null;
 
     gltfLoader.load(
       modelPath,
-      (gltf: any) => {
-        const group = gltf.scene as THREE.Group;
-        baseModel = group;
-        modelRef.current = group;
+      (gltf: GLTF) => {
+        try {
+          const group = gltf.scene as THREE.Group;
+          baseModel = group;
+          modelRef.current = group;
 
-        group.rotation.y = 0;
-        // Move slightly down and scale up a bit
-        group.position.set(0, -650, -350);
-        group.scale.set(460, 460, 4.6);
+          // Transform (your values kept)
+          group.rotation.y = 0;
+          group.position.set(0, -950, -350);
+          group.scale.set(250, 250, 4.6);
+          group.visible = true;
 
-        // Improve perceived realism: enable shadows and tune material reflection
-        group.traverse((child: THREE.Object3D) => {
-          const maybeMesh = child as THREE.Mesh;
-          if ((maybeMesh as any).isMesh) {
-            maybeMesh.castShadow = true;
-            maybeMesh.receiveShadow = true;
-            const materialOrArray = maybeMesh.material as THREE.Material | THREE.Material[] | undefined;
-            const materials = Array.isArray(materialOrArray) ? materialOrArray : materialOrArray ? [materialOrArray] : [];
-            materials.forEach((mat) => {
-              const std = mat as unknown as THREE.MeshStandardMaterial;
-              if (std && (std as any).isMeshStandardMaterial) {
-                // Keep reflections subtle to avoid washing out skin
-                std.envMapIntensity = Math.min(1.25, (std.envMapIntensity ?? 1.0) * 1.0);
-                if (typeof std.roughness === 'number') std.roughness = Math.max(0.2, Math.min(0.95, std.roughness));
-                if (typeof std.metalness === 'number') std.metalness = Math.min(0.6, (std.metalness ?? 0.0) + 0.05);
-              }
-            });
-          }
-        });
-
-        scene.scene?.add(group);
-
-        const mixer = new THREE.AnimationMixer(group);
-        mixerRef.current = mixer;
-        scene.setAnimationMixer(mixer);
-
-        // Only keep animations 1,4,6,7 (1-based) => 0,3,5,6 (0-based)
-        const clips = gltf.animations ?? [];
-        const selectedIndices = [0, 3, 5, 6];
-        const picks = selectedIndices
-          .filter(i => clips[i])
-          .map(i => ({ label: String(i + 1), clip: clips[i] }));
-
-        const names: string[] = [];
-        picks.forEach(({ label, clip }) => {
-          const action = mixer.clipAction(clip);
-          action.enabled = true;
-          actionsRef.current[label] = action;
-          names.push(label);
-        });
-
-        setAvailable(names);
-        setLoading(false);
-        setLoadingProgress(100);
-
-        // Map roles in the order required: 1st=walk, 2nd=idle, 3rd=think, 4th=speak
-        roleLabelsRef.current = {
-          walk: names[0],
-          idle: names[1],
-          think: names[2],
-          speak: names[3],
-        };
-
-        // Configure looping behavior
-        const walk = roleLabelsRef.current.walk ? actionsRef.current[roleLabelsRef.current.walk] : null;
-        const idle = roleLabelsRef.current.idle ? actionsRef.current[roleLabelsRef.current.idle] : null;
-        const think = roleLabelsRef.current.think ? actionsRef.current[roleLabelsRef.current.think] : null;
-        const speak = roleLabelsRef.current.speak ? actionsRef.current[roleLabelsRef.current.speak] : null;
-
-        if (walk) {
-          walk.setLoop(THREE.LoopOnce, 1);
-          walk.clampWhenFinished = true;
-        }
-        if (idle) {
-          idle.setLoop(THREE.LoopRepeat, Infinity);
-        }
-        if (think) {
-          think.setLoop(THREE.LoopRepeat, Infinity);
-        }
-        if (speak) {
-          speak.setLoop(THREE.LoopRepeat, Infinity);
-        }
-
-        // When any action finishes, if it was walk, go to idle
-        const onFinished = (e: any) => {
-          if (!e?.action) return;
-          if (walk && e.action === walk && roleLabelsRef.current.idle) {
-            playRole('idle');
-          }
-        };
-        mixer.addEventListener('finished', onFinished);
-        mixerFinishedHandlerRef.current = onFinished;
-
-        // Autoplay walk once, then switch to idle via finished handler
-        if (roleLabelsRef.current.walk) {
-          playRole('walk');
-        } else if (roleLabelsRef.current.idle) {
-          playRole('idle');
-        }
-
-        // Listen for global avatar state changes
-        const onAvatarState = (evt: Event) => {
-          try {
-            const detail = (evt as CustomEvent).detail as { state?: string } | undefined;
-            const state = detail?.state;
-            switch (state) {
-              case 'walk':
-                playRole('walk');
-                break;
-              case 'idle':
-                playRole('idle');
-                break;
-              case 'thinking':
-              case 'think':
-                playRole('think');
-                break;
-              case 'speaking':
-              case 'speak':
-                playRole('speak');
-                break;
+          // Materials
+          group.traverse((child: THREE.Object3D) => {
+            const maybeMesh = child as THREE.Mesh;
+            if ((maybeMesh as any).isMesh) {
+              maybeMesh.castShadow = true;
+              maybeMesh.receiveShadow = true;
+              const materialOrArray = maybeMesh.material as THREE.Material | THREE.Material[] | undefined;
+              const materials = Array.isArray(materialOrArray) ? materialOrArray : materialOrArray ? [materialOrArray] : [];
+              materials.forEach((mat) => {
+                const std = mat as unknown as THREE.MeshStandardMaterial;
+                if (std && (std as any).isMeshStandardMaterial) {
+                  std.envMapIntensity = Math.min(1.25, (std.envMapIntensity ?? 1.0) * 1.0);
+                  if (typeof std.roughness === 'number') std.roughness = Math.max(0.2, Math.min(0.95, std.roughness));
+                  if (typeof std.metalness === 'number') std.metalness = Math.min(0.6, (std.metalness ?? 0.0) + 0.05);
+                }
+              });
             }
-          } catch { }
-        };
-        window.addEventListener('avatar:state', onAvatarState as EventListener);
-        windowEventHandlerRef.current = onAvatarState;
+          });
+
+          // Add to scene
+          if (!sceneInitRef.current?.scene) throw new Error('Scene not available');
+          sceneInitRef.current.scene.add(group);
+
+          // Mixer
+          const mixer = new THREE.AnimationMixer(group);
+          mixerRef.current = mixer;
+          sceneInitRef.current?.setAnimationMixer(mixer);
+
+          // --- Animations: use ALL clips, with TS-safe types ---
+          const clips: THREE.AnimationClip[] = gltf.animations ?? [];
+          const names: string[] = [];
+
+          // (Optional) ensure unique button labels if clips share names
+          const used = new Set<string>();
+          const uniqueName = (base: string) => {
+            let name = base || 'Animation';
+            let k = 1;
+            while (used.has(name)) name = `${base}_${k++}`;
+            used.add(name);
+            return name;
+          };
+
+          clips.forEach((clip: THREE.AnimationClip, i: number) => {
+            const action = mixer.clipAction(clip);
+            action.enabled = true;
+            action.setLoop(THREE.LoopRepeat, Infinity);
+
+            const base = clip.name?.trim() || `Animation_${i + 1}`;
+            const name = uniqueName(base);
+
+            actionsRef.current[name] = action;
+            names.push(name);
+          });
+
+          setAvailable(names);
+          setLoading(false);
+          setLoadingProgress(100);
+
+          // Log available animation names for debugging
+          console.log('[ThreeScene] Available animation names:', names);
+
+          // Autoplay first
+          if (names.length > 0) {
+            setTimeout(() => play(names[0]), 300);
+          }
+
+        } catch (err) {
+          console.error('Error setting up model:', err);
+          setError('Failed to setup 3D model');
+          setLoading(false);
+        }
       },
-      (progress: any) => {
-        const total = (progress as ProgressEvent).total || 0;
-        const loaded = (progress as ProgressEvent).loaded || 0;
-        setLoadingProgress(total > 0 ? (loaded / total * 100) : 0);
+      (progress: ProgressEvent<EventTarget>) => {
+        const total = progress.total || 0;
+        const loaded = progress.loaded || 0;
+        const percentage = total > 0 ? (loaded / total) * 100 : 0;
+        setLoadingProgress(percentage);
       },
-      (err: any) => {
-        console.error('Error loading idle1a GLTF:', err);
+      (err: unknown) => {
+        console.error('Error loading GLTF:', err);
+        setError('Failed to load 3D model');
         setLoading(false);
       }
     );
 
+    // Listen for avatar:state events
+    const handleAvatarState = (e: Event) => {
+      // @ts-ignore
+      const state = e.detail?.state;
+      if (!state) return;
+
+      // Get available animation names
+      const availableNames = Object.keys(actionsRef.current);
+      console.log('[ThreeScene] Available animations:', availableNames);
+      console.log('[ThreeScene] Requested state:', state);
+
+      // Map avatar states to animation names - try multiple possible names
+      let anim: string | null = null;
+
+      if (state === 'talking') {
+        // Try to find talking animation
+        anim = availableNames.find(name =>
+          name.toLowerCase().includes('talk') ||
+          name.toLowerCase().includes('speak') ||
+          name === 'Talking'
+        ) || null;
+      } else if (state === 'idle2') {
+        // Try to find second idle animation
+        anim = availableNames.find(name =>
+          name.toLowerCase().includes('idle') && (name.includes('2') || name.includes('_2')) ||
+          name === 'Idle_2'
+        ) || availableNames.find(name => name.toLowerCase().includes('idle')) || null;
+      } else if (state === 'idle1') {
+        // Try to find first idle animation
+        anim = availableNames.find(name =>
+          name.toLowerCase().includes('idle') && (name.includes('1') || name.includes('_1')) ||
+          name === 'Idle_1'
+        ) || availableNames.find(name => name.toLowerCase().includes('idle')) || availableNames[0] || null;
+      }
+
+      console.log('[ThreeScene] Mapped animation:', anim);
+
+      // Only play if available
+      if (anim && actionsRef.current[anim]) {
+        play(anim);
+      } else {
+        console.warn('[ThreeScene] Animation for state', state, 'not found! Available:', availableNames);
+      }
+    };
+
+    window.addEventListener('avatar:state', handleAvatarState);
+    windowEventHandlerRef.current = handleAvatarState;
+
     return () => {
-      // Cleanup three scene
+      // Cleanup
       sceneInitRef.current?.dispose();
+
       if (mixerRef.current) {
-        if (mixerFinishedHandlerRef.current) {
-          try { mixerRef.current.removeEventListener('finished', mixerFinishedHandlerRef.current); } catch { }
-        }
         mixerRef.current.stopAllAction();
         mixerRef.current = null;
       }
+
       actionsRef.current = {};
       currentActionRef.current = null;
 
-      // Remove window listener
       if (windowEventHandlerRef.current) {
-        try { window.removeEventListener('avatar:state', windowEventHandlerRef.current as EventListener); } catch { }
+        try {
+          window.removeEventListener('avatar:state', windowEventHandlerRef.current as EventListener);
+        } catch { }
       }
 
       if (baseModel) {
-        baseModel.traverse((child: any) => {
+        baseModel.traverse((child: THREE.Object3D) => {
           const mesh = child as THREE.Mesh;
           if ((mesh as any).isMesh) {
             mesh.geometry?.dispose();
             const mat = mesh.material as THREE.Material | THREE.Material[] | undefined;
-            if (mat) Array.isArray(mat) ? mat.forEach(m => m.dispose()) : mat.dispose();
+            if (mat) {
+              Array.isArray(mat) ? mat.forEach(m => m.dispose()) : mat.dispose();
+            }
           }
         });
       }
     };
   }, [canvasId, modelPath]);
 
+  if (error) {
+    return (
+      <div className={`flex-1 md:min-w-[50%] h-full md:h-full overflow-hidden relative model-container ${className}`}>
+        <div className="absolute inset-0 flex items-center justify-center bg-red-900/20">
+          <div className="text-center text-red-400">
+            <p className="text-lg font-semibold">Error loading 3D model</p>
+            <p className="text-sm">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div
-      className={`flex-1 md:min-w-[50%] h-full md:h-full overflow-hidden relative model-container ${className}`}
-    >
+    <div className={`flex-1 md:min-w-[50%] h-full md:h-full overflow-hidden relative model-container ${className}`}>
       <div
         className="absolute inset-0"
         style={{
@@ -239,16 +282,14 @@ export default function ThreeScene({
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          filter: 'brightness(0.2)' // darkens without reducing model opacity
-
+          filter: 'brightness(0.2)'
         }}
       />
-
 
       <canvas id={canvasId} className="relative z-10" />
 
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/70">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/70 z-20">
           <div className="text-center">
             <div className="relative mb-6">
               <div className="animate-spin rounded-full h-16 w-16 border-4 border-orange-500/30 border-t-orange-500 mx-auto"></div>
@@ -264,37 +305,44 @@ export default function ThreeScene({
                 style={{ width: `${Math.round(loadingProgress)}%` }}
               />
             </div>
-            <p className="text-gray-400 text-sm font-body pt-2 tracking-wide">Loading model…</p>
+            <p className="text-gray-400 text-sm font-body pt-2 tracking-wide">
+              Loading model…
+            </p>
           </div>
         </div>
       )}
-      {/* 
-      {!loading && available.length > 0 && (
-        <div className="absolute bottom-0 inset-x-0 p-3 bg-black/40 backdrop-blur-sm">
+
+      {!loading && !error && available.length > 0 && (
+        <div className="absolute bottom-0 inset-x-0 p-3 bg-black/40 backdrop-blur-sm z-20">
           <div className="flex flex-wrap items-center justify-center gap-2">
-            {available.map((name) => (
+            {available.map((key) => (
               <button
-                key={name}
-                onClick={() => play(name)}
+                key={key}
+                onClick={() => play(key)}
                 className={[
                   "px-3 py-1 rounded-md text-xs font-semibold transition-colors",
-                  currentName === name
+                  currentName === key
                     ? "bg-orange-500 text-black"
                     : "bg-zinc-800/80 text-zinc-200 hover:bg-zinc-700"
                 ].join(' ')}
-                aria-pressed={currentName === name}
-                aria-label={`Play animation ${name}`}
-                title={`Animation ${name}`}
+                aria-pressed={currentName === key}
+                aria-label={`Play ${animationDisplayLabels[key] || key}`}
+                title={animationDisplayLabels[key] || key}
               >
-                {name}
+                {animationDisplayLabels[key] || key}
               </button>
             ))}
           </div>
         </div>
-      )} */}
+      )}
 
-
-
+      {!loading && !error && available.length === 0 && (
+        <div className="absolute bottom-0 inset-x-0 p-3 bg-black/40 backdrop-blur-sm z-20">
+          <div className="text-center text-gray-400 text-sm">
+            No animations found in model
+          </div>
+        </div>
+      )}
     </div>
   )
 }
