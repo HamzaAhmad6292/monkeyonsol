@@ -47,6 +47,7 @@ export default function MonkeyCompanionPage() {
   const [inputMessage, setInputMessage] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const [isChatHidden, setIsChatHidden] = useState(true)
+  const [performanceMode, setPerformanceMode] = useState(false)
   const { toast } = useToast()
 
   // Voice recording state
@@ -69,6 +70,18 @@ export default function MonkeyCompanionPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages, isTyping])
 
+  // Set initial avatar state to idle2 when component mounts
+  useEffect(() => {
+    // Small delay to ensure 3D scene is ready
+    const timer = setTimeout(() => {
+      setAvatarState('idle2')
+    }, 1000)
+    
+    return () => clearTimeout(timer)
+  }, [])
+
+
+
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return
     await sendMessage(inputMessage)
@@ -86,7 +99,9 @@ export default function MonkeyCompanionPage() {
   const setAvatarState = (state: 'idle1' | 'idle2' | 'talking') => {
     try {
       window.dispatchEvent(new CustomEvent('avatar:state', { detail: { state } }))
-    } catch { }
+    } catch (error) {
+      console.error('[MonkeyCompanion] Error dispatching avatar state:', error);
+    }
   }
 
   // Cleanup media stream on unmount
@@ -138,15 +153,19 @@ export default function MonkeyCompanionPage() {
 
         setIsRecording(false)
 
-        // Always trigger Idle_1 animation when recording stops
-        setAvatarState('idle1')
-
         if (wasCancelled) {
+          // If cancelled, go back to idle2 (default state)
+          setAvatarState('idle2')
           return
         }
 
         if (blob.size > 0) {
+          // Stay in idle1 while transcribing
+          setAvatarState('idle1')
           await transcribeAudio(blob)
+        } else {
+          // If no audio recorded, go back to idle2
+          setAvatarState('idle2')
         }
       }
 
@@ -154,21 +173,21 @@ export default function MonkeyCompanionPage() {
       recorder.start()
       setIsRecording(true)
 
-      // Trigger Idle_2 animation when recording starts
-      setAvatarState('idle2')
+      // Trigger Idle_1 animation when recording starts
+      // Add a small delay to ensure the 3D scene is ready
+      setTimeout(() => {
+        setAvatarState('idle1');
+      }, 100);
     } catch (err) {
       setHasTranscriptionError('Microphone access denied or unavailable')
       // toast({ title: 'Microphone error', description: 'Please allow mic access and try again.' })
-      setAvatarState('idle1')
+      setAvatarState('idle2')
     }
   }
 
   const stopRecording = (cancel = false) => {
     try {
       cancelNextStopRef.current = cancel
-
-      // Always trigger idle1 when stopping recording, regardless of cancel state
-      setAvatarState('idle1')
 
       if (mediaRecorderRef.current?.state === 'recording') {
         mediaRecorderRef.current.stop()
@@ -242,7 +261,7 @@ export default function MonkeyCompanionPage() {
     } catch (e: any) {
       setHasTranscriptionError(e?.message || 'Transcription failed')
       // toast({ title: 'Transcription error', description: 'Tap retry to try again.' })
-      setAvatarState('idle1')
+      setAvatarState('idle2')
     } finally {
       setIsTranscribing(false)
     }
@@ -276,21 +295,21 @@ export default function MonkeyCompanionPage() {
           // Switch to talking now that TTS response is ready
           setAvatarState('talking')
 
-          // When finished, go back to idle1 and cleanup URL
+          // When finished, go back to idle2 (default state) and cleanup URL
           audio.addEventListener('ended', () => {
             URL.revokeObjectURL(url)
-            setAvatarState('idle1')
+            setAvatarState('idle2')
           }, { once: true })
           audio.addEventListener('error', () => {
             URL.revokeObjectURL(url)
-            setAvatarState('idle1')
+            setAvatarState('idle2')
           }, { once: true })
 
           await audio.play()
         } catch (e: any) {
-          // If autoplay is blocked or TTS failed, inform user and return to idle1
+          // If autoplay is blocked or TTS failed, inform user and return to idle2
           toast({ title: 'Tap to enable audio', description: e?.message || 'Autoplay blocked by browser.' })
-          setAvatarState('idle1')
+          setAvatarState('idle2')
         }
       })()
   }, [messages, toast])
@@ -340,21 +359,44 @@ export default function MonkeyCompanionPage() {
                   </div>
                 </div>
 
-                {/* Hide/Show Chat Toggle */}
+                {/* Performance Mode and Hide/Show Chat Toggle */}
                 <div className="ml-auto flex items-center gap-3 mt-2 sm:mt-0 w-full sm:w-auto justify-end">
-                  <label
-                    htmlFor="hide-chat-toggle"
-                    className={`text-xs md:text-sm tracking-wider font-body ${isChatHidden ? 'bg-gradient-to-r from-orange-500 to-yellow-500 bg-clip-text text-transparent' : 'text-gray-300'}`}
-                  >
-                    Hide Chat
-                  </label>
-                  <Switch
-                    id="hide-chat-toggle"
-                    checked={isChatHidden}
-                    onCheckedChange={setIsChatHidden}
-                    aria-label="Hide chat toggle"
-                    className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-orange-500 data-[state=checked]:to-yellow-500"
-                  />
+                  <div className="flex items-center gap-2">
+                    <label
+                      htmlFor="performance-toggle"
+                      className="text-xs md:text-sm tracking-wider font-body text-gray-300"
+                    >
+                      Performance
+                    </label>
+                    <Switch
+                      id="performance-toggle"
+                      checked={performanceMode}
+                      onCheckedChange={(enabled) => {
+                        setPerformanceMode(enabled);
+                        // Dispatch event to ThreeScene to enable/disable performance mode
+                        // Performance mode: smaller model, disabled outlines, optimized rendering
+                        // Non-performance mode: larger model, enhanced outlines, better materials, antialiasing
+                        window.dispatchEvent(new CustomEvent('avatar:performance', { detail: { enabled } }));
+                      }}
+                      aria-label="Performance mode toggle"
+                      className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-orange-500 data-[state=checked]:to-yellow-500"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label
+                      htmlFor="hide-chat-toggle"
+                      className={`text-xs md:text-sm tracking-wider font-body ${isChatHidden ? 'bg-gradient-to-r from-orange-500 to-yellow-500 bg-clip-text text-transparent' : 'text-gray-300'}`}
+                    >
+                      Hide Chat
+                    </label>
+                    <Switch
+                      id="hide-chat-toggle"
+                      checked={isChatHidden}
+                      onCheckedChange={setIsChatHidden}
+                      aria-label="Hide chat toggle"
+                      className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-orange-500 data-[state=checked]:to-yellow-500"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -468,6 +510,7 @@ export default function MonkeyCompanionPage() {
 
             {/* Input Area */}
             <div className="sticky bottom-0 bg-gradient-to-t from-black/60 to-black/20 p-4">
+
               {isChatHidden && (
                 <div className="flex w-full justify-center mb-2">
                   <button
