@@ -13,17 +13,10 @@ interface NavLink {
 }
 
 const navLinks: NavLink[] = [
-  // { href: "#tokenomics", label: "Tokenomics" }, s
-  { href: "#", label: "Home",  }, 
-  // { href: "#about", label: "About" },
-  // { href: "#social-media", label: "Socials" }, 
-  { href: "#monkey-paw-agent", label: "Paw Agent" },
-  { href: "#creativity", label: "Art Tool" },
-  // { href: "#community", label: "Community" },
-  { href: "/game", label: "Art Gallery", isExternal: true }, // Link to game page
-  { href: "/whitepaper", label: "White Paper", isExternal: true }, // Link to game page
-  { href: "/monkeycompanion", label: "Companion", isExternal: true }, // Link to game page
-  ]
+  { href: "/game", label: "Art Gallery", isExternal: true },
+  { href: "/monkeycompanion", label: "Companion", isExternal: true },
+  { href: "/editor", label: "Art Tool", isExternal: true },
+]
 
 export function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false)

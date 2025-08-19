@@ -52,6 +52,30 @@ export default function MemeTokenGaming() {
         />
       </div>
 
+      {/* Floating Talk to Companion Button - Mobile Only - Floating for entire page */}
+      <div className="lg:hidden fixed left-4 bottom-8 z-50">
+        {/* Cloud Speech Bubble */}
+        <div className="relative mb-2">
+          <div className="bg-white/95 text-black px-3 py-2 rounded-2xl shadow-lg border-2 border-orange-400/60 relative">
+            <span className="text-xs font-bold text-center block">Talk to Companion</span>
+            {/* Cloud tail pointing down */}
+            <div className="absolute -bottom-2 left-6 w-4 h-4 bg-white/95 border-b-2 border-r-2 border-orange-400/60 transform rotate-45"></div>
+          </div>
+        </div>
+        
+        <Button
+          onClick={() => router.push("/monkeycompanion")}
+          className="w-20 h-20 bg-gradient-to-r from-orange-600 to-yellow-500 hover:from-orange-500 hover:to-yellow-500 rounded-full shadow-2xl shadow-orange-500/40 border-2 border-orange-400/60 transition-all duration-300 hover:scale-110 flex items-center justify-center p-0 overflow-hidden"
+          size="sm"
+        >
+          <img
+            src="/images/monkey-picasso_no_bg.png"
+            alt="Talk to Companion"
+            className="w-16 h-16 object-contain"
+          />
+        </Button>
+      </div>
+
       {/* Token CA Box */}
       <div className="relative z-40 flex justify-center mt-6 px-4 mb-8">
         <div className="flex w-full max-w-3xl items-center gap-3 bg-gradient-to-r from-orange-900/90 via-black/90 to-yellow-900/90 border-2 border-orange-400/60 rounded-2xl shadow-2xl shadow-orange-500/30 px-6 py-4 backdrop-blur-md">
@@ -78,6 +102,8 @@ export default function MemeTokenGaming() {
 
       {/* Hero Section */}
       <section className="relative z-10 min-h-[70vh] flex items-center justify-center px-2 sm:px-4">
+        
+
         <div className="text-center max-w-6xl mx-auto w-full">
           <div
             className={`transition-all duration-2000 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
