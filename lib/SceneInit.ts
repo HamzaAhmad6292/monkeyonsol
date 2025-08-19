@@ -76,10 +76,10 @@ export default class SceneInit {
     this.renderer.setSize(rect.width, rect.height);
     this.renderer.setClearColor(0x000000, 0); // transparent
 
-    // Enhanced settings for better visual quality
+    // Enhanced settings for room ambient lighting
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.4; // Decreased from 1.6 for better balanced brightness
+    this.renderer.toneMappingExposure = 2.6; // Increased for better skin tone visibility
     this.renderer.shadowMap.enabled = false; // Keep shadows disabled for performance
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     
@@ -93,42 +93,55 @@ export default class SceneInit {
     this.controls.enableRotate = false;
     this.controls.enableDamping = false;
 
-    // Optimized lighting setup - enhanced for anime style (reduced intensity)
-    this.ambientLight = new THREE.AmbientLight(0xffffff, 0.7); // Increased from 0.6 for better overall illumination
+    // Cool ambient room lighting - enhanced for natural skin tone visibility
+    this.ambientLight = new THREE.AmbientLight(0xf0f8ff, 5.5); // Cool white ambient for natural skin tones
     this.scene.add(this.ambientLight);
 
-    // Main directional light for toon shading
-    this.directionalLight = new THREE.DirectionalLight(
-      new THREE.Color(0xfff2cc),
-      1.6 // Increased from 1.4 for better main illumination
-    );
-    this.directionalLight.position.set(60, 120, 80);
-    this.directionalLight.castShadow = false; // Disable shadows for performance
-    this.scene.add(this.directionalLight);
+    // Multiple distant point lights positioned around the entire room for even illumination
+    const roomLight1 = new THREE.PointLight(0xf8faff, 3.2, 1000); // Cool white for natural skin tones
+    roomLight1.position.set(0, 0, 0); // Center of room
+    this.scene.add(roomLight1);
 
-    // Rim light for edge definition
-    this.rimLight = new THREE.DirectionalLight(new THREE.Color(0xcfe8ff), 0.8); // Increased from 0.7 for better edge definition
-    this.rimLight.position.set(-80, 60, -120);
-    this.scene.add(this.rimLight);
+    const roomLight2 = new THREE.PointLight(0xf0f8ff, 2.8, 1000); // Cool white for natural skin tones
+    roomLight2.position.set(200, 200, 200); // Top corner
+    this.scene.add(roomLight2);
 
-    // Enhanced hemisphere light for toon materials
-    this.hemiLight = new THREE.HemisphereLight(0x88baff, 0xffe1b0, 0.5); // Increased from 0.4 for better ambient lighting
+    const roomLight3 = new THREE.PointLight(0xf0f8ff, 2.8, 1000); // Cool white for natural skin tones
+    roomLight3.position.set(-200, 200, -200); // Opposite top corner
+    this.scene.add(roomLight3);
+
+    // Cool hemisphere light for natural skin tone coverage
+    this.hemiLight = new THREE.HemisphereLight(0xe6f3ff, 0xf5f5f5, 4.2); // Cool sky, neutral ground
     this.scene.add(this.hemiLight);
 
-    // Additional fill light for better anime illumination
-    const fillLight = new THREE.DirectionalLight(0xffffff, 0.5); // Increased from 0.4 for better fill lighting
-    fillLight.position.set(-60, 40, 60);
-    this.scene.add(fillLight);
+    const roomLight4 = new THREE.PointLight(0xf0f8ff, 2.4, 1000); // Cool white for natural skin tones
+    roomLight4.position.set(200, 200, -200);
+    this.scene.add(roomLight4);
 
-    // Top light for better overall illumination
-    const topLight = new THREE.DirectionalLight(0xffffff, 0.4); // Increased from 0.3 for better top illumination
-    topLight.position.set(0, 200, 0);
-    this.scene.add(topLight);
+    const roomLight5 = new THREE.PointLight(0xf0f8ff, 2.4, 1000); // Cool white for natural skin tones
+    roomLight5.position.set(-200, 200, 200);
+    this.scene.add(roomLight5);
 
-    // Subtle rim light for anime edge definition
-    const animeRimLight = new THREE.DirectionalLight(0xffe1b0, 0.4); // Increased from 0.3 for better edge definition
-    animeRimLight.position.set(0, -100, -200);
-    this.scene.add(animeRimLight);
+    // Additional room lights for complete coverage
+    const roomLight6 = new THREE.PointLight(0xf0f8ff, 2.2, 1000); // Cool white for natural skin tones
+    roomLight6.position.set(0, 300, 0);
+    this.scene.add(roomLight6);
+
+    const roomLight7 = new THREE.PointLight(0xf0f8ff, 2.0, 1000); // Cool white for natural skin tones
+    roomLight7.position.set(300, 0, 0);
+    this.scene.add(roomLight7);
+
+    const roomLight8 = new THREE.PointLight(0xf0f8ff, 2.0, 1000); // Cool white for natural skin tones
+    roomLight8.position.set(-300, 0, 0);
+    this.scene.add(roomLight8);
+
+    const roomLight9 = new THREE.PointLight(0xf0f8ff, 1.8, 1000); // Cool white for natural skin tones
+    roomLight9.position.set(0, 0, 300);
+    this.scene.add(roomLight9);
+
+    const roomLight10 = new THREE.PointLight(0xf0f8ff, 1.8, 1000); // Cool white for natural skin tones
+    roomLight10.position.set(0, 0, -300);
+    this.scene.add(roomLight10);
 
     // Simplified environment - disable complex environment mapping for performance
     // this.pmremGenerator = new THREE.PMREMGenerator(this.renderer);

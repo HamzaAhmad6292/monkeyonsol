@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import Telegram from "@/components/icons/Telegram"
 import XIcon from "@/components/icons/XIcon" // <-- Add this import for your X logo SVG component
 import TikTokIcon from "@/components/icons/TikTokIcon"
 import { Paintbrush, Palette, Download, ArrowRight } from "lucide-react"
@@ -793,13 +792,6 @@ export default function MemeTokenGaming() {
           </p>
           <div className="flex justify-center gap-6">
             {[
-              {
-                icon: Telegram,
-                label: "Telegram",
-                href: "https://t.me/monkeyportal1",
-                description: "Community chat & updates",
-                color: "from-blue-500 to-cyan-500",
-              },
               {
                 icon: XIcon,
                 label: "X Community",
