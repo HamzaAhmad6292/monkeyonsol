@@ -11,7 +11,7 @@ interface ThreeSceneProps {
   className?: string;
 }
 
-const WALKING_PATH = '/assets/skib/final.glb';
+const WALKING_PATH = '/assets/fat.glb';
 
 // Animation mapping for buttons and triggering
 const animationButtonMap: { key: string; label: string }[] = [
