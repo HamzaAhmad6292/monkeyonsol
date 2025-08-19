@@ -32,6 +32,11 @@ const customStyles = `
     display: none !important;
   }
 
+  /* Hide the load button in the header */
+  .tui-image-editor-header-buttons {
+    display: none !important;
+  }
+
   /* ---------- Mobile only ---------- */
   @media (max-width: 768px) {
   .tui-image-editor-range-wrap {
@@ -605,8 +610,8 @@ const handleShare = async () => {
           zIndex: 100,
         }}
       >
-        {/* 1. LOAD */}
-        <button
+        {/* 1. LOAD - COMMENTED OUT */}
+        {/* <button
           onClick={() => {
             const input = document.createElement('input');
             input.type = 'file';
@@ -638,7 +643,7 @@ const handleShare = async () => {
           <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
             <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z" />
           </svg>
-        </button>
+        </button> */}
 
         {/* 2. ADD TEXT */}
         {/* <button
