@@ -11,8 +11,7 @@ interface ThreeSceneProps {
   className?: string;
 }
 
-const WALKING_PATH = "/assets/fat.glb";
-
+const WALKING_PATH = "/assets/final_fat.glb";
 // Animation mapping for buttons and triggering
 const animationButtonMap: { key: string; label: string }[] = [
   { key: "Idle_1", label: "Idle 1" },
@@ -75,15 +74,18 @@ export default function ThreeScene({
     return /Android|iPhone|iPad|iPod|Mobile|Windows Phone/i.test(ua) || touch > 1;
   };
 
-  const createBandedGradientTexture = (levels: number = 7): THREE.DataTexture => {
+  const createBandedGradientTexture = (levels: number = 9): THREE.DataTexture => {
     const width = Math.max(2, levels);
     const data = new Uint8Array(width * 3);
     for (let i = 0; i < width; i++) {
-      // Create more contrast between bands for better anime visibility
+      // Create very soft contrast for lighter skin tones
       const v = Math.floor((i / (width - 1)) * 255);
-      data[i * 3 + 0] = v;
-      data[i * 3 + 1] = v;
-      data[i * 3 + 2] = v;
+      // Minimal contrast for lighter, natural appearance
+      const enhancedV = v < 128 ? Math.floor(v * 0.92) : Math.floor(v * 1.08);
+      const clampedV = Math.max(0, Math.min(255, enhancedV));
+      data[i * 3 + 0] = clampedV;
+      data[i * 3 + 1] = clampedV;
+      data[i * 3 + 2] = clampedV;
     }
     const tex = new THREE.DataTexture(data, width, 1, THREE.RGBFormat);
     tex.needsUpdate = true;
@@ -110,22 +112,25 @@ export default function ThreeScene({
     const grad = gradientTextureRef.current || createBandedGradientTexture(7);
     const toon = new THREE.MeshToonMaterial();
     
-    // Enhanced anime-style properties for non-performance mode
+    // Light, natural skin tone properties
     toon.color = src.color.clone();
-    toon.color.multiplyScalar(1.15); // Slightly brighter for anime style
+    toon.color.multiplyScalar(0.95); // Reduced brightness for lighter skin tones
     
     if (src.map) toon.map = src.map;
     if (src.normalMap) toon.normalMap = src.normalMap;
     
-    // Enhanced toon properties
+    // Enhanced toon properties for crisp edges
     toon.gradientMap = grad;
     toon.transparent = src.transparent;
     toon.opacity = src.opacity;
     toon.alphaTest = src.alphaTest;
     
-    // Enhanced lighting properties for better edge definition
-    toon.emissive = src.emissive ? src.emissive.clone().multiplyScalar(0.25) : new THREE.Color(0x000000);
-    toon.emissiveIntensity = 0.15; // Increased for better edge visibility
+    // Minimal lighting properties for natural skin tones
+    toon.emissive = src.emissive ? src.emissive.clone().multiplyScalar(0.05) : new THREE.Color(0x000000);
+    toon.emissiveIntensity = 0.04; // Minimal for natural skin appearance
+    
+    // Enhanced edge properties
+    toon.wireframe = false; // Ensure wireframe is off
     
     // Support for skinning and morph targets
     (toon as any).skinning = (src as any).skinning;
@@ -185,29 +190,57 @@ export default function ThreeScene({
     });
   };
 
-  // Inflate normals in vertex shader (view space) for outline width
-  const outlineWidth = 0.015; // Increased from 0.012 for better visibility in non-performance mode
+  // Stable outline settings to prevent flickering during animation
+  const outlineWidth = 0.012; // Reduced for stability during movement
   const outlineColor = new THREE.Color(0x000000); // Pure black for anime style
-  const secondaryOutlineColor = new THREE.Color(0x222222); // Darker gray for secondary outline in non-performance mode
+  const secondaryOutlineColor = new THREE.Color(0x1a1a1a); // Darker gray for secondary outline
+  const tertiaryOutlineColor = new THREE.Color(0x333333); // Third outline layer for enhanced corners
 
   const createInvertedHullMaterial = (
     src: THREE.MeshStandardMaterial,
-    isSecondary: boolean = false
+    outlineType: 'primary' | 'secondary' | 'tertiary' = 'primary'
   ): THREE.MeshToonMaterial => {
     const mat = new THREE.MeshToonMaterial();
-    mat.color = isSecondary ? secondaryOutlineColor : outlineColor;
+    
+    // Bright outline material properties for better visibility
+    switch (outlineType) {
+      case 'primary':
+        mat.color = outlineColor;
+        mat.opacity = 0.75; // Reduced opacity for better light penetration
+        break;
+      case 'secondary':
+        mat.color = secondaryOutlineColor;
+        mat.opacity = 0.5; // Reduced opacity for better light penetration
+        break;
+      case 'tertiary':
+        mat.color = tertiaryOutlineColor;
+        mat.opacity = 0.3; // Reduced opacity for better light penetration
+        break;
+    }
+    
     mat.transparent = true;
-    mat.opacity = isSecondary ? 0.6 : 0.8; // Secondary outline is more transparent
     mat.side = THREE.BackSide; // Render on back side for outline effect
     mat.depthWrite = false; // Prevent z-fighting
     mat.blending = THREE.NormalBlending;
 
-    // Enhanced vertex shader for better outline control
-    const width = isSecondary ? outlineWidth * 1.5 : outlineWidth;
+    // Stable vertex shader to prevent flickering during animation
+    let width: number;
+    switch (outlineType) {
+      case 'primary':
+        width = outlineWidth;
+        break;
+      case 'secondary':
+        width = outlineWidth * 1.4; // Reduced multiplier for stability
+        break;
+      case 'tertiary':
+        width = outlineWidth * 1.8; // Reduced multiplier for stability
+        break;
+    }
+    
     mat.onBeforeCompile = (shader: any) => {
       shader.vertexShader = shader.vertexShader.replace(
         `#include <project_vertex>`,
-        `#include <project_vertex>\nvec3 norm = normalize(normalMatrix * normal);\ntransformed += norm * ${width.toFixed(5)} * length(transformed) * 0.1 + norm * ${width.toFixed(5)};`
+        `#include <project_vertex>\nvec3 norm = normalize(normalMatrix * normal);\ntransformed += norm * ${width.toFixed(5)};`
       );
     };
 
@@ -223,10 +256,16 @@ export default function ThreeScene({
       // Skip if this is already an outline mesh to prevent recursion
       if (mesh.name && mesh.name.includes('__outline')) return;
 
+      // Skip very small meshes that can cause flickering
+      if (mesh.geometry.boundingBox) {
+        const size = mesh.geometry.boundingBox.getSize(new THREE.Vector3());
+        if (size.length() < 10) return; // Skip tiny meshes
+      }
+
       // Create primary outline
       const outlineMat = createInvertedHullMaterial(
         mesh.material as THREE.MeshStandardMaterial,
-        false
+        'primary'
       );
 
       let outline: THREE.Mesh;
@@ -261,7 +300,7 @@ export default function ThreeScene({
       // Create secondary outline for better definition
       const secondaryOutlineMat = createInvertedHullMaterial(
         mesh.material as THREE.MeshStandardMaterial,
-        true
+        'secondary'
       );
 
       let secondaryOutline: THREE.Mesh;
@@ -291,6 +330,40 @@ export default function ThreeScene({
       }
 
       outlineMeshesRef.current.push(secondaryOutline);
+
+      // Create tertiary outline for enhanced corner definition
+      const tertiaryOutlineMat = createInvertedHullMaterial(
+        mesh.material as THREE.MeshStandardMaterial,
+        'tertiary'
+      );
+
+      let tertiaryOutline: THREE.Mesh;
+      if ((mesh as any).isSkinnedMesh) {
+        tertiaryOutline = new THREE.SkinnedMesh(mesh.geometry, tertiaryOutlineMat);
+        (tertiaryOutline as THREE.SkinnedMesh).bind((mesh as any).skeleton, (mesh as any).bindMatrix);
+      } else {
+        tertiaryOutline = new THREE.Mesh(mesh.geometry, tertiaryOutlineMat);
+      }
+
+      tertiaryOutline.name = `${mesh.name || 'mesh'}__outline_tertiary`;
+      tertiaryOutline.renderOrder = (mesh.renderOrder || 0) - 3; // Behind secondary outline
+      tertiaryOutline.visible = meshOutlineEnabled;
+
+      // Copy morph target data if available
+      if ((mesh as any).morphTargetInfluences) {
+        (tertiaryOutline as any).morphTargetInfluences = (mesh as any).morphTargetInfluences;
+        (tertiaryOutline as any).morphTargetDictionary = (mesh as any).morphTargetDictionary;
+      }
+
+      // Add tertiary outline
+      if (mesh.parent) {
+        mesh.parent.add(tertiaryOutline);
+        tertiaryOutline.position.copy(mesh.position);
+        tertiaryOutline.rotation.copy(mesh.rotation);
+        tertiaryOutline.scale.copy(mesh.scale);
+      }
+
+      outlineMeshesRef.current.push(tertiaryOutline);
     });
   };
 
@@ -443,8 +516,8 @@ export default function ThreeScene({
           if (performanceMode) {
             group.scale.set(200, 200, 3.7); // Reduced scale for better performance
           } else {
-            // Non-performance mode: decrease height by 10% and improve quality
-            group.scale.set(250, 235, 4.6); // Y scale increased slightly from 225 to 235
+            // Non-performance mode: restore original height
+            group.scale.set(250, 250, 4.6); // Y scale restored to original height
           }
           
           group.visible = true;
@@ -467,18 +540,18 @@ export default function ThreeScene({
               materials.forEach((mat) => {
                 const std = mat as unknown as THREE.MeshStandardMaterial;
                 if (std && (std as any).isMeshStandardMaterial) {
-                  // Enhanced material properties for non-performance mode
+                  // Light, natural skin tone material properties
                   std.envMapIntensity = Math.min(
-                    1.6, // Increased from 1.25 for better anime visibility
-                    (std.envMapIntensity ?? 1.0) * 1.3
+                    1.2, // Reduced for lighter skin appearance
+                    (std.envMapIntensity ?? 1.0) * 0.95
                   );
                   
-                  // Enhanced color saturation for anime style
+                  // Enhanced color properties for lighter skin tones
                   if (std.color) {
                     const hsl = { h: 0, s: 0, l: 0 };
                     std.color.getHSL(hsl);
-                    hsl.s = Math.min(1.0, hsl.s * 1.15); // Increase saturation
-                    hsl.l = Math.min(0.92, hsl.l * 1.08); // Slightly increase lightness
+                    hsl.s = Math.min(1.0, hsl.s * 0.9); // Reduced saturation for lighter skin
+                    hsl.l = Math.min(0.95, hsl.l * 1.15); // Increased lightness for whiter skin
                     std.color.setHSL(hsl.h, hsl.s, hsl.l);
                   }
                   
@@ -500,29 +573,18 @@ export default function ThreeScene({
           // Apply toon materials (non-destructive visually, preserving maps)
           replaceWithToonMaterials(group);
 
-          // Add inverted-hull outlines that follow skinning/morphs (only on desktop for performance)
+          // Add stable outlines - prefer post-processing for better quality during animation
           if (!shouldDisableOutlines() && !performanceMode) {
+            // Use post-processing outline for better stability during animation
+            sceneInitRef.current?.enableScreenSpaceOutline(true, [group]);
+            setScreenOutlineEnabled(true);
+            
+            // Also add mesh outlines as backup for better coverage
             addInvertedHullOutlines(group);
           }
 
-          // Add only one optimized light for toon materials (reduced from 3 lights for performance)
-          const toonLight = new THREE.PointLight(0xffffff, 1.6, 1200); // Increased from 1.4 for better illumination
-          toonLight.position.set(0, 100, 200);
-          group.add(toonLight);
-
-          // Add additional lights for better anime illumination
-          const frontLight = new THREE.PointLight(0xffffff, 1.1, 800); // Increased from 0.9 for better front illumination
-          frontLight.position.set(0, 0, 300);
-          group.add(frontLight);
-
-          const sideLight = new THREE.PointLight(0xffe1b0, 0.8, 600); // Increased from 0.6 for better side illumination
-          sideLight.position.set(150, 50, 0);
-          group.add(sideLight);
-          
-          // Additional rim light for better edge definition in non-performance mode
-          const rimLight = new THREE.PointLight(0xcfe8ff, 0.5, 500);
-          rimLight.position.set(-150, 50, -200);
-          group.add(rimLight);
+          // SceneInit already has comprehensive lighting setup
+          // No need to add additional lights here
 
           if (!sceneInitRef.current?.scene)
             throw new Error("Scene not available");
@@ -586,13 +648,16 @@ export default function ThreeScene({
           window.addEventListener("avatar:performance", handlePerformanceToggle as EventListener);
           windowEventHandlerRef.current = handleAvatarState;
 
-          // Default outline configuration: optimized for performance
+          // Default outline configuration: optimized for stability during animation
           const mobile = isMobileLike();
           const outlinesEnabled = !shouldDisableOutlines();
           setMeshOutlineEnabled(outlinesEnabled);
           toggleMeshOutlines(outlinesEnabled);
-          setScreenOutlineEnabled(false);
-          sceneInitRef.current?.enableScreenSpaceOutline(false, [group]);
+          
+          // Enable screen space outline by default for better stability
+          setScreenOutlineEnabled(true);
+          sceneInitRef.current?.enableScreenSpaceOutline(true, [group]);
+          
           if (outlinesEnabled) {
             sceneInitRef.current?.setOutlineSelectedObjects([group]);
           }
@@ -656,6 +721,13 @@ export default function ThreeScene({
         sceneInitRef.current?.enableScreenSpaceOutline(enabled, modelRef.current ? [modelRef.current] : undefined);
       } else if (mode === 'mesh') {
         toggleMeshOutlines(enabled);
+      } else {
+        // Default: enable both for best quality
+        setScreenOutlineEnabled(enabled);
+        toggleMeshOutlines(enabled);
+        if (enabled && modelRef.current) {
+          sceneInitRef.current?.enableScreenSpaceOutline(true, [modelRef.current]);
+        }
       }
     };
 
@@ -676,8 +748,8 @@ export default function ThreeScene({
         if (enabled) {
           modelRef.current.scale.set(200, 200, 3.7); // Reduced scale for better performance
         } else {
-          // Non-performance mode: decrease height by 10% and improve quality
-          modelRef.current.scale.set(250, 235, 4.6); // Y scale increased slightly from 225 to 235
+          // Non-performance mode: restore original height
+          modelRef.current.scale.set(250, 250, 4.6); // Y scale restored to original height
         }
       }
       
