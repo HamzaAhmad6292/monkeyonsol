@@ -111,32 +111,32 @@ export default function ThreeScene({
 
     const grad = gradientTextureRef.current || createBandedGradientTexture(7);
     const toon = new THREE.MeshToonMaterial();
-    
+
     // Light, natural skin tone properties
     toon.color = src.color.clone();
     toon.color.multiplyScalar(0.95); // Reduced brightness for lighter skin tones
-    
+
     if (src.map) toon.map = src.map;
     if (src.normalMap) toon.normalMap = src.normalMap;
-    
+
     // Enhanced toon properties for crisp edges
     toon.gradientMap = grad;
     toon.transparent = src.transparent;
     toon.opacity = src.opacity;
     toon.alphaTest = src.alphaTest;
-    
+
     // Minimal lighting properties for natural skin tones
     toon.emissive = src.emissive ? src.emissive.clone().multiplyScalar(0.05) : new THREE.Color(0x000000);
     toon.emissiveIntensity = 0.04; // Minimal for natural skin appearance
-    
+
     // Enhanced edge properties
     toon.wireframe = false; // Ensure wireframe is off
-    
+
     // Support for skinning and morph targets
     (toon as any).skinning = (src as any).skinning;
     (toon as any).morphTargets = (src as any).morphTargets;
     (toon as any).morphNormals = (src as any).morphNormals;
-    
+
     toonMaterialsCacheRef.current.set(cacheKey, toon);
     return toon;
   };
@@ -154,8 +154,8 @@ export default function ThreeScene({
       const materials = Array.isArray(materialOrArray)
         ? materialOrArray
         : materialOrArray
-        ? [materialOrArray]
-        : [];
+          ? [materialOrArray]
+          : [];
 
       materials.forEach((mat) => {
         const std = mat as unknown as THREE.MeshStandardMaterial;
@@ -165,7 +165,7 @@ export default function ThreeScene({
             1.8, // Increased from 1.5 for better anime visibility
             (std.envMapIntensity ?? 1.0) * 1.4
           );
-          
+
           // Enhanced color saturation for anime style
           if (std.color) {
             const hsl = { h: 0, s: 0, l: 0 };
@@ -174,7 +174,7 @@ export default function ThreeScene({
             hsl.l = Math.min(0.95, hsl.l * 1.1); // Increase lightness more
             std.color.setHSL(hsl.h, hsl.s, hsl.l);
           }
-          
+
           if (typeof std.roughness === "number")
             std.roughness = Math.max(
               0.1, // Reduced from 0.15 for shinier anime look
@@ -201,7 +201,7 @@ export default function ThreeScene({
     outlineType: 'primary' | 'secondary' | 'tertiary' = 'primary'
   ): THREE.MeshToonMaterial => {
     const mat = new THREE.MeshToonMaterial();
-    
+
     // Bright outline material properties for better visibility
     switch (outlineType) {
       case 'primary':
@@ -217,7 +217,7 @@ export default function ThreeScene({
         mat.opacity = 0.3; // Reduced opacity for better light penetration
         break;
     }
-    
+
     mat.transparent = true;
     mat.side = THREE.BackSide; // Render on back side for outline effect
     mat.depthWrite = false; // Prevent z-fighting
@@ -236,7 +236,7 @@ export default function ThreeScene({
         width = outlineWidth * 1.8; // Reduced multiplier for stability
         break;
     }
-    
+
     mat.onBeforeCompile = (shader: any) => {
       shader.vertexShader = shader.vertexShader.replace(
         `#include <project_vertex>`,
@@ -511,7 +511,7 @@ export default function ThreeScene({
           // Transform (your values kept)
           group.rotation.y = 0;
           group.position.set(0, -950, -350);
-          
+
           // Optimize scale for performance mode
           if (performanceMode) {
             group.scale.set(200, 200, 3.7); // Reduced scale for better performance
@@ -519,7 +519,7 @@ export default function ThreeScene({
             // Non-performance mode: restore original height
             group.scale.set(250, 250, 4.6); // Y scale restored to original height
           }
-          
+
           group.visible = true;
 
           // Materials adjustments (kept) + replace with toon where applicable
@@ -534,8 +534,8 @@ export default function ThreeScene({
               const materials = Array.isArray(materialOrArray)
                 ? materialOrArray
                 : materialOrArray
-                ? [materialOrArray]
-                : [];
+                  ? [materialOrArray]
+                  : [];
 
               materials.forEach((mat) => {
                 const std = mat as unknown as THREE.MeshStandardMaterial;
@@ -545,7 +545,7 @@ export default function ThreeScene({
                     1.2, // Reduced for lighter skin appearance
                     (std.envMapIntensity ?? 1.0) * 0.95
                   );
-                  
+
                   // Enhanced color properties for lighter skin tones
                   if (std.color) {
                     const hsl = { h: 0, s: 0, l: 0 };
@@ -554,7 +554,7 @@ export default function ThreeScene({
                     hsl.l = Math.min(0.95, hsl.l * 1.15); // Increased lightness for whiter skin
                     std.color.setHSL(hsl.h, hsl.s, hsl.l);
                   }
-                  
+
                   if (typeof std.roughness === "number")
                     std.roughness = Math.max(
                       0.12, // Reduced from 0.15 for shinier anime look
@@ -578,7 +578,7 @@ export default function ThreeScene({
             // Use post-processing outline for better stability during animation
             sceneInitRef.current?.enableScreenSpaceOutline(true, [group]);
             setScreenOutlineEnabled(true);
-            
+
             // Also add mesh outlines as backup for better coverage
             addInvertedHullOutlines(group);
           }
@@ -653,11 +653,11 @@ export default function ThreeScene({
           const outlinesEnabled = !shouldDisableOutlines();
           setMeshOutlineEnabled(outlinesEnabled);
           toggleMeshOutlines(outlinesEnabled);
-          
+
           // Enable screen space outline by default for better stability
           setScreenOutlineEnabled(true);
           sceneInitRef.current?.enableScreenSpaceOutline(true, [group]);
-          
+
           if (outlinesEnabled) {
             sceneInitRef.current?.setOutlineSelectedObjects([group]);
           }
@@ -742,7 +742,7 @@ export default function ThreeScene({
       const detail = (e as any).detail || {};
       const enabled = detail.enabled;
       setPerformanceMode(enabled);
-      
+
       // Update model scale for performance
       if (modelRef.current) {
         if (enabled) {
@@ -752,7 +752,7 @@ export default function ThreeScene({
           modelRef.current.scale.set(250, 250, 4.6); // Y scale restored to original height
         }
       }
-      
+
       // Toggle outlines based on performance mode
       if (enabled) {
         // Performance mode: disable outlines
@@ -783,13 +783,13 @@ export default function ThreeScene({
             "avatar:state",
             windowEventHandlerRef.current as EventListener
           );
-        } catch {}
+        } catch { }
       }
       try {
         window.removeEventListener("avatar:outline", handleOutlineToggle as EventListener);
         window.removeEventListener("avatar:postprocessing", handlePostprocessingToggle as EventListener);
         window.removeEventListener("avatar:performance", handlePerformanceToggle as EventListener);
-      } catch {}
+      } catch { }
 
       // Dispose gradient texture
       if (gradientTextureRef.current) {
