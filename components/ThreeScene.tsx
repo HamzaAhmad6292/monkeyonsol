@@ -11,7 +11,7 @@ interface ThreeSceneProps {
   className?: string;
 }
 
-const WALKING_PATH = "/assets/final_fat.glb";
+const WALKING_PATH = "/assets/test.glb";
 // Animation mapping for buttons and triggering
 const animationButtonMap: { key: string; label: string }[] = [
   { key: "Idle_1", label: "Idle 1" },
@@ -508,16 +508,16 @@ export default function ThreeScene({
           baseModel = group;
           modelRef.current = group;
 
-          // Transform (your values kept)
+          // Transform - balanced scale for test.glb model
           group.rotation.y = 0;
-          group.position.set(0, -950, -350);
+          group.position.set(0, -250, 0); // Slightly higher than before
 
-          // Optimize scale for performance mode
+          // Balanced scale - bigger than before but still fits container
           if (performanceMode) {
-            group.scale.set(200, 200, 3.7); // Reduced scale for better performance
+            group.scale.set(2.0, 2.0, 2.0); // Medium scale for performance mode
           } else {
-            // Non-performance mode: restore original height
-            group.scale.set(250, 250, 4.6); // Y scale restored to original height
+            // High quality mode: balanced scale to fit container
+            group.scale.set(3.0, 3.0, 3.0); // Balanced scale to fit container properly
           }
 
           group.visible = true;
@@ -540,31 +540,37 @@ export default function ThreeScene({
               materials.forEach((mat) => {
                 const std = mat as unknown as THREE.MeshStandardMaterial;
                 if (std && (std as any).isMeshStandardMaterial) {
-                  // Light, natural skin tone material properties
+                  // Anime-style material properties - completely non-metallic with subtle glow
                   std.envMapIntensity = Math.min(
-                    1.2, // Reduced for lighter skin appearance
-                    (std.envMapIntensity ?? 1.0) * 0.95
+                    0.1, // Almost no environment reflection for non-metallic look
+                    (std.envMapIntensity ?? 1.0) * 0.1
                   );
 
-                  // Enhanced color properties for lighter skin tones
+                  // Enhanced color properties for anime look with subtle glow
                   if (std.color) {
                     const hsl = { h: 0, s: 0, l: 0 };
                     std.color.getHSL(hsl);
-                    hsl.s = Math.min(1.0, hsl.s * 0.9); // Reduced saturation for lighter skin
-                    hsl.l = Math.min(0.95, hsl.l * 1.15); // Increased lightness for whiter skin
+                    hsl.s = Math.min(1.0, hsl.s * 0.7); // Further reduced saturation
+                    hsl.l = Math.min(0.95, hsl.l * 1.2); // Increased lightness for subtle glow
                     std.color.setHSL(hsl.h, hsl.s, hsl.l);
                   }
 
                   if (typeof std.roughness === "number")
                     std.roughness = Math.max(
-                      0.12, // Reduced from 0.15 for shinier anime look
-                      Math.min(0.85, std.roughness * 0.85)
+                      0.8, // Very high roughness for completely matte look
+                      Math.min(0.98, std.roughness * 1.4)
                     );
                   if (typeof std.metalness === "number")
                     std.metalness = Math.min(
-                      0.75, // Increased from 0.7 for better anime shine
-                      (std.metalness ?? 0.0) + 0.15
+                      0.01, // Almost zero metalness for completely non-metallic look
+                      (std.metalness ?? 0.0) * 0.01
                     );
+                  
+                  // Add subtle glow effect
+                  if (std.emissive) {
+                    std.emissive.setHSL(0, 0, 0.03); // Reduced white glow
+                  }
+                  std.emissiveIntensity = 0.2; // Reduced glow intensity to prevent over-glow
                 }
               });
             }
@@ -746,10 +752,10 @@ export default function ThreeScene({
       // Update model scale for performance
       if (modelRef.current) {
         if (enabled) {
-          modelRef.current.scale.set(200, 200, 3.7); // Reduced scale for better performance
+          modelRef.current.scale.set(2.0, 2.0, 2.0); // Medium scale for performance mode
         } else {
-          // Non-performance mode: restore original height
-          modelRef.current.scale.set(250, 250, 4.6); // Y scale restored to original height
+          // Non-performance mode: balanced scale for container fit
+          modelRef.current.scale.set(3.0, 3.0, 3.0); // Balanced scale to fit container properly
         }
       }
 

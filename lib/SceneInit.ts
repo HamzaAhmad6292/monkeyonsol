@@ -14,7 +14,7 @@ export default class SceneInit {
   private outlinePass: OutlinePass | undefined;
   private postProcessingEnabled: boolean = false;
 
-  private fov: number = 75;
+  private fov: number = 60; // Reduced FOV for better framing of smaller model
   private nearPlane: number = 1;
   private farPlane: number = 2000;
   private canvasId: string;
@@ -62,7 +62,7 @@ export default class SceneInit {
       this.nearPlane,
       this.farPlane
     );
-    this.camera.position.set(0, 200, 600);
+    this.camera.position.set(0, 100, 300); // Closer position for better framing of tiny model
 
     const canvas = document.getElementById(this.canvasId) as HTMLCanvasElement;
     if (!canvas) throw new Error(`Canvas with id "${this.canvasId}" not found`);
@@ -118,84 +118,61 @@ export default class SceneInit {
   private setupThreePointLighting(): void {
     if (!this.scene) return;
 
-    // 1. KEY LIGHT (Primary Light)
-    // Positioned in front-right of subject, elevated at 45 degrees
-    // This is the main light that defines the primary shadows and highlights
-    this.keyLight = new THREE.DirectionalLight(0xffffff, 2.0);  // Much brighter!
-    this.keyLight.position.set(300, 400, 500);  // Front-right, elevated, closer to camera
-    this.keyLight.target.position.set(0, -200, -350);  // Target the model position
+    // 1. MOTIVATED LIGHT (Fill Light)
+    // Positioned in front of the model for very subtle face illumination
+    this.fillLight = new THREE.DirectionalLight(0xf8f8ff, 0.8);  // Much lower intensity - very subtle fill
+    this.fillLight.position.set(0, 100, 300);  // Front, elevated
+    this.fillLight.target.position.set(0, -250, 0);  // Target the model position
 
-    // Enable shadows for key light
-    this.keyLight.castShadow = true;
-    this.keyLight.shadow.mapSize.width = 2048;
-    this.keyLight.shadow.mapSize.height = 2048;
-    this.keyLight.shadow.camera.near = 0.5;
-    this.keyLight.shadow.camera.far = 1500;
-    this.keyLight.shadow.camera.left = -500;
-    this.keyLight.shadow.camera.right = 500;
-    this.keyLight.shadow.camera.top = 500;
-    this.keyLight.shadow.camera.bottom = -500;
-    this.keyLight.shadow.bias = -0.0001;
-
-    this.scene.add(this.keyLight);
-    this.scene.add(this.keyLight.target);
-
-    // 2. FILL LIGHT (Secondary Light)
-    // Positioned in front-left of subject, lower than key light
-    // Softens harsh shadows created by key light
-    this.fillLight = new THREE.DirectionalLight(0xe6f3ff, 3.5);  // Much brighter!
-    this.fillLight.position.set(-250, 250, 400);  // Front-left, lower elevation
-    this.fillLight.target.position.set(0, -200, -350);  // Target the model position
-
-    // Fill light typically doesn't cast shadows to avoid double shadows
+    // Motivated light doesn't cast shadows - it's just for very subtle fill
     this.fillLight.castShadow = false;
 
     this.scene.add(this.fillLight);
     this.scene.add(this.fillLight.target);
 
-    // 3. BACK LIGHT / RIM LIGHT (Hair Light)
-    // Positioned behind and above the subject to create edge lighting
-    // Separates subject from background and adds depth
-    this.backLight = new THREE.DirectionalLight(0xf0f8ff, 2.5);  // Brighter for rim effect
-    this.backLight.position.set(0, 300, -600);  // Directly behind, elevated
-    this.backLight.target.position.set(0, -200, -350);  // Target the model position
+    // 2. BACKLIGHT (Rim Light)
+    // Positioned behind the model to create separation from background
+    this.backLight = new THREE.DirectionalLight(0xf0f8ff, 2.8);  // Moderate rim effect
+    this.backLight.position.set(0, 200, -400);  // Behind, elevated
+    this.backLight.target.position.set(0, -250, 0);  // Target the model position
 
-    // Back light can cast subtle shadows for rim effect
-    this.backLight.castShadow = false; // Usually disabled to avoid conflicting shadows
+    // Backlight doesn't cast shadows to avoid conflicts
+    this.backLight.castShadow = false;
 
     this.scene.add(this.backLight);
     this.scene.add(this.backLight.target);
 
-    // AMBIENT LIGHT (Base Illumination)
+    // 3. KEY LIGHT (Main Light)
+    // Positioned on the right side - this should be the primary light source
+    this.keyLight = new THREE.DirectionalLight(0xfff8f0, 3.2);  // Main light source - reduced intensity
+    this.keyLight.position.set(500, 200, 0);  // Right side, at distance, elevated
+    this.keyLight.target.position.set(0, -250, 0);  // Target the model position
+
+    // Key light casts shadows as the main light source
+    this.keyLight.castShadow = true;
+    this.keyLight.shadow.mapSize.width = 1024;
+    this.keyLight.shadow.mapSize.height = 1024;
+    this.keyLight.shadow.camera.near = 0.5;
+    this.keyLight.shadow.camera.far = 1000;
+    this.keyLight.shadow.camera.left = -300;
+    this.keyLight.shadow.camera.right = 300;
+    this.keyLight.shadow.camera.top = 300;
+    this.keyLight.shadow.camera.bottom = -300;
+    this.keyLight.shadow.bias = -0.0001;
+    this.keyLight.shadow.radius = 4;  // Softer shadows
+
+    this.scene.add(this.keyLight);
+    this.scene.add(this.keyLight.target);
+
+    // AMBIENT LIGHT (Base Illumination with subtle glow)
     // Provides overall base lighting to prevent completely black shadows
-    // Much brighter to ensure visibility
-    this.ambientLight = new THREE.AmbientLight(0xf5f5f5, 2.0);  // Much brighter!
+    this.ambientLight = new THREE.AmbientLight(0xf8f8ff, 1.5);  // Reduced for more balanced lighting
     this.scene.add(this.ambientLight);
 
-    // HEMISPHERE LIGHT (Environmental Lighting)
+    // HEMISPHERE LIGHT (Environmental Lighting with glow)
     // Simulates natural sky/ground lighting for more realistic results
-    this.hemiLight = new THREE.HemisphereLight(0x87ceeb, 0x8b7355, 4.0);  // Much brighter!
+    this.hemiLight = new THREE.HemisphereLight(0x87ceeb, 0x8b7355, 1.2);  // Reduced for more balanced lighting
     this.scene.add(this.hemiLight);
-
-    // ADDITIONAL FRONT LIGHTS for better visibility
-    // Add extra front-facing lights to ensure the model is well-lit
-    // const frontLight1 = new THREE.DirectionalLight(0xffffff, 1.5);
-    // frontLight1.position.set(0, 200, 800);  // Directly in front, elevated
-    // frontLight1.target.position.set(0, -200, -350);
-    // this.scene.add(frontLight1);
-    // this.scene.add(frontLight1.target);
-
-    const frontLight2 = new THREE.DirectionalLight(0xf8f8ff, 0.5);
-    frontLight2.position.set(200, 100, 600);  // Front-right, lower
-    frontLight2.target.position.set(0, -200, -350);
-    this.scene.add(frontLight2);
-    this.scene.add(frontLight2.target);
-
-    const frontLight3 = new THREE.DirectionalLight(0xf8f8ff, 2.5);
-    frontLight3.position.set(-200, 100, 600);  // Front-left, lower
-    frontLight3.target.position.set(0, -200, -350);
-    this.scene.add(frontLight3);
-    this.scene.add(frontLight3.target);
 
     // Optional: Add light helpers for debugging (remove in production)
     // if (process.env.NODE_ENV === 'development') {
