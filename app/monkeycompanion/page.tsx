@@ -47,7 +47,6 @@ export default function MonkeyCompanionPage() {
   const [inputMessage, setInputMessage] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const [isChatHidden, setIsChatHidden] = useState(true)
-  const [performanceMode, setPerformanceMode] = useState(false)
   const { toast } = useToast()
 
   // Voice recording state
@@ -70,15 +69,8 @@ export default function MonkeyCompanionPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages, isTyping])
 
-  // Set initial avatar state to idle2 when component mounts
-  useEffect(() => {
-    // Small delay to ensure 3D scene is ready
-    const timer = setTimeout(() => {
-      setAvatarState('idle2')
-    }, 1000)
-    
-    return () => clearTimeout(timer)
-  }, [])
+  // Model will automatically start in A1 (Idle) state after loading
+  // No need for additional state trigger
 
 
 
@@ -160,8 +152,8 @@ export default function MonkeyCompanionPage() {
         }
 
         if (blob.size > 0) {
-          // Stay in idle1 while transcribing
-          setAvatarState('idle1')
+          // Go to idle state while transcribing (A1)
+          setAvatarState('idle2')
           await transcribeAudio(blob)
         } else {
           // If no audio recorded, go back to idle2
@@ -173,10 +165,10 @@ export default function MonkeyCompanionPage() {
       recorder.start()
       setIsRecording(true)
 
-      // Trigger Idle_1 animation when recording starts
+      // Trigger A2 combo (Listening) when recording starts
       // Add a small delay to ensure the 3D scene is ready
       setTimeout(() => {
-        setAvatarState('idle1');
+        setAvatarState('idle1'); // This will trigger A2 combo (Listening)
       }, 100);
     } catch (err) {
       setHasTranscriptionError('Microphone access denied or unavailable')
@@ -203,8 +195,8 @@ export default function MonkeyCompanionPage() {
     } catch (error) {
       console.error('Error stopping recording:', error)
 
-      // Ensure we always return to idle1 even on error
-      setAvatarState('idle1')
+      // Ensure we always return to idle2 even on error
+      setAvatarState('idle2')
       setIsRecording(false)
 
       // Cleanup on error
@@ -359,29 +351,8 @@ export default function MonkeyCompanionPage() {
                   </div>
                 </div>
 
-                {/* Performance Mode and Hide/Show Chat Toggle */}
+                {/* Hide/Show Chat Toggle */}
                 <div className="ml-auto flex items-center gap-3 mt-2 sm:mt-0 w-full sm:w-auto justify-end">
-                  <div className="flex items-center gap-2">
-                    <label
-                      htmlFor="performance-toggle"
-                      className="text-xs md:text-sm tracking-wider font-body text-gray-300"
-                    >
-                      Performance
-                    </label>
-                    <Switch
-                      id="performance-toggle"
-                      checked={performanceMode}
-                      onCheckedChange={(enabled) => {
-                        setPerformanceMode(enabled);
-                        // Dispatch event to ThreeScene to enable/disable performance mode
-                        // Performance mode: smaller model, disabled outlines, optimized rendering
-                        // Non-performance mode: larger model, enhanced outlines, better materials, antialiasing
-                        window.dispatchEvent(new CustomEvent('avatar:performance', { detail: { enabled } }));
-                      }}
-                      aria-label="Performance mode toggle"
-                      className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-orange-500 data-[state=checked]:to-yellow-500"
-                    />
-                  </div>
                   <div className="flex items-center gap-2">
                     <label
                       htmlFor="hide-chat-toggle"

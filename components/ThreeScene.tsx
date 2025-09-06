@@ -4,6 +4,7 @@ import { useRef, useEffect, useState } from "react";
 import * as THREE from "three";
 import { GLTFLoader, type GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 import SceneInit from "@/lib/SceneInit";
+import { count } from "console";
 
 interface ThreeSceneProps {
   canvasId?: string;
@@ -11,20 +12,20 @@ interface ThreeSceneProps {
   className?: string;
 }
 
-const WALKING_PATH = "/assets/final_fat.glb";
+const WALKING_PATH = "/assets/main.glb";
 // Animation mapping for buttons and triggering
-const animationButtonMap: { key: string; label: string }[] = [
-  { key: "Idle_1", label: "Idle 1" },
-  { key: "Idle_2", label: "Idle 2" },
-  { key: "Talking", label: "Talking" },
-];
+// const animationButtonMap: { key: string; label: string }[] = [
+//   { key: "Idle_1", label: "Idle 1" },
+//   { key: "Idle_2", label: "Idle 2" },
+//   { key: "Talking", label: "Talking" },
+// ];
 
-// Helper: map animation names to display labels
-const animationDisplayLabels: Record<string, string> = {
-  Idle_1: "Idle 1",
-  Idle_2: "Idle 2",
-  Talking: "Talking",
-};
+// // Helper: map animation names to display labels
+// const animationDisplayLabels: Record<string, string> = {
+//   Idle_1: "Idle 1",
+//   Idle_2: "Idle 2",
+//   Talking: "Talking",
+// };
 
 export default function ThreeScene({
   canvasId = "myThreeJsCanvas",
@@ -50,6 +51,7 @@ export default function ThreeScene({
   const [meshOutlineEnabled, setMeshOutlineEnabled] = useState(true);
   const [performanceMode, setPerformanceMode] = useState(false);
   const [fps, setFps] = useState(0);
+  const [modelVisible, setModelVisible] = useState(false);
 
   // Names of meshes that should keep PBR materials (skip toon replace)
   const PBR_KEEP_NAMES = [
@@ -111,32 +113,36 @@ export default function ThreeScene({
 
     const grad = gradientTextureRef.current || createBandedGradientTexture(7);
     const toon = new THREE.MeshToonMaterial();
-    
+
     // Light, natural skin tone properties
     toon.color = src.color.clone();
     toon.color.multiplyScalar(0.95); // Reduced brightness for lighter skin tones
-    
+
     if (src.map) toon.map = src.map;
     if (src.normalMap) toon.normalMap = src.normalMap;
-    
+
     // Enhanced toon properties for crisp edges
     toon.gradientMap = grad;
     toon.transparent = src.transparent;
     toon.opacity = src.opacity;
     toon.alphaTest = src.alphaTest;
-    
+
     // Minimal lighting properties for natural skin tones
     toon.emissive = src.emissive ? src.emissive.clone().multiplyScalar(0.05) : new THREE.Color(0x000000);
     toon.emissiveIntensity = 0.04; // Minimal for natural skin appearance
-    
+
     // Enhanced edge properties
     toon.wireframe = false; // Ensure wireframe is off
+
     
     // Support for skinning and morph targets
-    (toon as any).skinning = (src as any).skinning;
-    (toon as any).morphTargets = (src as any).morphTargets;
-    (toon as any).morphNormals = (src as any).morphNormals;
     
+    (toon as any).skinning = (src as any).skinning;
+    
+    (toon as any).morphTargets = (src as any).morphTargets;
+    
+    (toon as any).morphNormals = (src as any).morphNormals;
+
     toonMaterialsCacheRef.current.set(cacheKey, toon);
     return toon;
   };
@@ -154,8 +160,8 @@ export default function ThreeScene({
       const materials = Array.isArray(materialOrArray)
         ? materialOrArray
         : materialOrArray
-        ? [materialOrArray]
-        : [];
+          ? [materialOrArray]
+          : [];
 
       materials.forEach((mat) => {
         const std = mat as unknown as THREE.MeshStandardMaterial;
@@ -165,7 +171,7 @@ export default function ThreeScene({
             1.8, // Increased from 1.5 for better anime visibility
             (std.envMapIntensity ?? 1.0) * 1.4
           );
-          
+
           // Enhanced color saturation for anime style
           if (std.color) {
             const hsl = { h: 0, s: 0, l: 0 };
@@ -174,7 +180,7 @@ export default function ThreeScene({
             hsl.l = Math.min(0.95, hsl.l * 1.1); // Increase lightness more
             std.color.setHSL(hsl.h, hsl.s, hsl.l);
           }
-          
+
           if (typeof std.roughness === "number")
             std.roughness = Math.max(
               0.1, // Reduced from 0.15 for shinier anime look
@@ -201,7 +207,7 @@ export default function ThreeScene({
     outlineType: 'primary' | 'secondary' | 'tertiary' = 'primary'
   ): THREE.MeshToonMaterial => {
     const mat = new THREE.MeshToonMaterial();
-    
+
     // Bright outline material properties for better visibility
     switch (outlineType) {
       case 'primary':
@@ -217,7 +223,7 @@ export default function ThreeScene({
         mat.opacity = 0.3; // Reduced opacity for better light penetration
         break;
     }
-    
+
     mat.transparent = true;
     mat.side = THREE.BackSide; // Render on back side for outline effect
     mat.depthWrite = false; // Prevent z-fighting
@@ -236,7 +242,7 @@ export default function ThreeScene({
         width = outlineWidth * 1.8; // Reduced multiplier for stability
         break;
     }
-    
+
     mat.onBeforeCompile = (shader: any) => {
       shader.vertexShader = shader.vertexShader.replace(
         `#include <project_vertex>`,
@@ -372,6 +378,100 @@ export default function ThreeScene({
     setMeshOutlineEnabled(enabled);
   };
 
+  // const playMultiple = (names: string[]) => {
+  //   names.forEach((name) => {
+  //     const action = actionsRef.current[name];
+  //     if (action) {
+  //       action.reset().play();
+  //       console.log(`[ThreeScene] Animation triggered: ${name}`);
+  //     }
+  //   });
+  //   setCurrentName(names.join(", "));
+  // };
+
+  const playMultiple = (names: string[]) => {
+    const fadeDuration = 0.8; // Reduced fade duration for smoother transitions
+
+    // Keep track of all actions
+    const allActions = Object.values(actionsRef.current);
+
+    // Find currently playing actions
+    const currentlyPlaying = allActions.filter((a) => a.isRunning());
+
+    // Stop/blend out currently playing ones with smooth transition
+    currentlyPlaying.forEach((action) => {
+      action.fadeOut(fadeDuration);
+    });
+
+    // Play new ones with fade-in after a brief delay to prevent T-pose
+    setTimeout(() => {
+      names.forEach((name) => {
+        const action = actionsRef.current[name];
+        if (action) {
+          // Don't reset to prevent T-pose, just ensure it's ready
+          action.enabled = true;
+          action.fadeIn(fadeDuration);
+          action.play();
+          console.log(`[ThreeScene] Animation triggered: ${name}`);
+        } else {
+          console.warn(`[ThreeScene] Animation not found: ${name}`);
+        }
+      });
+    }, 100); // Small delay to ensure smooth transition
+
+    setCurrentName(names.join(", "));
+  };
+
+
+  const playTalkingAndBlink = () => {
+    const names = available.slice(-2); // last two animations (2nd last = Talking, last = Blink)
+    if (names.length >= 2) {
+      playMultiple(names);
+    } else {
+      console.warn("Not enough animations available to play Talking + Blink.");
+    }
+  };
+
+  // Animation combo mapping:
+  // A1: Idle state (idle2)
+  // A2: Listening state (idle1) 
+  // A3: Speaking state (talking)
+  const combos = {
+    A1: ["Armature.001|mixamo.com|Layer0", "Blink"], // Idle
+    A2: ["Armature.002|mixamo.com|Layer0", "Blink"], // Listening
+    A3: ["talking", "Blink"], // Speaking
+  };
+
+  // const playCombo = (comboName: keyof typeof combos) => {
+  //   playMultiple(combos[comboName]);
+  // };
+  const playCombo = (comboName: keyof typeof combos) => {
+    const fadeDuration = 0.5; // Shorter fade for smoother transitions
+    
+    // Get all current actions
+    const allActions = Object.values(actionsRef.current);
+    
+    // Find currently playing actions
+    const currentlyPlaying = allActions.filter((a) => a.isRunning());
+
+
+    // Stop/blend out currently playing ones with smooth transition
+    
+    currentlyPlaying.forEach((action) => {
+      action.fadeOut(fadeDuration);
+    });
+    
+    // Small delay to prevent T-pose, then play the combo
+    setTimeout(() => {
+      playMultiple(combos[comboName]);
+    }, 50); // Small delay to ensure smooth transition
+  };
+
+
+
+
+
+
   const play = (name: string) => {
     const next = actionsRef.current[name];
     if (!next) return;
@@ -386,12 +486,10 @@ export default function ThreeScene({
     setCurrentName(name);
 
     // Log animation trigger
-    console.log(
-      "[ThreeScene] Animation triggered:",
-      `name="${name}"`,
-      `display="${animationButtonMap.find((anim) => anim.key === name)?.label || name}"`
-    );
+    console.log('[ThreeScene] Animation triggered:', `name="${name}"`);
+
   };
+  // console.log(available);
 
   // Helper function to find animation by state
   const findAnimationByState = (
@@ -459,29 +557,24 @@ export default function ThreeScene({
     return null;
   };
 
-  // Set avatar state function
+  // Set avatar state function using combo triggers
   const setAvatarState = (state: "idle1" | "idle2" | "talking") => {
-    const anim = findAnimationByState(state);
-    if (anim && actionsRef.current[anim]) {
-      const action = actionsRef.current[anim];
-
-      if (state === "idle2") {
-        action.setLoop(THREE.LoopRepeat, Infinity);
-      } else if (state === "idle1") {
-        action.setLoop(THREE.LoopRepeat, Infinity);
-      } else if (state === "talking") {
-        action.setLoop(THREE.LoopRepeat, Infinity);
-      }
-
-      play(anim);
+    // Map states to combo triggers
+    let comboKey: keyof typeof combos;
+    
+    if (state === "idle1") {
+      comboKey = "A2"; // Listening
+    } else if (state === "idle2") {
+      comboKey = "A1"; // Idle
+    } else if (state === "talking") {
+      comboKey = "A3"; // Speaking
     } else {
-      console.warn(
-        "[ThreeScene] Animation for state",
-        state,
-        "not found! Available:",
-        Object.keys(actionsRef.current)
-      );
+      console.warn("[ThreeScene] Unknown state:", state);
+      return;
     }
+
+    // Use playCombo to prevent T-pose and ensure smooth transitions
+    playCombo(comboKey);
   };
 
   useEffect(() => {
@@ -508,19 +601,19 @@ export default function ThreeScene({
           baseModel = group;
           modelRef.current = group;
 
-          // Transform (your values kept)
+          // Transform - balanced scale for test.glb model
           group.rotation.y = 0;
-          group.position.set(0, -950, -350);
-          
-          // Optimize scale for performance mode
+          group.position.set(0, -180, 0); // Slightly higher than before
+
+          // Balanced scale - bigger than before but still fits container
           if (performanceMode) {
-            group.scale.set(200, 200, 3.7); // Reduced scale for better performance
+            group.scale.set(2.0, 2.0, 2.0); // Medium scale for performance mode
           } else {
-            // Non-performance mode: restore original height
-            group.scale.set(250, 250, 4.6); // Y scale restored to original height
+            // High quality mode: balanced scale to fit container
+            group.scale.set(11.0, 11.0, 11.0); // Balanced scale to fit container properly
           }
-          
-          group.visible = true;
+
+          group.visible = false; // Hide initially until animation is ready
 
           // Materials adjustments (kept) + replace with toon where applicable
           group.traverse((child: THREE.Object3D) => {
@@ -534,37 +627,43 @@ export default function ThreeScene({
               const materials = Array.isArray(materialOrArray)
                 ? materialOrArray
                 : materialOrArray
-                ? [materialOrArray]
-                : [];
+                  ? [materialOrArray]
+                  : [];
 
               materials.forEach((mat) => {
                 const std = mat as unknown as THREE.MeshStandardMaterial;
                 if (std && (std as any).isMeshStandardMaterial) {
-                  // Light, natural skin tone material properties
+                  // Anime-style material properties - completely non-metallic with subtle glow
                   std.envMapIntensity = Math.min(
-                    1.2, // Reduced for lighter skin appearance
-                    (std.envMapIntensity ?? 1.0) * 0.95
+                    0.1, // Almost no environment reflection for non-metallic look
+                    (std.envMapIntensity ?? 1.0) * 0.1
                   );
-                  
-                  // Enhanced color properties for lighter skin tones
+
+                  // Enhanced color properties for anime look with subtle glow
                   if (std.color) {
                     const hsl = { h: 0, s: 0, l: 0 };
                     std.color.getHSL(hsl);
-                    hsl.s = Math.min(1.0, hsl.s * 0.9); // Reduced saturation for lighter skin
-                    hsl.l = Math.min(0.95, hsl.l * 1.15); // Increased lightness for whiter skin
+                    hsl.s = Math.min(1.0, hsl.s * 0.7); // Further reduced saturation
+                    hsl.l = Math.min(0.95, hsl.l * 1.2); // Increased lightness for subtle glow
                     std.color.setHSL(hsl.h, hsl.s, hsl.l);
                   }
-                  
+
                   if (typeof std.roughness === "number")
                     std.roughness = Math.max(
-                      0.12, // Reduced from 0.15 for shinier anime look
-                      Math.min(0.85, std.roughness * 0.85)
+                      0.8, // Very high roughness for completely matte look
+                      Math.min(0.98, std.roughness * 1.4)
                     );
                   if (typeof std.metalness === "number")
                     std.metalness = Math.min(
-                      0.75, // Increased from 0.7 for better anime shine
-                      (std.metalness ?? 0.0) + 0.15
+                      0.01, // Almost zero metalness for completely non-metallic look
+                      (std.metalness ?? 0.0) * 0.01
                     );
+
+                  // Add subtle glow effect
+                  if (std.emissive) {
+                    std.emissive.setHSL(0, 0, 0.03); // Reduced white glow
+                  }
+                  std.emissiveIntensity = 0.2; // Reduced glow intensity to prevent over-glow
                 }
               });
             }
@@ -578,7 +677,7 @@ export default function ThreeScene({
             // Use post-processing outline for better stability during animation
             sceneInitRef.current?.enableScreenSpaceOutline(true, [group]);
             setScreenOutlineEnabled(true);
-            
+
             // Also add mesh outlines as backup for better coverage
             addInvertedHullOutlines(group);
           }
@@ -617,9 +716,9 @@ export default function ThreeScene({
             actionsRef.current[name] = action;
             names.push(name);
 
-            console.log(
-              `[ThreeScene] Loaded animation: ${name} (from clip: ${clip.name})`
-            );
+            // console.log(
+            //   `[ThreeScene] Loaded animation: ${name} (from clip: ${clip.name})`
+            // );
           });
 
           setAvailable(names);
@@ -628,17 +727,15 @@ export default function ThreeScene({
 
           console.log("[ThreeScene] Available animation names:", names);
 
+          // Start in A1 (Idle) state immediately after model is loaded
           if (names.length > 0) {
+            playCombo("A1"); // Start in idle state immediately
+            
+            // Show model after animation is loaded (0.5 second delay)
             setTimeout(() => {
-              const defaultAnim = findAnimationByState("idle2") || names[0];
-              if (defaultAnim) {
-                const action = actionsRef.current[defaultAnim];
-                if (action) {
-                  action.setLoop(THREE.LoopRepeat, Infinity);
-                  play(defaultAnim);
-                }
-              }
-            }, 300);
+              group.visible = true;
+              setModelVisible(true);
+            }, 500);
           }
 
           // Set up event listener after model is loaded
@@ -653,11 +750,11 @@ export default function ThreeScene({
           const outlinesEnabled = !shouldDisableOutlines();
           setMeshOutlineEnabled(outlinesEnabled);
           toggleMeshOutlines(outlinesEnabled);
-          
+
           // Enable screen space outline by default for better stability
           setScreenOutlineEnabled(true);
           sceneInitRef.current?.enableScreenSpaceOutline(true, [group]);
-          
+
           if (outlinesEnabled) {
             sceneInitRef.current?.setOutlineSelectedObjects([group]);
           }
@@ -742,17 +839,17 @@ export default function ThreeScene({
       const detail = (e as any).detail || {};
       const enabled = detail.enabled;
       setPerformanceMode(enabled);
-      
+
       // Update model scale for performance
       if (modelRef.current) {
         if (enabled) {
-          modelRef.current.scale.set(200, 200, 3.7); // Reduced scale for better performance
+          modelRef.current.scale.set(2.0, 2.0, 2.0); // Medium scale for performance mode
         } else {
-          // Non-performance mode: restore original height
-          modelRef.current.scale.set(250, 250, 4.6); // Y scale restored to original height
+          // Non-performance mode: balanced scale for container fit
+          modelRef.current.scale.set(3.0, 3.0, 3.0); // Balanced scale to fit container properly
         }
       }
-      
+
       // Toggle outlines based on performance mode
       if (enabled) {
         // Performance mode: disable outlines
@@ -783,13 +880,13 @@ export default function ThreeScene({
             "avatar:state",
             windowEventHandlerRef.current as EventListener
           );
-        } catch {}
+        } catch { }
       }
       try {
         window.removeEventListener("avatar:outline", handleOutlineToggle as EventListener);
         window.removeEventListener("avatar:postprocessing", handlePostprocessingToggle as EventListener);
         window.removeEventListener("avatar:performance", handlePerformanceToggle as EventListener);
-      } catch {}
+      } catch { }
 
       // Dispose gradient texture
       if (gradientTextureRef.current) {
@@ -862,6 +959,59 @@ export default function ThreeScene({
         }}
       />
       <canvas id={canvasId} className="relative z-10" />
+
+      {/* Animation Buttons */}
+      {!loading && available.length > 0 && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 flex-wrap justify-center z-20 max-w-[90%]">
+          {/* {available.map((anim) => (
+            <button
+              key={anim}
+              onClick={() => play(anim)}
+              className={`px-3 py-1 rounded-lg text-sm font-medium transition ${currentName === anim
+                ? "bg-orange-500 text-white"
+                : "bg-white/20 text-white hover:bg-white/30"
+                }`}
+            >
+              {anim}
+            </button>
+          ))} */}
+          {/* <button
+            onClick={() => playMultiple(["Blink", "Talking"])}
+            className="px-4 py-2 m-2 rounded bg-purple-600 text-white"
+          >
+            SKIBIDI
+          </button> */}
+
+
+
+          {/* <button
+            onClick={() => playMultiple(combos.A1)}
+            className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+          >
+            1
+          </button>
+
+          <button
+            onClick={() => playMultiple(combos.A2)}
+            className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+          >
+            2
+          </button>
+
+          <button
+            onClick={() => playMultiple(combos.A3)}
+            className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+          >
+            3
+          </button> */}
+
+
+
+
+
+        </div>
+      )}
+
 
       {/* FPS Display */}
       {!loading && (
