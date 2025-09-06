@@ -51,6 +51,7 @@ export default function ThreeScene({
   const [meshOutlineEnabled, setMeshOutlineEnabled] = useState(true);
   const [performanceMode, setPerformanceMode] = useState(false);
   const [fps, setFps] = useState(0);
+  const [modelVisible, setModelVisible] = useState(false);
 
   // Names of meshes that should keep PBR materials (skip toon replace)
   const PBR_KEEP_NAMES = [
@@ -452,8 +453,10 @@ export default function ThreeScene({
     
     // Find currently playing actions
     const currentlyPlaying = allActions.filter((a) => a.isRunning());
-    
+
+
     // Stop/blend out currently playing ones with smooth transition
+    
     currentlyPlaying.forEach((action) => {
       action.fadeOut(fadeDuration);
     });
@@ -610,7 +613,7 @@ export default function ThreeScene({
             group.scale.set(11.0, 11.0, 11.0); // Balanced scale to fit container properly
           }
 
-          group.visible = true;
+          group.visible = false; // Hide initially until animation is ready
 
           // Materials adjustments (kept) + replace with toon where applicable
           group.traverse((child: THREE.Object3D) => {
@@ -724,10 +727,15 @@ export default function ThreeScene({
 
           console.log("[ThreeScene] Available animation names:", names);
 
+          // Start in A1 (Idle) state immediately after model is loaded
           if (names.length > 0) {
+            playCombo("A1"); // Start in idle state immediately
+            
+            // Show model after animation is loaded (0.5 second delay)
             setTimeout(() => {
-              playCombo("A1"); // Trigger A1 combo on load
-            }, 300);
+              group.visible = true;
+              setModelVisible(true);
+            }, 500);
           }
 
           // Set up event listener after model is loaded
