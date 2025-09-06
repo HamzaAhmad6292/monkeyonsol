@@ -133,9 +133,13 @@ export default function ThreeScene({
     // Enhanced edge properties
     toon.wireframe = false; // Ensure wireframe is off
 
+    
     // Support for skinning and morph targets
+    
     (toon as any).skinning = (src as any).skinning;
+    
     (toon as any).morphTargets = (src as any).morphTargets;
+    
     (toon as any).morphNormals = (src as any).morphNormals;
 
     toonMaterialsCacheRef.current.set(cacheKey, toon);
@@ -385,7 +389,7 @@ export default function ThreeScene({
   // };
 
   const playMultiple = (names: string[]) => {
-    const fadeDuration = 1.5; // seconds to transition
+    const fadeDuration = 0.8; // Reduced fade duration for smoother transitions
 
     // Keep track of all actions
     const allActions = Object.values(actionsRef.current);
@@ -393,24 +397,26 @@ export default function ThreeScene({
     // Find currently playing actions
     const currentlyPlaying = allActions.filter((a) => a.isRunning());
 
-    // Stop/blend out currently playing ones
+    // Stop/blend out currently playing ones with smooth transition
     currentlyPlaying.forEach((action) => {
-      action.crossFadeTo(action, 0, false); // ensure no lingering
       action.fadeOut(fadeDuration);
     });
 
-    // Play new ones with fade-in
-    names.forEach((name) => {
-      const action = actionsRef.current[name];
-      if (action) {
-        action.reset();
-        action.fadeIn(fadeDuration);
-        action.play();
-        console.log(`[ThreeScene] Animation triggered: ${name}`);
-      } else {
-        console.warn(`[ThreeScene] Animation not found: ${name}`);
-      }
-    });
+    // Play new ones with fade-in after a brief delay to prevent T-pose
+    setTimeout(() => {
+      names.forEach((name) => {
+        const action = actionsRef.current[name];
+        if (action) {
+          // Don't reset to prevent T-pose, just ensure it's ready
+          action.enabled = true;
+          action.fadeIn(fadeDuration);
+          action.play();
+          console.log(`[ThreeScene] Animation triggered: ${name}`);
+        } else {
+          console.warn(`[ThreeScene] Animation not found: ${name}`);
+        }
+      });
+    }, 100); // Small delay to ensure smooth transition
 
     setCurrentName(names.join(", "));
   };
@@ -425,22 +431,37 @@ export default function ThreeScene({
     }
   };
 
+  // Animation combo mapping:
+  // A1: Idle state (idle2)
+  // A2: Listening state (idle1) 
+  // A3: Speaking state (talking)
   const combos = {
-    A1: ["Armature.001|mixamo.com|Layer0", "Blink"],
-    A2: ["Armature.002|mixamo.com|Layer0", "Blink"],
-    A3: ["talking", "Blink"],
-    // A4: ["Idle2", "Blink"],
+    A1: ["Armature.001|mixamo.com|Layer0", "Blink"], // Idle
+    A2: ["Armature.002|mixamo.com|Layer0", "Blink"], // Listening
+    A3: ["talking", "Blink"], // Speaking
   };
 
   // const playCombo = (comboName: keyof typeof combos) => {
   //   playMultiple(combos[comboName]);
   // };
   const playCombo = (comboName: keyof typeof combos) => {
-    // stop any currently running combo animations first
-    Object.values(actionsRef.current).forEach((action) => action.stop());
-
-    // then play the combo
-    playMultiple(combos[comboName]);
+    const fadeDuration = 0.5; // Shorter fade for smoother transitions
+    
+    // Get all current actions
+    const allActions = Object.values(actionsRef.current);
+    
+    // Find currently playing actions
+    const currentlyPlaying = allActions.filter((a) => a.isRunning());
+    
+    // Stop/blend out currently playing ones with smooth transition
+    currentlyPlaying.forEach((action) => {
+      action.fadeOut(fadeDuration);
+    });
+    
+    // Small delay to prevent T-pose, then play the combo
+    setTimeout(() => {
+      playMultiple(combos[comboName]);
+    }, 50); // Small delay to ensure smooth transition
   };
 
 
@@ -533,29 +554,24 @@ export default function ThreeScene({
     return null;
   };
 
-  // Set avatar state function
+  // Set avatar state function using combo triggers
   const setAvatarState = (state: "idle1" | "idle2" | "talking") => {
-    const anim = findAnimationByState(state);
-    if (anim && actionsRef.current[anim]) {
-      const action = actionsRef.current[anim];
-
-      if (state === "idle2") {
-        action.setLoop(THREE.LoopRepeat, Infinity);
-      } else if (state === "idle1") {
-        action.setLoop(THREE.LoopRepeat, Infinity);
-      } else if (state === "talking") {
-        action.setLoop(THREE.LoopRepeat, Infinity);
-      }
-
-      play(anim);
+    // Map states to combo triggers
+    let comboKey: keyof typeof combos;
+    
+    if (state === "idle1") {
+      comboKey = "A2"; // Listening
+    } else if (state === "idle2") {
+      comboKey = "A1"; // Idle
+    } else if (state === "talking") {
+      comboKey = "A3"; // Speaking
     } else {
-      console.warn(
-        "[ThreeScene] Animation for state",
-        state,
-        "not found! Available:",
-        Object.keys(actionsRef.current)
-      );
+      console.warn("[ThreeScene] Unknown state:", state);
+      return;
     }
+
+    // Use playCombo to prevent T-pose and ensure smooth transitions
+    playCombo(comboKey);
   };
 
   useEffect(() => {

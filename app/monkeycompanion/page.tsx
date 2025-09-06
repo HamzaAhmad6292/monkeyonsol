@@ -74,7 +74,7 @@ export default function MonkeyCompanionPage() {
   useEffect(() => {
     // Small delay to ensure 3D scene is ready
     const timer = setTimeout(() => {
-      setAvatarState('idle2')
+      setAvatarState('idle2') // This will trigger A1 combo (Idle)
     }, 1000)
     
     return () => clearTimeout(timer)
@@ -173,10 +173,10 @@ export default function MonkeyCompanionPage() {
       recorder.start()
       setIsRecording(true)
 
-      // Trigger Idle_1 animation when recording starts
+      // Trigger A2 combo (Listening) when recording starts
       // Add a small delay to ensure the 3D scene is ready
       setTimeout(() => {
-        setAvatarState('idle1');
+        setAvatarState('idle1'); // This will trigger A2 combo (Listening)
       }, 100);
     } catch (err) {
       setHasTranscriptionError('Microphone access denied or unavailable')
