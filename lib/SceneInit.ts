@@ -120,9 +120,9 @@ export default class SceneInit {
 
     // 1. MOTIVATED LIGHT (Fill Light)
     // Positioned in front of the model for very subtle face illumination
-    this.fillLight = new THREE.DirectionalLight(0xf8f8ff, 0.8);  // Much lower intensity - very subtle fill
-    this.fillLight.position.set(0, 100, 300);  // Front, elevated
-    this.fillLight.target.position.set(0, -250, 0);  // Target the model position
+    this.fillLight = new THREE.DirectionalLight(0xf8f8ff, 2.5);  // Much lower intensity - very subtle fill
+    this.fillLight.position.set(-500, 0, 0);  // Front, elevated
+    this.fillLight.target.position.set(0, 0, 0);  // Target the model position
 
     // Motivated light doesn't cast shadows - it's just for very subtle fill
     this.fillLight.castShadow = false;
@@ -134,7 +134,7 @@ export default class SceneInit {
     // Positioned behind the model to create separation from background
     this.backLight = new THREE.DirectionalLight(0xf0f8ff, 2.8);  // Moderate rim effect
     this.backLight.position.set(0, 200, -400);  // Behind, elevated
-    this.backLight.target.position.set(0, -250, 0);  // Target the model position
+    this.backLight.target.position.set(0, -250, -1000);  // Target the model position
 
     // Backlight doesn't cast shadows to avoid conflicts
     this.backLight.castShadow = false;
@@ -144,9 +144,9 @@ export default class SceneInit {
 
     // 3. KEY LIGHT (Main Light)
     // Positioned on the right side - this should be the primary light source
-    this.keyLight = new THREE.DirectionalLight(0xfff8f0, 3.2);  // Main light source - reduced intensity
-    this.keyLight.position.set(500, 200, 0);  // Right side, at distance, elevated
-    this.keyLight.target.position.set(0, -250, 0);  // Target the model position
+    this.keyLight = new THREE.DirectionalLight(0xfff8f0, 5.0);  // Main light source - reduced intensity
+    this.keyLight.position.set(500, 200, -500);  // Right side, at distance, elevated
+    this.keyLight.target.position.set(-500, -250, 0);  // Target the model position
 
     // Key light casts shadows as the main light source
     this.keyLight.castShadow = true;
@@ -166,15 +166,15 @@ export default class SceneInit {
 
     // AMBIENT LIGHT (Base Illumination with subtle glow)
     // Provides overall base lighting to prevent completely black shadows
-    this.ambientLight = new THREE.AmbientLight(0xf8f8ff, 1.5);  // Reduced for more balanced lighting
+    this.ambientLight = new THREE.AmbientLight(0xf8f8ff, 1.8);  // Reduced for more balanced lighting
     this.scene.add(this.ambientLight);
 
     // HEMISPHERE LIGHT (Environmental Lighting with glow)
     // Simulates natural sky/ground lighting for more realistic results
-    this.hemiLight = new THREE.HemisphereLight(0x87ceeb, 0x8b7355, 1.2);  // Reduced for more balanced lighting
+    this.hemiLight = new THREE.HemisphereLight(0x87ceeb, 0x8b7355, 1.8);  // Reduced for more balanced lighting
     this.scene.add(this.hemiLight);
 
-    // Optional: Add light helpers for debugging (remove in production)
+    // Optional: Add light helpers for debugging(remove in production)
     // if (process.env.NODE_ENV === 'development') {
     //   const keyLightHelper = new THREE.DirectionalLightHelper(this.keyLight, 25);
     //   const fillLightHelper = new THREE.DirectionalLightHelper(this.fillLight, 25);

@@ -4,6 +4,7 @@ import { useRef, useEffect, useState } from "react";
 import * as THREE from "three";
 import { GLTFLoader, type GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 import SceneInit from "@/lib/SceneInit";
+import { count } from "console";
 
 interface ThreeSceneProps {
   canvasId?: string;
@@ -11,20 +12,20 @@ interface ThreeSceneProps {
   className?: string;
 }
 
-const WALKING_PATH = "/assets/test.glb";
+const WALKING_PATH = "/assets/main.glb";
 // Animation mapping for buttons and triggering
-const animationButtonMap: { key: string; label: string }[] = [
-  { key: "Idle_1", label: "Idle 1" },
-  { key: "Idle_2", label: "Idle 2" },
-  { key: "Talking", label: "Talking" },
-];
+// const animationButtonMap: { key: string; label: string }[] = [
+//   { key: "Idle_1", label: "Idle 1" },
+//   { key: "Idle_2", label: "Idle 2" },
+//   { key: "Talking", label: "Talking" },
+// ];
 
-// Helper: map animation names to display labels
-const animationDisplayLabels: Record<string, string> = {
-  Idle_1: "Idle 1",
-  Idle_2: "Idle 2",
-  Talking: "Talking",
-};
+// // Helper: map animation names to display labels
+// const animationDisplayLabels: Record<string, string> = {
+//   Idle_1: "Idle 1",
+//   Idle_2: "Idle 2",
+//   Talking: "Talking",
+// };
 
 export default function ThreeScene({
   canvasId = "myThreeJsCanvas",
@@ -372,6 +373,81 @@ export default function ThreeScene({
     setMeshOutlineEnabled(enabled);
   };
 
+  // const playMultiple = (names: string[]) => {
+  //   names.forEach((name) => {
+  //     const action = actionsRef.current[name];
+  //     if (action) {
+  //       action.reset().play();
+  //       console.log(`[ThreeScene] Animation triggered: ${name}`);
+  //     }
+  //   });
+  //   setCurrentName(names.join(", "));
+  // };
+
+  const playMultiple = (names: string[]) => {
+    const fadeDuration = 1.5; // seconds to transition
+
+    // Keep track of all actions
+    const allActions = Object.values(actionsRef.current);
+
+    // Find currently playing actions
+    const currentlyPlaying = allActions.filter((a) => a.isRunning());
+
+    // Stop/blend out currently playing ones
+    currentlyPlaying.forEach((action) => {
+      action.crossFadeTo(action, 0, false); // ensure no lingering
+      action.fadeOut(fadeDuration);
+    });
+
+    // Play new ones with fade-in
+    names.forEach((name) => {
+      const action = actionsRef.current[name];
+      if (action) {
+        action.reset();
+        action.fadeIn(fadeDuration);
+        action.play();
+        console.log(`[ThreeScene] Animation triggered: ${name}`);
+      } else {
+        console.warn(`[ThreeScene] Animation not found: ${name}`);
+      }
+    });
+
+    setCurrentName(names.join(", "));
+  };
+
+
+  const playTalkingAndBlink = () => {
+    const names = available.slice(-2); // last two animations (2nd last = Talking, last = Blink)
+    if (names.length >= 2) {
+      playMultiple(names);
+    } else {
+      console.warn("Not enough animations available to play Talking + Blink.");
+    }
+  };
+
+  const combos = {
+    A1: ["Armature.001|mixamo.com|Layer0", "Blink"],
+    A2: ["Armature.002|mixamo.com|Layer0", "Blink"],
+    A3: ["talking", "Blink"],
+    // A4: ["Idle2", "Blink"],
+  };
+
+  // const playCombo = (comboName: keyof typeof combos) => {
+  //   playMultiple(combos[comboName]);
+  // };
+  const playCombo = (comboName: keyof typeof combos) => {
+    // stop any currently running combo animations first
+    Object.values(actionsRef.current).forEach((action) => action.stop());
+
+    // then play the combo
+    playMultiple(combos[comboName]);
+  };
+
+
+
+
+
+
   const play = (name: string) => {
     const next = actionsRef.current[name];
     if (!next) return;
@@ -386,12 +462,10 @@ export default function ThreeScene({
     setCurrentName(name);
 
     // Log animation trigger
-    console.log(
-      "[ThreeScene] Animation triggered:",
-      `name="${name}"`,
-      `display="${animationButtonMap.find((anim) => anim.key === name)?.label || name}"`
-    );
+    console.log('[ThreeScene] Animation triggered:', `name="${name}"`);
+
   };
+  // console.log(available);
 
   // Helper function to find animation by state
   const findAnimationByState = (
@@ -510,14 +584,14 @@ export default function ThreeScene({
 
           // Transform - balanced scale for test.glb model
           group.rotation.y = 0;
-          group.position.set(0, -250, 0); // Slightly higher than before
+          group.position.set(0, -180, 0); // Slightly higher than before
 
           // Balanced scale - bigger than before but still fits container
           if (performanceMode) {
             group.scale.set(2.0, 2.0, 2.0); // Medium scale for performance mode
           } else {
             // High quality mode: balanced scale to fit container
-            group.scale.set(3.0, 3.0, 3.0); // Balanced scale to fit container properly
+            group.scale.set(11.0, 11.0, 11.0); // Balanced scale to fit container properly
           }
 
           group.visible = true;
@@ -565,7 +639,7 @@ export default function ThreeScene({
                       0.01, // Almost zero metalness for completely non-metallic look
                       (std.metalness ?? 0.0) * 0.01
                     );
-                  
+
                   // Add subtle glow effect
                   if (std.emissive) {
                     std.emissive.setHSL(0, 0, 0.03); // Reduced white glow
@@ -623,9 +697,9 @@ export default function ThreeScene({
             actionsRef.current[name] = action;
             names.push(name);
 
-            console.log(
-              `[ThreeScene] Loaded animation: ${name} (from clip: ${clip.name})`
-            );
+            // console.log(
+            //   `[ThreeScene] Loaded animation: ${name} (from clip: ${clip.name})`
+            // );
           });
 
           setAvailable(names);
@@ -636,14 +710,7 @@ export default function ThreeScene({
 
           if (names.length > 0) {
             setTimeout(() => {
-              const defaultAnim = findAnimationByState("idle2") || names[0];
-              if (defaultAnim) {
-                const action = actionsRef.current[defaultAnim];
-                if (action) {
-                  action.setLoop(THREE.LoopRepeat, Infinity);
-                  play(defaultAnim);
-                }
-              }
+              playCombo("A1"); // Trigger A1 combo on load
             }, 300);
           }
 
@@ -868,6 +935,59 @@ export default function ThreeScene({
         }}
       />
       <canvas id={canvasId} className="relative z-10" />
+
+      {/* Animation Buttons */}
+      {!loading && available.length > 0 && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 flex-wrap justify-center z-20 max-w-[90%]">
+          {/* {available.map((anim) => (
+            <button
+              key={anim}
+              onClick={() => play(anim)}
+              className={`px-3 py-1 rounded-lg text-sm font-medium transition ${currentName === anim
+                ? "bg-orange-500 text-white"
+                : "bg-white/20 text-white hover:bg-white/30"
+                }`}
+            >
+              {anim}
+            </button>
+          ))} */}
+          {/* <button
+            onClick={() => playMultiple(["Blink", "Talking"])}
+            className="px-4 py-2 m-2 rounded bg-purple-600 text-white"
+          >
+            SKIBIDI
+          </button> */}
+
+
+
+          {/* <button
+            onClick={() => playMultiple(combos.A1)}
+            className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+          >
+            1
+          </button>
+
+          <button
+            onClick={() => playMultiple(combos.A2)}
+            className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+          >
+            2
+          </button>
+
+          <button
+            onClick={() => playMultiple(combos.A3)}
+            className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+          >
+            3
+          </button> */}
+
+
+
+
+
+        </div>
+      )}
+
 
       {/* FPS Display */}
       {!loading && (
