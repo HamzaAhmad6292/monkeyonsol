@@ -111,7 +111,7 @@ export default function MemeTokenGaming() {
             <div className="mb-16 relative px-2 sm:px-4">
               <div className="relative overflow-hidden rounded-3xl border-4 border-orange-400/40 shadow-[0_8px_48px_0_rgba(251,146,60,0.25)]">
                 <img
-                  src="/images/header1.jpg"
+                  src="/images/hero_bg.jpeg"
                   alt="Gallery Loading"
                   className="w-full max-w-5xl mx-auto h-auto object-cover filter brightness-90 contrast-150 saturate-200"
                   style={{
@@ -363,7 +363,7 @@ export default function MemeTokenGaming() {
               <div className="grid grid-cols-1 gap-3 mb-6">
                 <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
                   <div className="text-orange-400 font-black text-xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
-                    640k+
+                     43k+
                   </div>
                   <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Followers</div>
                 </div>
@@ -420,7 +420,7 @@ export default function MemeTokenGaming() {
               <div className="grid grid-cols-1 gap-3 mb-6">
                 <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
                   <div className="text-orange-400 font-black text-xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
-                    49K+
+                    86K+
                   </div>
                   <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Followers</div>
                 </div>
@@ -477,7 +477,7 @@ export default function MemeTokenGaming() {
               <div className="grid grid-cols-1 gap-3 mb-6">
                 <div className="text-center bg-black/40 rounded-xl p-3 border border-orange-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
                   <div className="text-orange-400 font-black text-xl italic group-hover:text-yellow-400 transition-colors duration-300 drop-shadow">
-                    1.2M+
+                    1.4M+
                   </div>
                   <div className="text-orange-200 text-xs uppercase font-bold tracking-wider">Members</div>
                 </div>
@@ -795,7 +795,7 @@ export default function MemeTokenGaming() {
               {
                 icon: XIcon,
                 label: "X Community",
-                href: "https://x.com/MonkeyGoodBoy?t=-QDE1J-1iAEuMrexSIJdDA&s=09",
+                href: "https://x.com/monkey_picasso?s=21",
                 description: "Latest news & discussions",
                 color: "from-gray-600 to-black",
               },
