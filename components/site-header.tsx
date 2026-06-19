@@ -14,7 +14,7 @@ interface NavLink {
 
 const navLinks: NavLink[] = [
   { href: "/game", label: "Art Gallery", isExternal: true },
-  { href: "/monkeycompanion", label: "Companion", isExternal: true },
+  // { href: "/monkeycompanion", label: "Companion", isExternal: true },
   { href: "/editor", label: "Art Tool", isExternal: true },
 ]
 
@@ -44,19 +44,19 @@ export function SiteHeader() {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-black/80 backdrop-blur-md shadow-lg border-b border-orange-400/30" : "bg-transparent"
+        isScrolled ? "bg-black/80 backdrop-blur-md shadow-lg border-b border-emerald-400/30" : "bg-transparent"
       }`}
     >
       <div className="container mx-auto flex h-20 items-center justify-between px-4 lg:px-8">
         {/* Logo/Title */}
         <Link href="/" className="flex items-center gap-2">
           <div
-            className="font-extrabold italic text-transparent uppercase tracking-[0.08em] drop-shadow-[0_8px_40px_rgba(251,146,60,0.8)]"
+            className="font-extrabold italic text-transparent uppercase tracking-[0.08em] drop-shadow-[0_2px_18px_rgba(52,211,153,0.95)]"
             style={{
               fontFamily: "'Bebas Neue', 'Oswald', 'Montserrat', Arial, sans-serif",
               fontSize: "clamp(1.5rem, 4vw, 2.5rem)", // Adjusted for header
               letterSpacing: "0.08em",
-              background: "linear-gradient(90deg, #fde047 0%, #fb923c 50%, #fbbf24 100%)",
+              background: "linear-gradient(90deg, #bbf7d0 0%, #4ade80 45%, #5eead4 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
             }}
@@ -74,7 +74,7 @@ export function SiteHeader() {
                 href={link.href}
                 target="_blank" // Open external links in new tab
                 rel="noopener noreferrer"
-                className="text-lg font-bold text-orange-200 hover:text-yellow-300 transition-colors italic tracking-wide"
+                className="text-lg font-bold text-emerald-200 hover:text-green-300 transition-colors italic tracking-wide"
               >
                 {link.label}
               </Link>
@@ -82,7 +82,7 @@ export function SiteHeader() {
               <button
                 key={link.href}
                 onClick={() => scrollToSection(link.href.substring(1))}
-                className="text-lg font-bold text-orange-200 hover:text-yellow-300 transition-colors italic tracking-wide bg-transparent border-none cursor-pointer"
+                className="text-lg font-bold text-emerald-200 hover:text-green-300 transition-colors italic tracking-wide bg-transparent border-none cursor-pointer"
               >
                 {link.label}
               </button>
@@ -94,12 +94,12 @@ export function SiteHeader() {
         <div className="lg:hidden">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-orange-300 hover:bg-orange-900/50">
+              <Button variant="ghost" size="icon" className="text-emerald-300 hover:bg-emerald-900/50">
                 <Menu className="h-6 w-6" />
                 <span className="sr-only">Toggle navigation menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-64 bg-black/90 border-l border-orange-400/30 p-6">
+            <SheetContent side="right" className="w-64 bg-black/90 border-l border-emerald-400/30 p-6">
               <div className="flex flex-col items-start gap-6 pt-8">
                 {navLinks.map((link) =>
                   link.isExternal ? (
@@ -108,7 +108,7 @@ export function SiteHeader() {
                       href={link.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xl font-bold text-orange-200 hover:text-yellow-300 transition-colors italic tracking-wide w-full py-2"
+                      className="text-xl font-bold text-emerald-200 hover:text-green-300 transition-colors italic tracking-wide w-full py-2"
                     >
                       {link.label}
                     </Link>
@@ -116,7 +116,7 @@ export function SiteHeader() {
                     <SheetClose asChild key={link.href}>
                       <button
                         onClick={() => scrollToSection(link.href.substring(1))}
-                        className="text-xl font-bold text-orange-200 hover:text-yellow-300 transition-colors italic tracking-wide w-full py-2 text-left bg-transparent border-none cursor-pointer"
+                        className="text-xl font-bold text-emerald-200 hover:text-green-300 transition-colors italic tracking-wide w-full py-2 text-left bg-transparent border-none cursor-pointer"
                       >
                         {link.label}
                       </button>

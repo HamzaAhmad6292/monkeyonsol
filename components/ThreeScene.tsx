@@ -968,7 +968,7 @@ export default function ThreeScene({
               key={anim}
               onClick={() => play(anim)}
               className={`px-3 py-1 rounded-lg text-sm font-medium transition ${currentName === anim
-                ? "bg-orange-500 text-white"
+                ? "bg-emerald-500 text-white"
                 : "bg-white/20 text-white hover:bg-white/30"
                 }`}
             >
@@ -1024,9 +1024,9 @@ export default function ThreeScene({
         <div className="absolute inset-0 flex items-center justify-center bg-black/70 z-20">
           <div className="text-center">
             <div className="relative mb-6">
-              <div className="animate-spin rounded-full h-16 w-16 border-4 border-orange-500/30 border-t-orange-500 mx-auto"></div>
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-emerald-500/30 border-t-emerald-500 mx-auto"></div>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-orange-500 text-xs font-bold">
+                <span className="text-emerald-500 text-xs font-bold">
                   {Math.round(loadingProgress)}%
                 </span>
               </div>
@@ -1034,7 +1034,7 @@ export default function ThreeScene({
 
             <div className="w-64 bg-gray-700 rounded-full h-2 mx-auto">
               <div
-                className="bg-gradient-to-r from-orange-500 to-yellow-500 h-2 rounded-full transition-all duration-300"
+                className="bg-gradient-to-r from-emerald-500 to-green-500 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${Math.round(loadingProgress)}%` }}
               />
             </div>
