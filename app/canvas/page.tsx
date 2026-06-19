@@ -1454,13 +1454,13 @@ export default function MonkeyCanvas() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-orange-400/60 text-orange-600 hover:bg-orange-50 bg-transparent"
+                  className="border-emerald-400/60 text-emerald-600 hover:bg-emerald-50 bg-transparent"
                 >
                   <Home className="h-4 w-4 mr-2" />
                   Home
                 </Button>
               </Link>
-              <h1 className="text-2xl lg:text-3xl font-black italic bg-gradient-to-r from-orange-500 via-yellow-500 to-amber-500 bg-clip-text text-transparent">
+              <h1 className="text-2xl lg:text-3xl font-black italic bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 bg-clip-text text-transparent">
                  Monkey Canvas Pro
               </h1>
             </div>
@@ -1482,7 +1482,7 @@ export default function MonkeyCanvas() {
 
               {/* Status Bar */}
               <div className="flex items-center gap-2 text-sm">
-                <span className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full font-medium text-xs">
+                <span className="px-2 py-1 bg-emerald-100 text-emerald-800 rounded-full font-medium text-xs">
                   {tools.find((t) => t.id === tool)?.label}
                 </span>
                 <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full font-medium text-xs">
@@ -1512,7 +1512,7 @@ export default function MonkeyCanvas() {
                       setHoveredElementId(null) // Clear hover state when switching tools
                     }}
                     className={`w-12 h-12 p-0 ${
-                      tool === toolItem.id ? "bg-orange-500 hover:bg-orange-600 text-white" : "hover:bg-gray-100"
+                      tool === toolItem.id ? "bg-emerald-500 hover:bg-emerald-600 text-white" : "hover:bg-gray-100"
                     }`}
                   >
                     <toolItem.icon className="h-5 w-5" />
@@ -1615,7 +1615,7 @@ export default function MonkeyCanvas() {
                   {/* Text Input Overlay */}
                   {isTyping && textPosition && (
                     <div
-                      className="absolute bg-white border-2 border-orange-400 rounded-lg p-2 shadow-lg"
+                      className="absolute bg-white border-2 border-emerald-400 rounded-lg p-2 shadow-lg"
                       style={{
                         left: textPosition.x * zoom + panX,
                         top: textPosition.y * zoom + panY,
@@ -1663,7 +1663,7 @@ export default function MonkeyCanvas() {
           {/* Right Panel */}
           <div className="w-80 bg-white shadow-lg border-l p-4 space-y-4 overflow-y-auto">
             {/* Monkey Character */}
-            <Card className="bg-gradient-to-br from-orange-50 to-yellow-50 border-orange-200">
+            <Card className="bg-gradient-to-br from-emerald-50 to-green-50 border-emerald-200">
               <CardContent className="p-4 text-center">
                 <div
                   className={`text-6xl mb-2 transition-all duration-500 ${
@@ -1697,7 +1697,7 @@ export default function MonkeyCanvas() {
                               : ""}
                 </div>
                 {motivationalText && (
-                  <div className="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold animate-bounce">
+                  <div className="bg-emerald-500 text-white px-3 py-1 rounded-full text-sm font-bold animate-bounce">
                     {motivationalText}
                   </div>
                 )}
@@ -1971,7 +1971,7 @@ export default function MonkeyCanvas() {
                   Reset View
                 </Button>
 
-                <Button size="sm" onClick={saveImage} className="w-full mb-2 bg-green-500 hover:bg-green-600">
+                <Button size="sm" onClick={saveImage} className="w-full mb-2 bg-emerald-500 hover:bg-emerald-600">
                   <Download className="h-4 w-4 mr-1" />
                   Save Image
                 </Button>
@@ -1998,7 +1998,7 @@ export default function MonkeyCanvas() {
                       <div
                         key={element.id}
                         className={`p-2 rounded border text-xs cursor-pointer ${
-                          selectedElements.includes(element.id) ? "bg-orange-100 border-orange-300" : "bg-gray-50"
+                          selectedElements.includes(element.id) ? "bg-emerald-100 border-emerald-300" : "bg-gray-50"
                         }`}
                         onClick={() => {
                           setElements((prev) => prev.map((el) => ({ ...el, selected: el.id === element.id })))

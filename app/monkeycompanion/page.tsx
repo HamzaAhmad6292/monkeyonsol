@@ -338,13 +338,13 @@ export default function MonkeyCompanionPage() {
                     </svg>
                   </Button>
                 </Link>
-                <div className="w-8 h-8 md:w-12 md:h-12 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center shadow-lg">
+                <div className="w-8 h-8 md:w-12 md:h-12 bg-gradient-to-r from-emerald-500 to-green-500 rounded-full flex items-center justify-center shadow-lg">
                   <span className="text-sm md:text-xl">🐕</span>
                 </div>
                 <div>
                   <h3 className="font-bold text.white text-lg md:text-xl tracking-wider" style={{ fontFamily: 'var(--font-heading)' }}>MONKEY AI</h3>
                   <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full animate-pulse ${isTyping ? 'bg-yellow-400' : 'bg-green-400'}`} />
+                    <div className={`w-2 h-2 rounded-full animate-pulse ${isTyping ? 'bg-green-400' : 'bg-emerald-400'}`} />
                     <p className="text-gray-300 text-xs md:text-sm tracking-wider font-body">
                       {isTyping ? 'THINKING...' : 'ONLINE & READY'}
                     </p>
@@ -356,7 +356,7 @@ export default function MonkeyCompanionPage() {
                   <div className="flex items-center gap-2">
                     <label
                       htmlFor="hide-chat-toggle"
-                      className={`text-xs md:text-sm tracking-wider font-body ${isChatHidden ? 'bg-gradient-to-r from-orange-500 to-yellow-500 bg-clip-text text-transparent' : 'text-gray-300'}`}
+                      className={`text-xs md:text-sm tracking-wider font-body ${isChatHidden ? 'bg-gradient-to-r from-emerald-500 to-green-500 bg-clip-text text-transparent' : 'text-gray-300'}`}
                     >
                       Hide Chat
                     </label>
@@ -365,7 +365,7 @@ export default function MonkeyCompanionPage() {
                       checked={isChatHidden}
                       onCheckedChange={setIsChatHidden}
                       aria-label="Hide chat toggle"
-                      className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-orange-500 data-[state=checked]:to-yellow-500"
+                      className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-emerald-500 data-[state=checked]:to-green-500"
                     />
                   </div>
                 </div>
@@ -420,21 +420,21 @@ export default function MonkeyCompanionPage() {
                     >
                       <div
                         className={`max-w-[85%] px-4 py-3 md:px-6 md:py-4 shadow-lg backdrop-blur-sm relative overflow-hidden ${message.isUser
-                          ? "bg-gradient-to-br from-orange-500/10 to-yellow-500/8 text-white"
+                          ? "bg-gradient-to-br from-emerald-500/10 to-green-500/8 text-white"
                           : "bg-gradient-to-br from-gray-800/10 to-gray-900/8 text-gray-100"
                           }`}
                         style={{
                           borderRadius: "24px",
                           border: message.isUser
-                            ? "1px solid rgba(255, 165, 0, 0.2)"
+                            ? "1px solid rgba(34, 197, 94, 0.2)"
                             : "1px solid rgba(255, 255, 255, 0.1)",
                           boxShadow: message.isUser
-                            ? "0 8px 32px rgba(255, 165, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)"
+                            ? "0 8px 32px rgba(34, 197, 94, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)"
                             : "0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)"
                         }}
                       >
                         <div className={`absolute inset-0 bg-gradient-to-br ${message.isUser
-                          ? "from-orange-400/10 via-transparent to-yellow-400/10"
+                          ? "from-emerald-400/10 via-transparent to-green-400/10"
                           : "from-white/5 via-transparent to-white/5"
                           } opacity-50`}></div>
                         <div className="relative z-10">
@@ -498,13 +498,13 @@ export default function MonkeyCompanionPage() {
                     }}
                     aria-label={isRecording ? 'Stop voice recording' : 'Start voice recording'}
                     aria-pressed={isRecording}
-                    className={`relative w-14 h-14 md:w-16 md:h-16 rounded-full shadow-lg flex items-center justify-center transition transform duration-150 focus:outline-none focus:ring-2 focus:ring-orange-300/60 ${isRecording
-                      ? 'bg-gradient-to-br from-orange-500 to-yellow-500 hover:from-orange-400 hover:to-yellow-400 scale-100'
-                      : 'bg-gradient-to-br from-orange-500/20 to-yellow-500/20 hover:from-orange-500/30 hover:to-yellow-500/30 border border-orange-400/40 hover:scale-105 hover:shadow-xl'
+                    className={`relative w-14 h-14 md:w-16 md:h-16 rounded-full shadow-lg flex items-center justify-center transition transform duration-150 focus:outline-none focus:ring-2 focus:ring-emerald-300/60 ${isRecording
+                      ? 'bg-gradient-to-br from-emerald-500 to-green-500 hover:from-emerald-400 hover:to-green-400 scale-100'
+                      : 'bg-gradient-to-br from-emerald-500/20 to-green-500/20 hover:from-emerald-500/30 hover:to-green-500/30 border border-emerald-400/40 hover:scale-105 hover:shadow-xl'
                       }`}
                   >
                     {isRecording && (
-                      <span className="absolute -inset-1 rounded-full border-2 border-orange-300/40 animate-ping" />
+                      <span className="absolute -inset-1 rounded-full border-2 border-emerald-300/40 animate-ping" />
                     )}
                     <div className="relative z-10">
                       {hasTranscriptionError ? (
@@ -526,7 +526,7 @@ export default function MonkeyCompanionPage() {
                     onClick={retryTranscription}
                     aria-label="Retry transcription"
                     size="sm"
-                    className="h-7 px-3 bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-400 hover:to-yellow-400 text-white border-0"
+                    className="h-7 px-3 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-400 hover:to-green-400 text-white border-0"
                     style={{ borderRadius: '12px' }}
                   >
                     Retry
@@ -539,14 +539,14 @@ export default function MonkeyCompanionPage() {
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="MESSAGE MONKEY..."
-                  className={`flex-1 bg-gray-800/60 border border-gray-700/40 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500/50 text-xs md:text-base tracking-wide font-body ${inputPulse ? 'ring-2 ring-yellow-400 animate-pulse' : ''}`}
+                  className={`flex-1 bg-gray-800/60 border border-gray-700/40 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 text-xs md:text-base tracking-wide font-body ${inputPulse ? 'ring-2 ring-green-400 animate-pulse' : ''}`}
                   style={{ borderRadius: "20px" }}
                   disabled={isTyping}
                 />
                 <Button
                   onClick={handleSendMessage}
                   disabled={!inputMessage.trim() || isTyping}
-                  className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-400 hover:to-yellow-500 text-white px-4 md:px-6 shadow-lg disabled:opacity-50 tracking-wider uppercase font-body border-0"
+                  className="bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-400 hover:to-green-500 text-white px-4 md:px-6 shadow-lg disabled:opacity-50 tracking-wider uppercase font-body border-0"
                   style={{ borderRadius: "20px" }}
                 >
                   <Send className="w-3 h-3 md:w-4 md:h-4" />

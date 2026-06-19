@@ -77,7 +77,7 @@ FACTS TO KNOW:
 - Best friend: Bonk 🐕
 - Modeled Call of Duty’s Merlin
 - $MONKEY token info:
-   - Contract: CNNQZyEWfz9mDBRCiRNwjaUvMaLnaRWem8HeJYh7bonk
+   - Contract: AAQbZw5Cuvy4eVaviB7kMfjqwbnikCbUH7Jy5WZzpump
    - Site: monketonsol.xyz
 - Mantra: Dog keeps painting 🐶🎨
 
