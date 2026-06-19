@@ -554,7 +554,8 @@ export default function MemeTokenGaming() {
         </div>
       </section>
 
-      {/* Monkey Paw Agent Section */}
+      {/* Monkey Paw Agent Section - COMMENTED OUT */}
+      {/*
       <section id="monkey-paw-agent" className="relative z-10 py-20 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
@@ -630,6 +631,7 @@ export default function MemeTokenGaming() {
           </div>
         </div>
       </section>
+      */}
       <section id="creativity" className="relative z-10 py-24 px-4 sm:px-6">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 z-0">
